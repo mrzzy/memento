@@ -13,6 +13,8 @@ app = Flask(__name__)
 app.config.from_object(config)
 db = SQLAlchemy(app)
 
+from .models import *
+
 # root route
 @app.route('/')
 def route_root():
@@ -22,3 +24,6 @@ def route_root():
 @app.route('/healthz')
 def healh_check():
     return "OK"
+
+if __name__ == "__main__":
+    db.create_all()

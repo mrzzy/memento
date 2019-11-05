@@ -6,4 +6,4 @@
 
 from .models.iam import *
 from .models.assignment import *
-
+from .models.notification import *

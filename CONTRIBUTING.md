@@ -1,6 +1,18 @@
 # Contributing
 Guidelines to follow when contributing to NP-Portfolio-2.
 
+## Setup
+### Backend
+Setup without docker:
+1. Install module dependencies:
+```
+pip install -r src/backend/requirements.txt
+```
+2. Perform database migrations
+```
+flask db upgrade
+```
+
 ## Branches
 Branches used in the project:
 - develop - main develop branch
@@ -9,7 +21,6 @@ Branches used in the project:
     - should be mostly stable and not break
 - master - current release version
     - should be almost completely stable and not break
-
 > Use feature branches on to work on high risk 'something would break' features.
 
 ## Project Structure

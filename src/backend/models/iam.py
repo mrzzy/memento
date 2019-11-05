@@ -14,8 +14,8 @@ class Organisation(db.Model):
     name = db.Column(db.String(256), unique=True, nullable=False)
     logo_url = db.Column(db.String(2048), nullable=True)
     # relationships 
-    teams = db.relationship("Team", backref="organisation", lazy=True)
-    members = db.relationship("User", backref="organisation", lazy=True)
+    teams = db.relationship("Team", db.backref("organisation"), lazy=True)
+    members = db.relationship("User", db.backref("organisation"), lazy=True)
 
 # defines a team in an organisation  that users can be belng too
 class Team(db.Model):
@@ -25,11 +25,11 @@ class Team(db.Model):
     # relationships 
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"),
                        nullable=False)
-    members = db.relationship("User", backref="team", lazy=True)
+    members = db.relationship("User", db.backref("team"), lazy=True)
 
 # defines a user in the organisation.
 class User(db.Model):
-    # user kinds
+    # user kinds/types
     class Kind(Enum):
         Worker = "worker" # worker
         Supervisor = "worker" # supervisor of worker
@@ -38,10 +38,25 @@ class User(db.Model):
 
     # model fields
     id = db.Column(db.Integer, primary_key=True)
-    kind=db.Column(db.String(64), unique=True, nullable=False)
+    kind = db.Column(db.String(64), nullable=False)
     name = db.Column(db.String(256), unique=True, nullable=False)
     password = db.Column(db.String(512), nullable=False)
     email = db.Column(db.String(512), unique=True, nullable=False)
     # relationships 
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"), nullable=False)
     team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=True)
+
+# defines an assignment of management (supervisors) to workers and teams
+class Management(db.Model):
+    # management kinds/types
+    class Kind(Enum):
+        Worker = "worker" # manage only a single worker
+        Team = "team" # worker
+
+    # model fields
+    id = db.Column(db.Integer, primary_key=True)
+    kind = db.Column(db.String(64), nullable=False)
+    target = db.Column(db.Integer, nullable=False)
+    # relationships
+    manager_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    manager = db.relationship("User", lazy=True)

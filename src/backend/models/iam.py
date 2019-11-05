@@ -4,7 +4,6 @@
 # IAM Models 
 #
 
-from enum import Enum
 from ..app import db
 
 # defines an organisation that users and teams belong to
@@ -30,7 +29,7 @@ class Team(db.Model):
 # defines a user in the organisation.
 class User(db.Model):
     # user kinds/types
-    class Kind(Enum):
+    class Kind:
         Worker = "worker" # worker
         Supervisor = "worker" # supervisor of worker
         Admin = "admin" # root adminstrative user for the organisation
@@ -49,7 +48,7 @@ class User(db.Model):
 # defines an assignment of management (supervisors) to workers and teams
 class Management(db.Model):
     # management kinds/types
-    class Kind(Enum):
+    class Kind:
         Worker = "worker" # manage only a single worker
         Team = "team" # worker
 

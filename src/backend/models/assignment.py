@@ -4,7 +4,6 @@
 # Assignment Models 
 #
 
-from enum import Enum
 from ..app import db
 
 # defines a task to be completed
@@ -33,7 +32,7 @@ class Event(db.Model):
 
 class Assignment(db.Model):
     # assignment item/types
-    class Kind(Enum):
+    class Kind:
         Task = "task"
         Event = "event"
 

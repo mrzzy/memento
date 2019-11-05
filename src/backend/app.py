@@ -6,12 +6,15 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 from . import config
 
+# app core componments
 app = Flask(__name__)
 app.config.from_object(config)
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 from .models import *
 
@@ -24,5 +27,3 @@ def route_root():
 @app.route('/healthz')
 def healh_check():
     return "OK"
-
-db.create_all()

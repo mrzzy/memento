@@ -22,7 +22,7 @@ class TestNotificationModels(TestCase):
                                          channel=self.channel,
                                          title="Its to stop!",
                                          description="Its time to stop",
-                                         firing_time=datetime.now())
+                                         firing_time=datetime.utcnow())
         db.session.add(self.notification)
         db.session.commit()
 

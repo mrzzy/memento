@@ -25,7 +25,7 @@ class Notification(db.Model):
     kind = db.Column(db.String(64), nullable=False)
     title = db.Column(db.String(256), nullable=False)
     description = db.Column(db.String(1024), nullable=True)
-    firing_time = db.Column(db.DateTime, nullable=False)
+    firing_time = db.Column(db.DateTime, nullable=False) # utc timezone
 
     # relationships
     channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=True)

@@ -20,7 +20,7 @@ class TestAssignmentModels(TestCase):
 
         self.task = Task(name="Fishing",
                          description="Time to catch some endanged whales",
-                         deadline=datetime.now(),
+                         deadline=datetime.utcnow(),
                          duration=3600, # 1 hour
                          author=self.supervisor)
         db.session.add(self.task)
@@ -28,7 +28,7 @@ class TestAssignmentModels(TestCase):
 
         self.event = Event(name="Fishing Day",
                            description="Fishy presents for all",
-                           start_time=datetime.now(),
+                           start_time=datetime.utcnow(),
                            duration=8 * 3600, # 8 hours
                            author=self.supervisor)
         db.session.add(self.event)

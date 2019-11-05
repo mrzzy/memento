@@ -5,3 +5,5 @@
 #
 
 from .models.iam import *
+from .models.assignment import *
+

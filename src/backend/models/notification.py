@@ -4,7 +4,6 @@
 # Notification Models 
 #
 
-from enum import Enum
 from ..app import db
 
 # defines a channel where notifications are sent
@@ -17,7 +16,7 @@ class Channel(db.Model):
 
 class Notification(db.Model):
     # notification kinds/types
-    class Kind(Enum):
+    class Kind:
         Task = "task" # task
         Event = "event" # worker
 

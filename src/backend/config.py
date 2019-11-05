@@ -15,8 +15,7 @@ def parse_bool(value):
     elif type(value) == str:
         val_lower = value.lower()
 
-        if val_lower == "true" or val_lower == "t" or val_lower == "1":
-            return True
+        if val_lower == "true" or val_lower == "t" or val_lower == "1": return True
         elif val_lower == "false" or val_lower == "f" or val_lower == "0": return False
         else: return False
 

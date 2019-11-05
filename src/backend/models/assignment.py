@@ -12,7 +12,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), unique=False, nullable=False)
     description = db.Column(db.String(2048), unique=False, nullable=False)
-    deadline = db.Column(db.DateTime, nullable=False)
+    deadline = db.Column(db.DateTime, nullable=False) # utc timezone
     duration = db.Column(db.BigInteger, nullable=False) # seconds
     # relationships
     author_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -24,7 +24,7 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), unique=False, nullable=False)
     description = db.Column(db.String(2048), unique=False, nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False) # utc timezone
     duration = db.Column(db.BigInteger, nullable=False) # seconds
     # relationships
     author_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)

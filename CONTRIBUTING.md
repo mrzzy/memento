@@ -15,9 +15,14 @@ Branches used in the project:
 ## Project Structure
 - `src/` - source code
     - `frontend/` - website fontend
-    - `backend/` - backend server
-        - `notification/` - notification service
-        - `object/` - object service
+    - `backend/` - backend service
+        - `models/` - backend models
+            - `iam/` - identity and user managment 
+            - `notification/` - notification 
+            - `asssignment/` - assignment 
+        - `apis/` - backend api routes
+            - `iam/` - identity and user managment 
+            - `notification/` - notification 
+            - `asssignment/` - assignment 
     - `pi/` - Raspberry PI
-- `containers/` - docker containers. 
-
+- `containers/` - docker containers 

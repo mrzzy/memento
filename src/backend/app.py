@@ -25,5 +25,4 @@ def route_root():
 def healh_check():
     return "OK"
 
-if __name__ == "__main__":
-    db.create_all()
+db.create_all()

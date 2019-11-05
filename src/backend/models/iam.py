@@ -56,7 +56,7 @@ class Management(db.Model):
     # model fields
     id = db.Column(db.Integer, primary_key=True)
     kind = db.Column(db.String(64), nullable=False)
-    target = db.Column(db.Integer, nullable=False)
     # relationships
+    target_id = db.Column(db.Integer, nullable=False)
     manager_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     manager = db.relationship("User", lazy=True)

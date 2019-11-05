@@ -6,3 +6,4 @@
 
 from .iam import *
 from .notification import *
+from .assignment import *

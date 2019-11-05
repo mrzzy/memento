@@ -44,5 +44,6 @@ class Assignment(db.Model):
     item_id = db.Column(db.Integer, nullable=False)
     assignee_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     assignee = db.relationship("User", foreign_keys=[assignee_id], lazy=True)
+
     assigner_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     assignee = db.relationship("User", foreign_keys=[assigner_id], lazy=True)

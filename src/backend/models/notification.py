@@ -12,7 +12,8 @@ class Channel(db.Model):
     # model fields
     id = db.Column(db.String(64), primary_key=True)
     # relationships
-    notifications = db.relationship("Notification", backref="channel", lazy=True)
+    notifications = db.relationship("Notification", backref=db.backref("channel"),
+                                    lazy=True)
 
 class Notification(db.Model):
     # notification kinds/types

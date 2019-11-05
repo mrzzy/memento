@@ -14,8 +14,8 @@ class Organisation(db.Model):
     name = db.Column(db.String(256), unique=True, nullable=False)
     logo_url = db.Column(db.String(2048), nullable=True)
     # relationships 
-    teams = db.relationship("Team", db.backref("organisation"), lazy=True)
-    members = db.relationship("User", db.backref("organisation"), lazy=True)
+    teams = db.relationship("Team", backref=db.backref("organisation"), lazy=True)
+    members = db.relationship("User", backref=db.backref("organisation"), lazy=True)
 
 # defines a team in an organisation  that users can be belng too
 class Team(db.Model):
@@ -25,7 +25,7 @@ class Team(db.Model):
     # relationships 
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"),
                        nullable=False)
-    members = db.relationship("User", db.backref("team"), lazy=True)
+    members = db.relationship("User", backref=db.backref("team"), lazy=True)
 
 # defines a user in the organisation.
 class User(db.Model):

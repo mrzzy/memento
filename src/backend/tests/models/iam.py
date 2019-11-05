@@ -10,10 +10,7 @@ from ...models import *
 
 # unit tests for IAM model
 class TestIAMModels(TestCase):
-    def creata_test_data(self):
-        db.drop_all()
-        db.create_all()
-
+    def create_test_data(self):
         # create iam models for testing 
         self.organisation = Organisation(name="kompany")
         db.session.add(self.organisation)
@@ -48,5 +45,19 @@ class TestIAMModels(TestCase):
         db.session.add(self.management)
         db.session.commit()
 
-    def test_create(self):
-        self.creata_test_data()
+    def delete_test_data(self):
+        db.session.delete(self.management)
+        db.session.commit()
+        db.session.delete(self.worker)
+        db.session.commit()
+        db.session.delete(self.supervisor)
+        db.session.commit()
+        db.session.delete(self.team)
+        db.session.commit()
+        db.session.delete(self.organisation)
+        db.session.commit()
+
+    def test_create_delete(self):
+        self.create_test_data()
+        self.delete_test_data()
+

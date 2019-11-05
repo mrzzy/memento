@@ -4,6 +4,7 @@
 # Notification Models 
 #
 
+from enum import Enum
 from ..app import db
 
 # defines a channel where notifications are sent

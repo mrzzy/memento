@@ -16,8 +16,6 @@ class TestIAMOps(TestCase):
         org = get_org(org_id)
         self.assertEqual(org["name"], "kompany")
         self.assertEqual(query_orgs(), [org_id])
-        self.assertEqual(len(query_orgs(skip=1)), 0)
-        self.assertEqual(len(query_orgs(limit=0)), 0)
 
         update_org(org_id, "company", "http://logo.jpg")
         org = get_org(org_id)
@@ -25,3 +23,22 @@ class TestIAMOps(TestCase):
 
         delete_org(org_id)
         self.assertEqual(query_orgs(), [])
+
+    def test_team_ops(self):
+        self.assertEqual(query_teams(), [])
+        org_id = create_org("kompany", "http://logo.jpg")
+        team_id = create_team(org_id, "designer")
+
+        team = get_team(team_id)
+        self.assertEqual(team["name"], "designer")
+        self.assertEqual(query_teams(), [team_id])
+        self.assertEqual(query_teams(org_id=org_id), [team_id])
+        self.assertEqual(query_teams(org_id=-1), [])
+
+        update_team(team_id, name="ui/ux")
+        team = get_team(team_id)
+        self.assertEqual(team["name"], "ui/ux")
+
+        delete_team(team_id)
+        self.assertEqual(query_teams(), [])
+        delete_org(org_id)

@@ -42,3 +42,27 @@ class TestIAMOps(TestCase):
         delete_team(team_id)
         self.assertEqual(query_teams(), [])
         delete_org(org_id)
+
+    def test_user_ops(self):
+        self.assertEqual(query_users(), [])
+        org_id = create_org("kompany", "http://logo.jpg")
+        team_id = create_team(org_id, "designer")
+        user_id = create_user(User.Kind.Worker,
+                              "Joel",
+                              "password",
+                              "joel@jmail.com",
+                              org_id, team_id)
+
+        user = get_user(team_id)
+        self.assertEqual(user["name"], "Joel")
+        self.assertEqual(query_users(), [user_id])
+        self.assertEqual(query_users(team_id=team_id), [user_id])
+        self.assertEqual(query_users(team_id=-1), [])
+
+        update_user(user_id, name="James")
+        user = get_user(team_id)
+        self.assertEqual(user["name"], "James")
+
+        delete_user(user_id)
+        self.assertEqual(query_users(), [])
+        delete_org(org_id)

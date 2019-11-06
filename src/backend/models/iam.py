@@ -31,7 +31,7 @@ class User(db.Model):
     # user kinds/types
     class Kind:
         Worker = "worker" # worker
-        Supervisor = "worker" # supervisor of worker
+        Supervisor = "supervisor" # supervisor of worker
         Admin = "admin" # root adminstrative user for the organisation
         Service = "service" # service account
 

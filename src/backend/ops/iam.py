@@ -115,13 +115,18 @@ def update_team(team_id, org_id=None, name=None):
 
 
 # delete team for id 
+# also cascade deletes all objects depending on team
 def delete_team(team_id):
     team = Team.query.get(team_id)
+    # cascade delete
+    manage_ids = query_manage(kind=Management.Kind.Team, target_id=team_id)
+    for manage_id in manage_ids: delete_manage(delete_manage)
+
     db.session.delete(team)
     db.session.commit()
 
 
-## User
+## User Ops
 # query ids of users
 # org_id - show only users that belong to organisation given by org_id
 # team_id - show only users that belong to team given by team_id
@@ -197,5 +202,69 @@ def update_user(user_id, kind=None, name=None, password=None,
 def delete_user(user_id):
     user = User.query.get(user_id)
     # TODO: casecade delete
+    manage_ids = query_manage(manager_id=user_id) + \
+        query_manage(kind=Management.Kind.Worker, target_id=user_id)
+    for manage_id in manage_ids: delete_manage(delete_manage)
+
     db.session.delete(user)
+    db.session.commit()
+
+## Management Ops
+# query id of managements
+# kind - show only managements with the given kind (worker/team)
+# target_id - show only mangements for target with given id
+# manager_id - show only mangements with manager with given id
+# skip - skip the first skip organisations
+# limit - output ids limit to the first limit organisations
+def query_manage(kind=None, target_id=None, manager_id=None, skip=0, limit=None):
+    manage_ids = Management.query.with_entities(Management.id)
+    # apply filters
+    if not kind is None: manage_ids = manage_ids.filter_by(kind=kind)
+    if not target_id is None: manage_ids = manage_ids.filter_by(target_id=target_id)
+    if not manager_id is None: manage_ids = manage_ids.filter_by(manager_id=manager_id)
+    # apply skip & limit
+    manage_ids = [ i[0] for i in manage_ids ]
+    manage_ids = apply_bound(manage_ids, skip, limit);
+
+    return manage_ids
+
+# get management for id
+# returns managements as a dict
+def get_manage(manage_id):
+    manage = Management.query.get(manage_id)
+    # map fields to dict
+    mapping = [
+        ("target_id", "targetId"),
+        ("kind", "kind"),
+        ("manager_id",  "managerId")
+    ]
+    return map_dict(manage, mapping)
+
+# create a management
+# kind - kind of management target (worker/team)
+# target_id - id of the worker/team that is being managed
+# manager_id - id of the user that is assigned to manage target
+# returns the id of the management
+def create_manage(kind, target_id, manager_id):
+    manage = Management(kind=kind, target_id=target_id, manager_id=manager_id)
+    db.session.add(manage)
+    db.session.commit()
+
+    return manage.id
+
+# update management for given manage_id
+# kind - kind of management target (worker/team)
+# target_id - id of the worker/team that is being managed
+# manager_id - id of the user that is assigned to manage target
+def update_manage(manage_id, kind=None, target_id=None, manager_id=None):
+    manage = Management.query.get(manage_id)
+    if not kind is None: manage.kind = kind
+    if not target_id is None: manage.target_id = target_id
+    if not manager_id is None: manage.manager_id = manager_id
+    db.session.commit()
+
+# delete the managment for the given manage id
+def delete_manage(manage_id):
+    manage = Management.query.get(manage_id)
+    db.session.delete(manage)
     db.session.commit()

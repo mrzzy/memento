@@ -66,3 +66,35 @@ class TestIAMOps(TestCase):
         delete_user(user_id)
         self.assertEqual(query_users(), [])
         delete_org(org_id)
+
+    def test_mange_ops(self):
+        self.assertEqual(query_manage(), [])
+        org_id = create_org("kompany", "http://logo.jpg")
+        team_id = create_team(org_id, "designer")
+        manager_id = create_user(User.Kind.Supervisor,
+                              "John",
+                              "password",
+                              "john@jmail.com",
+                              org_id, team_id)
+        worker_id = create_user(User.Kind.Worker,
+                              "Joel",
+                              "password",
+                              "joel@jmail.com",
+                              org_id, team_id)
+        manage_id = create_manage(Management.Kind.Worker,
+                                  worker_id,
+                                  manager_id)
+
+        manage = get_manage(manage_id)
+        self.assertEqual(manage["targetId"], worker_id)
+        self.assertEqual(query_manage(), [manage_id])
+        self.assertEqual(query_manage(manager_id=manager_id), [manage_id])
+        self.assertEqual(query_manage(manager_id=-1), [])
+
+        update_manage(manage_id, Management.Kind.Team, team_id)
+        manage = get_manage(manage_id)
+        self.assertEqual(manage["targetId"], team_id)
+
+        delete_manage(manage_id)
+        self.assertEqual(query_manage(), [])
+        delete_org(org_id)

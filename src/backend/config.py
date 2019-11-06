@@ -5,6 +5,7 @@
 #
 
 import os
+from tempfile import gettempdir
 
 ## utils
 # evaluates if the given environment configuration value is true or false
@@ -22,7 +23,8 @@ def parse_bool(value):
 ## config
 # database configuration
 SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI",
-                                         "sqlite:////tmp/test.db")
+                                         "sqlite:///" + os.path.join(gettempdir(),
+                                                                     "test.db"))
 SQLALCHEMY_TRACK_MODIFICATIONS = \
     parse_bool(os.environ.get("SQLALCHEMY_TRACK_MODIFICATIONS", False))
 SQLALCHEMY_ECHO =  parse_bool(os.environ.get("SQLALCHEMY_ECHO", False))

@@ -24,7 +24,6 @@ def parse_bool(value):
 default_db_uri = "sqlite:///" + os.path.join(gettempdir(), "test.db")
 
 SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI",
-                                         default_db_uri)
 SQLALCHEMY_TRACK_MODIFICATIONS = \
     parse_bool(os.environ.get("SQLALCHEMY_TRACK_MODIFICATIONS", False))
 SQLALCHEMY_ECHO =  parse_bool(os.environ.get("SQLALCHEMY_ECHO", False))

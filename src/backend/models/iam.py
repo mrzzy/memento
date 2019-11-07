@@ -18,14 +18,14 @@ class Organisation(db.Model):
     teams = db.relationship("Team", backref=db.backref("organisation"), lazy=True)
     members = db.relationship("User", backref=db.backref("organisation"), lazy=True)
     
-    # @validates('name')
-    # def validate_name(self, key, name):
-    #     if not name:
-    #         raise AssertionError('Company name cannot be blank')
-    #     elif len(name) < 2 or len(name) > 50:
-    #         raise AssertionError(' must be between 2 and 50 characters long')
-    #     else:
-    #         return name
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name:
+            raise AssertionError('Organisation name must not be empty')
+        elif len(name) < 2 or len(name) > 256:
+            raise AssertionError(' must be between 2 and 256 characters long')
+        else:
+            return name
         
 
 # defines a team in an organisation  that users can be belng too
@@ -37,6 +37,8 @@ class Team(db.Model):
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"),
                        nullable=False)
     members = db.relationship("User", backref=db.backref("team"), lazy=True)
+
+
 
 # defines a user in the organisation.
 class User(db.Model):
@@ -57,45 +59,49 @@ class User(db.Model):
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"), nullable=False)
     team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=True)
 
-    # @validates('kind')
-    # def validate_kind(self, key, kind):
-    #     kindlist = ['worker','supervisor','admin','service']
-    #     if kind.search == ValueError:
-    #         raise AssertionError ('Enter either worker, supervisor, admin or service')
-    #     else:
-    #         return kind
+    @validates('kind')
+    def validate_kind(self, key, kind):
+        kind_list = ['worker','supervisor','admin','service']
+        if not kind:
+            raise AssertionError ('kind must not be empty')
+        elif len(kind) < 2 or len(kind) > 64:
+            raise AssertionError ('must be between 2 and 64 characters long')
+        elif kind not in kind_list:
+            raise AssertionError ('Enter either worker, supervisor, admin or service')
+        else:
+            return kind
 
 
-    # @validates('name')
-    # def validate_name(self, key, name):
-    #     if not name:
-    #         raise AssertionError('Name cannot be blank')
-    #     elif len(name) < 2 or len(name) > 50:
-    #         raise AssertionError(' must be between 2 and 50 characters long')
-    #     else:
-    #         return name
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name:
+            raise AssertionError('Name must not be empty')
+        elif len(name) < 2 or len(name) > 256:
+            raise AssertionError(' must be between 2 and 256 characters long')
+        else:
+            return name
 
-    # @validates('email')
-    # def validate_email(self, key, email):
-    #     if not email:
-    #         raise AssertionError('Email cannot be blank')
-    #     elif re.search("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",email) is None:
-    #         raise AssertionError('Ensure it is the correct email input')
-    #     else:
-    #         return email
+    @validates('email')
+    def validate_email(self, key, email):
+        if not email:
+            raise AssertionError('Email must not be empty')
+        elif not re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",email):
+            raise AssertionError('Ensure it is the correct email input')
+        else:
+            return email
 
-    # @validates('password')
-#     def validate_password(self, key, password):
-#         if not password:
-#             raise AssertionError('Password cannot be blank')
-#         elif len(password) < 8:
-#             raise AssertionError("Make sure your password is at lest 8 letters")
-#         elif re.search('[0-9]',password) is None:
-#             raise AssertionError("Make sure your password has a number in it")
-#         elif re.search('[A-Z]',password) is None: 
-#            raise AssertionError("Make sure your password has a capital letter in it")
-#         else:
-#          return password
+    @validates('password')
+    def validate_password(self, key, password):
+        if not password:
+            raise AssertionError('Password must not be empty')
+        elif len(password) < 8:
+            raise AssertionError("Make sure your password is at lest 8 letters")
+        elif re.search('[0-9]',password) is None:
+            raise AssertionError("Make sure your password has a number in it")
+        elif re.search('[A-Z]',password) is None: 
+           raise AssertionError("Make sure your password has a capital letter in it")
+        else:
+         return password
 
 # defines an assignment of management (supervisors) to workers and teams
 class Management(db.Model):
@@ -111,3 +117,17 @@ class Management(db.Model):
     target_id = db.Column(db.Integer, nullable=False)
     manager_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     manager = db.relationship("User", lazy=True)
+
+    @validates('kind')
+    def validate_kind(self, key, kind):
+        if not kind:
+            raise AssertionError ('kind must not be empty')
+        elif len(kind) < 1 or len(kind) > 64:        
+            raise AssertionError ('must be between 1 and 64 characters long')
+        elif kind != "worker" or kind != "team":
+            raise AssertionError ('Enter either worker or team')
+        else:
+            return kind
+
+
+

@@ -5,6 +5,8 @@
 #
 
 from ..app import db
+from sqlalchemy.orm import validates
+import re
 
 # defines a channel where notifications are sent
 class Channel(db.Model):
@@ -29,3 +31,26 @@ class Notification(db.Model):
 
     # relationships
     channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=True)
+
+    @validates('kind')
+    def validate_kind (self, key, kind):
+        if not kind:
+            raise AssertionError("kind must not be empty")
+        elif kind != "event" or kind != "task":
+            raise AssertionError("Enter either task or event")
+        else:
+            return kind
+
+    @validates('title')
+    def validate_title (self, key, title)
+    if not title:
+        raise AssertionError('title must not be empty')
+    elif len(title) < 2 or len(title) > 256:
+        raise AssertionError('must be between 2 to 256 characters long')
+
+    @validates('description')
+    def validate_description (self, key, description)
+    if not description:
+        raise AssertionError('description must not be empty') 
+    elif len(description) < 10 or len(description) > 1024:
+        raise AssertionError ('must be between 10 to 1024 characters long')

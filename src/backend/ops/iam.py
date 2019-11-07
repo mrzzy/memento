@@ -6,6 +6,7 @@
 
 from ..app import db
 from ..models.iam import *
+from .assignment import *
 
 from .utils import map_dict, apply_bound
 
@@ -202,9 +203,18 @@ def update_user(user_id, kind=None, name=None, password=None,
 def delete_user(user_id):
     user = User.query.get(user_id)
     # TODO: casecade delete
+    # cascade delete mangement 
     manage_ids = query_manage(manager_id=user_id) + \
         query_manage(kind=Management.Kind.Worker, target_id=user_id)
     for manage_id in manage_ids: delete_manage(delete_manage)
+    # cascade delete assignments created
+    assign_ids = query_assigns(assigner_id=user_id)
+    for assign_id in assign_ids: delete_assign(assign_id)
+    # cascade delete tasks/events created
+    task_ids = query_tasks(author_id=user_id)
+    for task_id in task_ids: delete_task(task_id)
+    event_ids = query_events(author_id=user_id)
+    for event_id in event_ids: delete_event(event_id)
 
     db.session.delete(user)
     db.session.commit()
@@ -224,7 +234,7 @@ def query_manage(kind=None, target_id=None, manager_id=None, skip=0, limit=None)
     if not manager_id is None: manage_ids = manage_ids.filter_by(manager_id=manager_id)
     # apply skip & limit
     manage_ids = [ i[0] for i in manage_ids ]
-    manage_ids = apply_bound(manage_ids, skip, limit);
+    manage_ids = apply_bound(manage_ids, skip, limit)
 
     return manage_ids
 

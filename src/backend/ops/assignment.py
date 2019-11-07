@@ -15,8 +15,8 @@ from .utils import map_dict, apply_bound
 # pending - show only tasks that are currently incomplete 
 # author_id - show only tasks created by author with given user id 
 # limit_by -show  only tasks that are due before given limit_by
-# skip - skip the first skip organisations
-# limit - output ids limit to the first limit organisations
+# skip - skip the first skip tasks
+# limit - output ids limit to the first limit tasks
 def query_tasks(pending=None, author_id=None, limit_by=None, skip=0, limit=None):
     task_ids = Task.query.with_entities(Task.id)
     # apply filters
@@ -97,8 +97,8 @@ def delete_task(task_id):
 # pending - show only pending events
 # author_id - show only events created by author with given user id
 # limit_by - show only events that have to be attended before and at limit_by
-# skip - skip the first skip organisations
-# limit - output ids limit to the first limit organisations
+# skip - skip the first skip events
+# limit - output ids limit to the first limip events
 def query_events(pending=None, author_id=None, limit_by=None, skip=0, limit=None):
     # apply filters
     event_ids = Event.query.with_entities(Event.id)
@@ -171,3 +171,88 @@ def delete_event(event_id):
     event = Event.query.get(event_id)
     db.session.delete(event)
     db.session.commit()
+
+## Assignment Ops
+# query ids of assignments
+# kind - show only assignments of the given kind
+# assigner_id - show only assignments assigned by user with assigner_idj
+# assignee_id - show only assignments assigned to user with assignee_id
+# pending - show only assignments with items that are pending
+# limit_by - show only assignments with items that relevant before limit_by
+# skip - skip the first skip assignments
+# limit - output ids limit to the first limit assignments
+def query_assigns(kind=None, assigner_id=None, assignee_id=None, pending=None,
+                 limit_by=None, skip=0, limit=None):
+    assign_ids = Assignment.query.with_entities(Assignment.id)
+    # apply filters
+    if not kind is None: assign_ids.filter_by(kind=kind)
+    if not assigner_id is None: assign_ids.filter_by(assigner_id=assigner_id)
+    if not assignee_id is None: assign_ids.filter_by(assignee_id=assignee_id)
+    if not pending is None:
+        if kind == Assignment.Kind.Task:
+            assign_ids = assign_ids.join(Task, Assignment.item_id == Task.id)
+            completed = not pending
+            assign_ids = assign_ids.filter(Task.completed == completed)
+        elif kind == Assignment.Kind.Event:
+            assign_ids = assign_ids.join(Event, Assignment.item_id == Event.id)
+            now = datetime.utcnow()
+            assign_ids = assign_ids.filter(Event.start_time > now)
+    if not limit_by is None:
+        now = datetime.utcnow()
+        if kind == Assignment.Kind.Task:
+            assign_ids = assign_ids.join(Task, Assignment.item_id == Task.id)
+            assign_ids = assign_ids.filter(Task.deadline <= limit_by)
+        elif kind == Assignment.Kind.Event:
+            assign_ids = assign_ids.join(Event, Assignment.item_id == Event.id)
+            assign_ids = assign_ids.filter(Event.start_time <= limit_by)
+
+    # apply skip & limit
+    assign_ids = [ i[0] for i in assign_ids ]
+    return apply_bound(assign_ids, skip, limit)
+
+# get assignment by id
+# returns assignment as a dictionary
+def get_assign(assign_id):
+    assign = Assignment.query.get(assign_id)
+    # map model fields to dict
+    mapping = [
+        ("kind", "kind"),
+        ("item_id", "itemId"),
+        ("assignee_id", "assigneeId"),
+        ("assigner_id", "assignerId")
+    ]
+
+    return map_dict(assign, mapping)
+
+# create a new assignment
+# kind - kind of assignment item (task, event)
+# item_id - id of the item in the assignment
+# assignee_id - id of the user that is assigned this assignment
+# assigner_id - id of the user that assigned this assignement
+def create_assign(kind, item_id, assignee_id, assigner_id):
+    assign = Assignment(kind=kind, item_id=item_id, assigner_id=assigner_id,
+                        assignee_id=assignee_id)
+    db.session.add(assign)
+    db.session.commit()
+
+    return assign.id
+
+# update assignment with the given assign_id
+# kind - kind of assignment item (task, event)
+# item_id - id of the item in the assignment
+# assignee_id - id of the user that is assigned this assignment
+# assigner_id - id of the user that assigned this assignement
+def update_assign(assign_id, kind=None, item_id=None, assignee_id=None, assigner_id=None):
+    assign = Assignment.query.get(assign_id)
+    if not kind is None: assign.kind = kind
+    if not item_id is None: assign.item_id = item_id
+    if not assignee_id is None: assign.assignee_id = assignee_id
+    if not assigner_id is None: assign.assigner_id = assigner_id
+    db.session.commit()
+
+# delete assignment with given id
+def delete_assign(assign_id):
+    assign = Assignment.query.get(assign_id)
+    db.session.delete(assign)
+    db.session.commit()
+

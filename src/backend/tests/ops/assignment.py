@@ -12,9 +12,8 @@ from ...ops.iam import *
 from ...ops.assignment import *
 
 class TestAssigmentOps(TestCase):
-    def test_task_ops(self):
-        self.assertEqual(query_tasks(), [])
 
+    def create_test_data(self):
         org_id = create_org("kompany")
         manager_id = create_user(User.Kind.Supervisor,
                               "John",
@@ -26,6 +25,13 @@ class TestAssigmentOps(TestCase):
                               "password",
                               "joel@jmail.com",
                               org_id)
+
+        return org_id, manager_id, worker_id
+
+    def test_task_ops(self):
+        self.assertEqual(query_tasks(), [])
+
+        org_id, manager_id, worker_id = self.create_test_data()
         task_deadline = datetime.utcnow()
         task_id = create_task("fish",
                               deadline= task_deadline,
@@ -49,17 +55,7 @@ class TestAssigmentOps(TestCase):
     def test_event_ops(self):
         self.assertEqual(query_events(), [])
 
-        org_id = create_org("kompany")
-        manager_id = create_user(User.Kind.Supervisor,
-                              "John",
-                              "password",
-                              "john@jmail.com",
-                              org_id)
-        worker_id = create_user(User.Kind.Worker,
-                              "Joel",
-                              "password",
-                              "joel@jmail.com",
-                              org_id)
+        org_id, manager_id, worker_id = self.create_test_data()
         event_start_time = datetime.utcnow()
         event_id = create_event("fishing trip",
                               start_time=event_start_time,
@@ -78,4 +74,33 @@ class TestAssigmentOps(TestCase):
 
         delete_event(event_id)
         self.assertEqual(query_events(), [])
-        delete_org(event_id)
+        delete_org(org_id)
+
+    def test_assign_ops(self):
+        self.assertEqual(query_assigns(), [])
+
+        org_id, manager_id, worker_id = self.create_test_data()
+        task_deadline = datetime.utcnow()
+        task_id = create_task("fish",
+                              deadline= task_deadline,
+                              duration=60,
+                              author_id=manager_id)
+        assign_id = create_assign(Assignment.Kind.Task,
+                                  task_id,
+                                  worker_id,
+                                  manager_id)
+
+        assign = get_assign(assign_id)
+        self.assertEqual(assign["assigneeId"], worker_id)
+        self.assertEqual(query_assigns(), [assign_id])
+        self.assertEqual(query_assigns(pending=False, limit_by=datetime.utcnow),
+                         [assign_id])
+
+        # swap worker and manager in assignment as a proof of concept
+        update_assign(assign_id, assigner_id=worker_id, assignee_id=manager_id)
+        assign = get_assign(assign_id)
+        self.assertEqual(assign["assigneeId"], manager_id)
+
+        delete_assign(assign_id)
+        self.assertEqual(query_assigns(), [])
+        delete_org(org_id)

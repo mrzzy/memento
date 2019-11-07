@@ -37,3 +37,22 @@ class TestsNotficationOps(TestCase):
         delete_channel(channel_id)
         self.assertEqual(query_tasks(), [])
         delete_org(org_id)
+
+    def test_channel_ops(self):
+        self.assertEqual(query_notify(), [])
+        org_id, user_id = self.create_test_data()
+        channel_id = create_channel(Channel.Kind.Notice, user_id)
+        notify_id = create_notify("fish", datetime.utcnow(), channel_id)
+
+        notify = get_notify(notify_id)
+        self.assertEqual(notify["title"], "fish")
+        self.assertEqual(query_notify(), [channel_id])
+        self.assertEqual(query_notify(pending=True), [])
+
+        update_notify(notify_id, title="gym")
+        notify = get_notify(notify_id)
+        self.assertEqual(notify["title"], "gym")
+
+        delete_notify(notify_id)
+        self.assertEqual(query_notify(), [])
+        delete_org(org_id)

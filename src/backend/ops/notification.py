@@ -63,7 +63,77 @@ def update_channel(channel_id, kind=None, user_id=None):
 # delete the channel with the given channel id
 # als cascade deletes any dependent objects
 def delete_channel(channel_id):
-    # TODO: cascade delete notifications
+    # cascade delete notifications
+    notify_ids = query_notify(channel_id=channel_id)
+    for notify_id in notify_ids: delete_notify(notify_id)
+
     channel = Channel.query.get(channel_id)
     db.session.delete(channel)
     db.session.commit()
+
+## Notification Ops
+# query ids of notifications
+# pending - show only pending notifications
+# channel_id - show only notifications sent on channel with channel id
+# skip - skip the first skip channels
+# limit - output ids limit to the first limit channels
+def query_notify(pending=None, channel_id=None, skip=0, limit=None):
+    notify_ids = Notification.query.with_entities(Notification.id)
+    # apply filters
+    if not pending is None:
+        now = datetime.utcnow()
+        if pending == True:
+            notify_ids = notify_ids.filter(Notification.firing_time > now)
+        else:
+            notify_ids = notify_ids.filter(Notification.firing_time <= now)
+    if not channel_id is None:
+        notify_ids = notify_ids.filter_by(channel_id=channel_id)
+    # apply skip & limit
+    notify_id = [ i[0] for i in notify_ids ]
+    return apply_bound(notify_id, skip, limit)
+
+# get notification for notify_id
+def get_notify(notify_id):
+    notify = Notification.query.get(notify_id)
+    # map fields to dict
+    mapping = [
+        ("title", "title"),
+        ("description", "description"),
+        ("firing_time", "firingTime"),
+        ("channel_id", "channelId")
+    ]
+    return map_dict(notify, mapping)
+
+# create an notification
+# title - title of the notification
+# firing_time - firing datetime of the notification
+# channel_id - id of the channel to send the notification
+# returns the id of the new notification
+def create_notify(title, firing_time, channel_id, description=""):
+    notify = Notification(title=title, firing_time=firing_time,
+                          channel_id=channel_id, description=description)
+    db.session.add(notify)
+    db.session.commit()
+
+    return notify.id
+
+# update notification with the given notification id
+# title - title of the notification
+# firing_time - firing datetime of the notification
+# channel_id - id of the channel to send the notification
+# returns the id of the new notification
+def update_notify(notify_id, title=None, firing_time=None, channel_id=None,
+                  description=None):
+    notify = Notification.query.get(notify_id)
+    if not title is None: notify.title = title
+    if not firing_time is None: notify.firing_time = firing_time
+    if not channel_id is None: notify.channel_id = channel_id
+    if not description is None: notify.description = description
+    db.session.commit()
+
+# delete notification with the given notify_id
+def delete_notify(notify_id):
+    notify = Notification.query.get(notify_id)
+    db.session.delete(notify)
+    db.session.commit()
+

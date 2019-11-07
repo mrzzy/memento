@@ -32,7 +32,7 @@ class Task(db.Model):
             return name
         
     @validates('description')
-    def validate_description(self, key, description)
+    def validate_description(self, key, description):
         if not description:
             raise AssertionError ("Description must not be empty")
         elif len(description) < 10 or len(description) > 2048:
@@ -62,7 +62,7 @@ class Event(db.Model):
             return name
     
     @validates('description')
-    def validate_description(self, key, description)
+    def validate_description(self, key, description):
         if not description:
             raise AssertionError ("Description must not be empty")
         elif len(description) < 10 or len(description) > 2048:

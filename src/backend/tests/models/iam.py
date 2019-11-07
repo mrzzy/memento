@@ -66,7 +66,7 @@ class TestIAMModels(TestCase):
         
         self.user = User(
             name="Joe",
-            password="1234",
+            password="1232323eeiejojA",
             kind=User.Kind.Admin,
             organisation=self.organisation,
             email="joe@gmail.com"

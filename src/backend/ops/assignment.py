@@ -14,18 +14,18 @@ from .utils import map_dict, apply_bound
 # query ids of tasks
 # pending - show only tasks that are currently incomplete 
 # author_id - show only tasks created by author with given user id 
-# do_by -show  only tasks that are due before given do_by datetime
+# limit_by -show  only tasks that are due before given limit_by
 # skip - skip the first skip organisations
 # limit - output ids limit to the first limit organisations
-def query_tasks(pending=None, author_id=None, do_by=None, skip=0, limit=None):
+def query_tasks(pending=None, author_id=None, limit_by=None, skip=0, limit=None):
     task_ids = Task.query.with_entities(Task.id)
     # apply filters
     if not pending is None:
         completed = not pending
         task_ids = task_ids.filter_by(completed=completed)
     if not author_id is None: task_id = task_ids.filter_by(author_id=author_id)
-    if not do_by is None:
-        task_ids = task_ids.filter(Task.deadline <= do_by)
+    if not limit_by is None:
+        task_ids = task_ids.filter(Task.deadline <= limit_by)
 
     # apply skip & limit
     task_ids = [ i[0] for  i in task_ids ]
@@ -96,10 +96,10 @@ def delete_task(task_id):
 # query ids of events
 # pending - show only pending events
 # author_id - show only events created by author with given user id
-# attend_by - show only events that have to be attended before and at attend_by
+# limit_by - show only events that have to be attended before and at limit_by
 # skip - skip the first skip organisations
 # limit - output ids limit to the first limit organisations
-def query_events(pending=None, author_id=None, attend_by=None, skip=0, limit=None):
+def query_events(pending=None, author_id=None, limit_by=None, skip=0, limit=None):
     # apply filters
     event_ids = Event.query.with_entities(Event.id)
     if not pending is None:
@@ -109,8 +109,8 @@ def query_events(pending=None, author_id=None, attend_by=None, skip=0, limit=Non
         else:
             event_ids = event_ids.filter(Event.start_time > now)
     if not author_id is None: event_id = event_ids.filter_by(author_id=author_id)
-    if not attend_by is None:
-        event_ids = event_ids.filter(Event.start_time <= attend_by)
+    if not limit_by is None:
+        event_ids = event_ids.filter(Event.start_time <= limit_by)
 
     # apply skip & limit
     event_ids = [ i[0] for  i in event_ids ]

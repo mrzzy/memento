@@ -7,6 +7,7 @@
 from ..app import db
 from ..models.iam import *
 from .assignment import *
+from .notification import query_channels, delete_channel
 
 from .utils import map_dict, apply_bound
 
@@ -27,6 +28,7 @@ def get_org(org_id):
     org = Organisation.query.get(org_id)
     # map model fields to dict
     mapping = [
+        ("id", "id"),
         ("name", "name"),
         ("logo_url", "logoUrl")
     ]
@@ -88,6 +90,7 @@ def get_team(team_id):
     team = Team.query.get(team_id)
     # map model fields to dict
     mapping = [
+        ("id", "id"),
         ("name", "name"),
         ("org_id", "orgId")
     ]
@@ -153,6 +156,7 @@ def get_user(user_id):
     user = User.query.get(user_id)
     # map fields to dict
     mapping = [
+        ("id", "id"),
         ("kind", "kind"),
         ("name", "name"),
         ("password", "password"),
@@ -202,7 +206,7 @@ def update_user(user_id, kind=None, name=None, password=None,
 # user_id - delete organisation with given id
 def delete_user(user_id):
     user = User.query.get(user_id)
-    # TODO: casecade delete
+    # cascade delete
     # cascade delete mangement 
     manage_ids = query_manage(manager_id=user_id) + \
         query_manage(kind=Management.Kind.Worker, target_id=user_id)
@@ -215,6 +219,9 @@ def delete_user(user_id):
     for task_id in task_ids: delete_task(task_id)
     event_ids = query_events(author_id=user_id)
     for event_id in event_ids: delete_event(event_id)
+    # cascde delete channel
+    channel_ids = query_channels(user_id=user_id)
+    for channel_id in channel_ids: delete_channel(channel_id)
 
     db.session.delete(user)
     db.session.commit()
@@ -244,6 +251,7 @@ def get_manage(manage_id):
     manage = Management.query.get(manage_id)
     # map fields to dict
     mapping = [
+        ("id", "id"),
         ("target_id", "targetId"),
         ("kind", "kind"),
         ("manager_id",  "managerId")

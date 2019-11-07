@@ -39,6 +39,7 @@ def get_task(task_id):
     task = Task.query.get(task_id)
     # map fields to dict
     mapping = [
+        ("id", "id"),
         ("name", "name"),
         ("description", "description"),
         ("duration", "duraiton"),
@@ -124,6 +125,7 @@ def get_event(event_id):
     event = Event.query.get(event_id)
     # map fields to dict
     mapping = [
+        ("id", "id"),
         ("name", "name"),
         ("description", "description"),
         ("start_time", "startTime"),
@@ -216,6 +218,7 @@ def get_assign(assign_id):
     assign = Assignment.query.get(assign_id)
     # map model fields to dict
     mapping = [
+        ("id", "id"),
         ("kind", "kind"),
         ("item_id", "itemId"),
         ("assignee_id", "assigneeId"),

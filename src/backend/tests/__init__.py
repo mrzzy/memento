@@ -10,3 +10,4 @@ from .models.notification import *
 
 from .ops.iam import *
 from .ops.assignment import *
+from .ops.notification import *

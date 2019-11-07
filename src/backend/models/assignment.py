@@ -14,6 +14,8 @@ class Task(db.Model):
     description = db.Column(db.String(2048), unique=False, nullable=False)
     deadline = db.Column(db.DateTime, nullable=False) # utc timezone
     duration = db.Column(db.BigInteger, nullable=False) # seconds
+    # whether the task is completed
+    completed = db.Column(db.Boolean, nullable=False, default=False)
     # relationships
     author_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     author = db.relationship("User", lazy=True)

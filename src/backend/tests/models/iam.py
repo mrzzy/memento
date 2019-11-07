@@ -60,4 +60,26 @@ class TestIAMModels(TestCase):
     def test_create_delete(self):
         self.create_test_data()
         self.delete_test_data()
+    
+    def test_validate_user(self):
+        self.create_test_data()
+        
+        self.user = User(
+            name="Joe",
+            password="1234",
+            kind=User.Kind.Admin,
+            organisation=self.organisation,
+            email="joe@gmail.com"
+        )
+        got_exception = False
+        try:
+            db.session.add(self.user)
+            db.session.commit()
+        except AssertionError:
+            got_exception = True
+        
+        self.assertTrue(got_exception)
+            
+        
+        self.delete_test_data()
 

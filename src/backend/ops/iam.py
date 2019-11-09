@@ -9,7 +9,7 @@ from ..models.iam import *
 from .assignment import *
 from .notification import query_channels, delete_channel
 
-from .utils import map_dict, apply_bound
+from ..utils import map_dict, apply_bound
 
 ## Organisation Ops
 # query ids of organisations. 

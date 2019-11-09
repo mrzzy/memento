@@ -8,7 +8,7 @@ from datetime import datetime
 
 from ..app import db
 from ..models.assignment import *
-from .utils import map_dict, apply_bound
+from ..utils import map_dict, apply_bound
 
 ## Task Ops
 # query ids of tasks

@@ -8,7 +8,7 @@ from datetime import datetime
 
 from ..app import db
 from ..models.notification import *
-from .utils import apply_bound, map_dict
+from ..utils import apply_bound, map_dict
 
 ## Channel Ops
 # query ids of channels

@@ -1,5 +1,0 @@
-#
-# Memento
-# Backend
-# API
-#

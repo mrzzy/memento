@@ -7,7 +7,6 @@
 
 # defines the mapping from task model fields to json api representation
 task_mapping = [
-    ("id", "id"),
     ("name", "name"),
     ("description", "description"),
     ("duration", "duraiton"),
@@ -18,7 +17,6 @@ task_mapping = [
 
 # defines the mapping from event model fields to json api representation
 event_mapping = [
-    ("id", "id"),
     ("name", "name"),
     ("description", "description"),
     ("start_time", "startTime"),
@@ -28,7 +26,6 @@ event_mapping = [
 
 # defines the mapping from assign model fields to json api representation
 assign_mapping = [
-    ("id", "id"),
     ("kind", "kind"),
     ("item_id", "itemId"),
     ("assignee_id", "assigneeId"),

@@ -8,6 +8,7 @@ from datetime import datetime
 
 from ..app import db
 from ..models.notification import *
+from ..mapping.notification import *
 from ..utils import apply_bound, map_dict
 
 ## Channel Ops
@@ -34,12 +35,7 @@ def query_channels(user_id=None, pending=None, skip=0, limit=None):
 def get_channel(channel_id):
     channel = Channel.query.get(channel_id)
     # map fields to dict
-    mapping = [
-        ("id", "id"),
-        ("kind", "kind"),
-        ("user_id", "userId")
-    ]
-    return map_dict(channel, mapping)
+    return map_dict(channel, channel_mapping)
 
 # create a channel
 # kind - kind of channel (task/event/notice)
@@ -96,13 +92,7 @@ def query_notify(pending=None, channel_id=None, skip=0, limit=None):
 def get_notify(notify_id):
     notify = Notification.query.get(notify_id)
     # map fields to dict
-    mapping = [
-        ("title", "title"),
-        ("description", "description"),
-        ("firing_time", "firingTime"),
-        ("channel_id", "channelId")
-    ]
-    return map_dict(notify, mapping)
+    return map_dict(notify, notify_mapping)
 
 # create an notification
 # title - title of the notification

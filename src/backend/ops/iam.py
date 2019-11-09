@@ -6,6 +6,7 @@
 
 from ..app import db
 from ..models.iam import *
+from ..mapping.iam import *
 from .assignment import *
 from .notification import query_channels, delete_channel
 
@@ -27,12 +28,7 @@ def query_orgs(skip=0, limit=None):
 def get_org(org_id):
     org = Organisation.query.get(org_id)
     # map model fields to dict
-    mapping = [
-        ("id", "id"),
-        ("name", "name"),
-        ("logo_url", "logoUrl")
-    ]
-    return map_dict(org, mapping)
+    return map_dict(org, org_mapping)
 
 # create a new organisation
 # name - name of the organisation, must be uniqu
@@ -89,12 +85,7 @@ def query_teams(org_id=None, skip=0, limit=None):
 def get_team(team_id):
     team = Team.query.get(team_id)
     # map model fields to dict
-    mapping = [
-        ("id", "id"),
-        ("name", "name"),
-        ("org_id", "orgId")
-    ]
-    return map_dict(team, mapping)
+    return map_dict(team, team_mapping)
 
 # create a new team
 # org_id - id of organisation that team belongs to 
@@ -155,17 +146,7 @@ def query_users(org_id=None, team_id=None, kind=None, skip=0, limit=None):
 def get_user(user_id):
     user = User.query.get(user_id)
     # map fields to dict
-    mapping = [
-        ("id", "id"),
-        ("kind", "kind"),
-        ("name", "name"),
-        ("password", "password"),
-        ("email", "email"),
-        ("org_id", "orgId"),
-        ("team_id", "teamId")
-    ]
-
-    return map_dict(user, mapping)
+    return map_dict(user, user_mapping)
 
 # create a user
 # kind - kind of user
@@ -250,13 +231,7 @@ def query_manage(kind=None, target_id=None, manager_id=None, skip=0, limit=None)
 def get_manage(manage_id):
     manage = Management.query.get(manage_id)
     # map fields to dict
-    mapping = [
-        ("id", "id"),
-        ("target_id", "targetId"),
-        ("kind", "kind"),
-        ("manager_id",  "managerId")
-    ]
-    return map_dict(manage, mapping)
+    return map_dict(manage, manage_mapping)
 
 # create a management
 # kind - kind of management target (worker/team)

@@ -31,9 +31,10 @@ Branches used in the project:
             - `iam/` - identity and user managment 
             - `notification/` - notification 
             - `asssignment/` - assignment 
-        - `apis/` - backend api routes
+        - `api/` - backend api routes
             - `iam/` - identity and user managment 
             - `notification/` - notification 
             - `asssignment/` - assignment 
+        - `mapping/` - mappings between models and json representation
     - `pi/` - Raspberry PI
 - `containers/` - docker containers 

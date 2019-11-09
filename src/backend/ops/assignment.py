@@ -8,6 +8,7 @@ from datetime import datetime
 
 from ..app import db
 from ..models.assignment import *
+from ..mapping.assignment import *
 from ..utils import map_dict, apply_bound
 
 ## Task Ops
@@ -38,16 +39,7 @@ def query_tasks(pending=None, author_id=None, limit_by=None, skip=0, limit=None)
 def get_task(task_id):
     task = Task.query.get(task_id)
     # map fields to dict
-    mapping = [
-        ("id", "id"),
-        ("name", "name"),
-        ("description", "description"),
-        ("duration", "duraiton"),
-        ("deadline", "deadline"),
-        ("completed", "completed"),
-        ("author_id", "authorId")
-    ]
-    return map_dict(task, mapping)
+    return map_dict(task, task_mapping)
 
 # create a task
 # name - name of the task
@@ -124,15 +116,7 @@ def query_events(pending=None, author_id=None, limit_by=None, skip=0, limit=None
 def get_event(event_id):
     event = Event.query.get(event_id)
     # map fields to dict
-    mapping = [
-        ("id", "id"),
-        ("name", "name"),
-        ("description", "description"),
-        ("start_time", "startTime"),
-        ("duration", "duraiton"),
-        ("author_id", "authorId")
-    ]
-    return map_dict(event, mapping)
+    return map_dict(event, event_mapping)
 
 # create a event
 # name - name of the event
@@ -217,15 +201,8 @@ def query_assigns(kind=None, assigner_id=None, assignee_id=None, pending=None,
 def get_assign(assign_id):
     assign = Assignment.query.get(assign_id)
     # map model fields to dict
-    mapping = [
-        ("id", "id"),
-        ("kind", "kind"),
-        ("item_id", "itemId"),
-        ("assignee_id", "assigneeId"),
-        ("assigner_id", "assignerId")
-    ]
 
-    return map_dict(assign, mapping)
+    return map_dict(assign, assign_mapping)
 
 # create a new assignment
 # kind - kind of assignment item (task, event)
@@ -258,4 +235,3 @@ def delete_assign(assign_id):
     assign = Assignment.query.get(assign_id)
     db.session.delete(assign)
     db.session.commit()
-

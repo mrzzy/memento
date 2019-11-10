@@ -94,8 +94,8 @@ class User(db.Model):
     def validate_password(self, key, password):
         if not password:
             raise AssertionError('Password must not be empty')
-        elif not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$",password):
-            raise AssertionError('minimum eight characters, at least one uppercase letter, one lowercase letter and one number')
+        elif not re.match(r"^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$])[\w\d@#$]{6,12}$",password):
+            raise AssertionError('at least one digit, one uppercase letter, at least one lowercase letter, at least one special character')
         else:
          return password
 

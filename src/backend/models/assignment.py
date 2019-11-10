@@ -70,6 +70,18 @@ class Event(db.Model):
         else:
             return description
 
+    @validates('duration')
+    def validate_duration(self, key, duration):
+        if not duration:
+            raise AssertionError ("Duration cannot be empty")
+        else:
+            return duration
+
+    @validates('start_time')
+    def validate_start_time(self, key, start_time):
+        if not start_time:
+            raise AssertionError("Start time cannot be empty.")
+        
 class Assignment(db.Model):
     # assignment item/types
     class Kind:

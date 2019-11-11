@@ -17,7 +17,7 @@ iam = Blueprint("iam", __name__)
 ## Organisation API
 # api - query organisations 
 # returns organisation ids using
-@iam.route(f"/api/v{API_VERSION}/iam/orgs", methods=["GET"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/orgs", methods=["GET"])
 def route_orgs():
     # parse query args
     skip = int(request.args.get("skip", 0))
@@ -28,8 +28,8 @@ def route_orgs():
     return jsonify(org_ids)
 
 # api - read, create, update, delete organisations
-@iam.route(f"/api/v{API_VERSION}/iam/org", methods=["POST"])
-@iam.route(f"/api/v{API_VERSION}/iam/org/<org_id>", methods=["GET", "PATCH", "DELETE"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/org", methods=["POST"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/org/<org_id>", methods=["GET", "PATCH", "DELETE"])
 def route_org(org_id=None):
     if request.method == "GET" and org_id:
         # get org for id
@@ -55,7 +55,7 @@ def route_org(org_id=None):
 
 ## Team API
 # api - query teams with url params
-@iam.route(f"/api/v{API_VERSION}/iam/teams", methods=["GET"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/teams", methods=["GET"])
 def route_teams():
     # parse query args
     skip = int(request.args.get("skip", 0))
@@ -68,8 +68,8 @@ def route_teams():
     return jsonify(team_ids)
 
 # api - read, create, update, delete teams
-@iam.route(f"/api/v{API_VERSION}/iam/team", methods=["POST"])
-@iam.route(f"/api/v{API_VERSION}/iam/team/<team_id>", methods=["GET", "PATCH", "DELETE"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/team", methods=["POST"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/team/<team_id>", methods=["GET", "PATCH", "DELETE"])
 def route_team(team_id=None):
     if request.method == "GET" and team_id:
         # get team for id
@@ -95,7 +95,7 @@ def route_team(team_id=None):
 
 ## User API
 # api - query users with url params
-@iam.route(f"/api/v{API_VERSION}/iam/users", methods=["GET"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/users", methods=["GET"])
 def route_users():
     # parse query url params
     skip = int(request.args.get("skip", 0))
@@ -112,8 +112,8 @@ def route_users():
     return jsonify(user_ids)
 
 # api - read, create, update, delete users
-@iam.route(f"/api/v{API_VERSION}/iam/user", methods=["POST"])
-@iam.route(f"/api/v{API_VERSION}/iam/user/<user_id>", methods=["GET", "PATCH", "DELETE"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/user", methods=["POST"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/user/<user_id>", methods=["GET", "PATCH", "DELETE"])
 def route_user(user_id=None):
     if request.method == "GET" and user_id:
         # get user for id
@@ -139,7 +139,7 @@ def route_user(user_id=None):
 
 ## manage api
 # api - query manages with url params
-@iam.route(f"/api/v{API_VERSION}/iam/manages", methods=["GET"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/manages", methods=["GET"])
 def route_manages():
     # parse query url params
     skip = int(request.args.get("skip", 0))
@@ -158,8 +158,8 @@ def route_manages():
     return jsonify(manage_ids)
 
 # api - read, create, update, delete managements
-@iam.route(f"/api/v{API_VERSION}/iam/manage", methods=["POST"])
-@iam.route(f"/api/v{API_VERSION}/iam/manage/<manage_id>", methods=["GET", "PATCH", "DELETE"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/manage", methods=["POST"])
+@iam.route(f"/api/v{API_VERSION}/{iam.name}/manage/<manage_id>", methods=["GET", "PATCH", "DELETE"])
 def route_manage(manage_id=None):
     if request.method == "GET" and manage_id:
         # get manage for id

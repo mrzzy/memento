@@ -16,7 +16,13 @@ app.config.from_object(config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-from .models import *
+# api components
+from .api.error import err
+from .api.iam import iam
+
+# register api component bluerints
+app.register_blueprint(iam)
+app.register_blueprint(err)
 
 # root route
 @app.route('/')

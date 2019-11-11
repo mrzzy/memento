@@ -4,7 +4,6 @@
 # Assignment mappings
 #
 
-
 # defines the mapping from task model fields to json api representation
 task_mapping = [
     ("name", "name"),
@@ -20,7 +19,7 @@ event_mapping = [
     ("name", "name"),
     ("description", "description"),
     ("start_time", "startTime"),
-    ("duration", "duraiton"),
+    ("duration", "duration"),
     ("author_id", "authorId")
 ]
 

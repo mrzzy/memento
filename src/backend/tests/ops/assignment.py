@@ -79,7 +79,7 @@ class TestAssigmentOps(TestCase):
         event = get_event(event_id)
         self.assertEqual(event["name"], "fishing trip")
         self.assertEqual(query_events(), [event_id])
-        self.assertEqual(query_events(pending=False), [])
+        self.assertEqual(query_events(pending=False), [event_id])
         self.assertEqual(query_events(limit_by=event_start_time), [event_id])
 
         update_event(event_id, name="cooking competition")

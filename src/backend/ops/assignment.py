@@ -108,9 +108,9 @@ def query_events(pending=None, author_id=None, limit_by=None, skip=0, limit=None
     if not pending is None:
         now = datetime.utcnow()
         if pending == True:
-            event_ids = event_ids.filter(Event.start_time <= now)
+            event_ids = event_ids.filter(Event.start_time >= now)
         else:
-            event_ids = event_ids.filter(Event.start_time > now)
+            event_ids = event_ids.filter(Event.start_time < now)
     if not author_id is None: event_id = event_ids.filter_by(author_id=author_id)
     if not limit_by is None:
         event_ids = event_ids.filter(Event.start_time <= limit_by)
@@ -203,7 +203,7 @@ def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None,
         elif kind == Assignment.Kind.Event:
             assign_ids = assign_ids.join(Event, Assignment.item_id == Event.id)
             now = datetime.utcnow()
-            assign_ids = assign_ids.filter(Event.start_time > now)
+            assign_ids = assign_ids.filter(Event.start_time >= now)
     if not limit_by is None:
         now = datetime.utcnow()
         if kind == Assignment.Kind.Task:

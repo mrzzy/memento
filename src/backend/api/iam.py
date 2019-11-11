@@ -4,15 +4,13 @@
 # IAM API
 #
 
-import json
-
 from flask import request, Blueprint, jsonify
 from sqlalchemy.exc import IntegrityError
 
 from .utils import parse_params
+from ..config import API_VERSION
 from ..mapping.iam import *
 from ..ops.iam import *
-from ..config import API_VERSION
 
 iam = Blueprint("iam", __name__)
 
@@ -99,7 +97,7 @@ def route_team(team_id=None):
 # api - query users with url params
 @iam.route(f"/api/v{API_VERSION}/iam/users", methods=["GET"])
 def route_users():
-    # parse query url paras
+    # parse query url params
     skip = int(request.args.get("skip", 0))
     limit = request.args.get("limit", None)
     if not limit is None: limit = int(limit)
@@ -139,3 +137,48 @@ def route_user(user_id=None):
     else:
         raise NotImplementedError
 
+## manage api
+# api - query manages with url params
+@iam.route(f"/api/v{API_VERSION}/iam/manages", methods=["GET"])
+def route_manages():
+    # parse query url params
+    skip = int(request.args.get("skip", 0))
+    limit = request.args.get("limit", None)
+    if not limit is None: limit = int(limit)
+    kind = request.args.get("kind", None)
+    org_id = request.args.get("org", None)
+    if not org_id is None: org_id = int(org_id)
+    target_id = request.args.get("target", None)
+    if not target_id is None: target_id = int(target_id)
+    manager_id = request.args.get("manager", None)
+    if not manager_id is None: manager_id = int(manager_id)
+
+    # perform query with op
+    manage_ids = query_manage(kind, org_id, target_id, manager_id, skip, limit)
+    return jsonify(manage_ids)
+
+# api - read, create, update, delete managements
+@iam.route(f"/api/v{API_VERSION}/iam/manage", methods=["POST"])
+@iam.route(f"/api/v{API_VERSION}/iam/manage/<manage_id>", methods=["GET", "PATCH", "DELETE"])
+def route_manage(manage_id=None):
+    if request.method == "GET" and manage_id:
+        # get manage for id
+        manage = get_manage(manage_id)
+        return jsonify(manage)
+    elif request.method == "POST" and request.is_json:
+        # create manage with params in json
+        params = parse_params(request, manage_mapping)
+        manage_id = create_manage(**params)
+        return jsonify({ "id": manage_id })
+    elif request.method == "PATCH" and manage_id and request.is_json:
+        # parse params in json
+        params = parse_params(request, manage_mapping)
+        # update manage with params in json
+        update_manage(manage_id, **params)
+        return jsonify({"success": True })
+    elif request.method == "DELETE" and manage_id:
+        # delete manage with params in json
+        delete_manage(manage_id)
+        return jsonify({"success": True })
+    else:
+        raise NotImplementedError

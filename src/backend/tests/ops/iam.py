@@ -122,6 +122,8 @@ class TestIAMOps(TestCase):
         self.assertEqual(query_manage(), [manage_id])
         self.assertEqual(query_manage(manager_id=manager_id), [manage_id])
         self.assertEqual(query_manage(manager_id=-1), [])
+        self.assertEqual(query_manage(org_id=org_id), [manage_id])
+        self.assertEqual(query_manage(org_id=-1), [])
 
         update_manage(manage_id, Management.Kind.Team, team_id)
         manage = get_manage(manage_id)

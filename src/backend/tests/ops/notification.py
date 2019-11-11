@@ -22,6 +22,14 @@ class TestsNotficationOps(TestCase):
 
     def test_channel_ops(self):
         self.assertEqual(query_channels(), [])
+
+        got_lookup_error = False
+        try:
+            get_channel(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
         org_id, user_id = self.create_test_data()
         channel_id = create_channel(Channel.Kind.Notice, user_id)
 
@@ -38,8 +46,16 @@ class TestsNotficationOps(TestCase):
         self.assertEqual(query_tasks(), [])
         delete_org(org_id)
 
-    def test_channel_ops(self):
+    def test_notify_ops(self):
         self.assertEqual(query_notify(), [])
+
+        got_lookup_error = False
+        try:
+            get_notify(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
         org_id, user_id = self.create_test_data()
         channel_id = create_channel(Channel.Kind.Notice, user_id)
         notify_id = create_notify("fish", datetime.utcnow(), channel_id)

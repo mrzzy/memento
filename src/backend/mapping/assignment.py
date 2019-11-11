@@ -9,7 +9,7 @@
 task_mapping = [
     ("name", "name"),
     ("description", "description"),
-    ("duration", "duraiton"),
+    ("duration", "duration"),
     ("deadline", "deadline"),
     ("completed", "completed"),
     ("author_id", "authorId")

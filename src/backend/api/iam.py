@@ -56,7 +56,7 @@ def route_org(org_id=None):
         raise NotImplementedError
 
 ## Team API
-# api - query teams with filters
+# api - query teams with url params
 @iam.route(f"/api/v{API_VERSION}/iam/teams", methods=["GET"])
 def route_teams():
     # parse query args
@@ -94,3 +94,48 @@ def route_team(team_id=None):
         return jsonify({"success": True })
     else:
         raise NotImplementedError
+
+## User API
+# api - query users with url params
+@iam.route(f"/api/v{API_VERSION}/iam/users", methods=["GET"])
+def route_users():
+    # parse query url paras
+    skip = int(request.args.get("skip", 0))
+    limit = request.args.get("limit", None)
+    if not limit is None: limit = int(limit)
+    org_id = request.args.get("org", None)
+    if not org_id is None: org_id = int(org_id)
+    team_id = request.args.get("team", None)
+    if not team_id is None: team_id = int(team_id)
+    kind = request.args.get("kind", None)
+
+    # perform query with op
+    user_ids = query_users(org_id, team_id, kind, skip, limit)
+    return jsonify(user_ids)
+
+# api - read, create, update, delete users
+@iam.route(f"/api/v{API_VERSION}/iam/user", methods=["POST"])
+@iam.route(f"/api/v{API_VERSION}/iam/user/<user_id>", methods=["GET", "PATCH", "DELETE"])
+def route_user(user_id=None):
+    if request.method == "GET" and user_id:
+        # get user for id
+        user = get_user(user_id)
+        return jsonify(user)
+    elif request.method == "POST" and request.is_json:
+        # create user with params in json
+        params = parse_params(request, user_mapping)
+        user_id = create_user(**params)
+        return jsonify({ "id": user_id })
+    elif request.method == "PATCH" and user_id and request.is_json:
+        # parse params in json
+        params = parse_params(request, user_mapping)
+        # update user with params in json
+        update_user(user_id, **params)
+        return jsonify({"success": True })
+    elif request.method == "DELETE" and user_id:
+        # delete user with params in json
+        delete_user(user_id)
+        return jsonify({"success": True })
+    else:
+        raise NotImplementedError
+

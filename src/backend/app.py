@@ -19,10 +19,12 @@ migrate = Migrate(app, db)
 # api components
 from .api.error import err
 from .api.iam import iam
+from .api.assignment import assign
 
 # register api component bluerints
 app.register_blueprint(iam)
 app.register_blueprint(err)
+app.register_blueprint(assign)
 
 # root route
 @app.route('/')

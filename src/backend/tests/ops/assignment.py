@@ -31,6 +31,13 @@ class TestAssigmentOps(TestCase):
     def test_task_ops(self):
         self.assertEqual(query_tasks(), [])
 
+        got_lookup_error = False
+        try:
+            get_task(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
         org_id, manager_id, worker_id = self.create_test_data()
         task_deadline = datetime.utcnow()
         task_id = create_task("fish",
@@ -55,6 +62,13 @@ class TestAssigmentOps(TestCase):
     def test_event_ops(self):
         self.assertEqual(query_events(), [])
 
+        got_lookup_error = False
+        try:
+            get_event(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
         org_id, manager_id, worker_id = self.create_test_data()
         event_start_time = datetime.utcnow()
         event_id = create_event("fishing trip",
@@ -78,6 +92,13 @@ class TestAssigmentOps(TestCase):
 
     def test_assign_ops(self):
         self.assertEqual(query_assigns(), [])
+
+        got_lookup_error = False
+        try:
+            get_assign(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
 
         org_id, manager_id, worker_id = self.create_test_data()
         task_deadline = datetime.utcnow()

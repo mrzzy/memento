@@ -35,9 +35,11 @@ def query_tasks(pending=None, author_id=None, limit_by=None, skip=0, limit=None)
     return task_ids
 
 # get task for id
+# throws LookupError if no task with task_id is found
 # returns task as a dict 
 def get_task(task_id):
     task = Task.query.get(task_id)
+    if task is None: raise LookupError
     # map fields to dict
     return map_dict(task, task_mapping)
 
@@ -65,9 +67,12 @@ def create_task(name, deadline, duration, author_id,
 # duration - duration of task of task in seconds
 # completed - whether the task is completed
 # author_id - user id of the author of the task
+# throws LookupError if no task with task_id is found
 def update_task(task_id, name=None, deadline=None, duration=None,
                 author_id=None, description=None, completed=None):
     task = Task.query.get(task_id)
+    if task is None: raise LookupError
+    # update task fields
     if not name is None: task.name = name
     if not deadline is None: task.deadline = deadline
     if not duration is None: task.duration = duration
@@ -78,10 +83,15 @@ def update_task(task_id, name=None, deadline=None, duration=None,
 
 # delete the task for the given task id
 # cascade deletes and dependent objects on task
+# throws LookupError if no task with task_id is found
 def delete_task(task_id):
-    # TODO: cascade delete
-
     task = Task.query.get(task_id)
+    if task is None: raise LookupError
+
+    # cascade delete dependent assignments
+    assign_ids = query_assigns(Assignment.Kind.Task, task_id)
+    for assign_id in assign_ids: delete_assign(assign_id)
+
     db.session.delete(task)
     db.session.commit()
 
@@ -113,8 +123,10 @@ def query_events(pending=None, author_id=None, limit_by=None, skip=0, limit=None
 
 # get event for id
 # returns event as a dict 
+# throws LookupError if no event with event_id is found
 def get_event(event_id):
     event = Event.query.get(event_id)
+    if event is None: raise LookupError
     # map fields to dict
     return map_dict(event, event_mapping)
 
@@ -139,9 +151,12 @@ def create_event(name, start_time, duration, author_id, description=""):
 # start_time - the begin time of the event
 # duration - duration of event of event in seconds
 # author_id - user id of the author of the event
+# throws LookupError if no event with event_id is found
 def update_event(event_id=None, name=None, start_time=None,
                  duration=None, author_id=None, description=None):
     event = Event.query.get(event_id)
+    if event is None: raise LookupError
+    # update event fields
     if not name is None: event.name = name
     if not start_time is None: event.start_time = start_time
     if not duration is None: event.duration = duration
@@ -151,27 +166,33 @@ def update_event(event_id=None, name=None, start_time=None,
 
 # delete the event for the given event id
 # cascade deletes and dependent objects on event
+# throws LookupError if no event with event_id is found
 def delete_event(event_id):
-    # TODO: cascade delete
-
     event = Event.query.get(event_id)
+    if event is None: raise LookupError
+    # cascade delete depedent assignments
+    assign_ids = query_assigns(Assignment.Kind.Event, event_id)
+    for assign_id in assign_ids: delete_assign(assign_id)
+
     db.session.delete(event)
     db.session.commit()
 
 ## Assignment Ops
 # query ids of assignments
 # kind - show only assignments of the given kind
+# item_id - show only assigns for given assignment type
 # assigner_id - show only assignments assigned by user with assigner_idj
 # assignee_id - show only assignments assigned to user with assignee_id
 # pending - show only assignments with items that are pending
 # limit_by - show only assignments with items that relevant before limit_by
 # skip - skip the first skip assignments
 # limit - output ids limit to the first limit assignments
-def query_assigns(kind=None, assigner_id=None, assignee_id=None, pending=None,
-                 limit_by=None, skip=0, limit=None):
+def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None, 
+                  pending=None, limit_by=None, skip=0, limit=None):
     assign_ids = Assignment.query.with_entities(Assignment.id)
     # apply filters
     if not kind is None: assign_ids.filter_by(kind=kind)
+    if not item_id is None: assign_ids.filter_by(item_id=item_id)
     if not assigner_id is None: assign_ids.filter_by(assigner_id=assigner_id)
     if not assignee_id is None: assign_ids.filter_by(assignee_id=assignee_id)
     if not pending is None:
@@ -198,10 +219,11 @@ def query_assigns(kind=None, assigner_id=None, assignee_id=None, pending=None,
 
 # get assignment by id
 # returns assignment as a dictionary
+# throws LookupError if no assign with assign_id is found
 def get_assign(assign_id):
     assign = Assignment.query.get(assign_id)
+    if assign is None: raise LookupError
     # map model fields to dict
-
     return map_dict(assign, assign_mapping)
 
 # create a new assignment
@@ -222,8 +244,11 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
 # item_id - id of the item in the assignment
 # assignee_id - id of the user that is assigned this assignment
 # assigner_id - id of the user that assigned this assignement
+# throws LookupError if no assign with assign_id is found
 def update_assign(assign_id, kind=None, item_id=None, assignee_id=None, assigner_id=None):
     assign = Assignment.query.get(assign_id)
+    if assign is None: raise LookupError
+    # update assignment fields
     if not kind is None: assign.kind = kind
     if not item_id is None: assign.item_id = item_id
     if not assignee_id is None: assign.assignee_id = assignee_id
@@ -231,7 +256,9 @@ def update_assign(assign_id, kind=None, item_id=None, assignee_id=None, assigner
     db.session.commit()
 
 # delete assignment with given id
+# throws LookupError if no assign with assign_id is found
 def delete_assign(assign_id):
     assign = Assignment.query.get(assign_id)
+    if assign is None: raise LookupError
     db.session.delete(assign)
     db.session.commit()

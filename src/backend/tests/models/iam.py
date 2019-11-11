@@ -38,7 +38,7 @@ class TestIAMModels(TestCase):
         db.session.add(self.worker)
         db.session.commit()
 
-        self.management = Management(kind=Management.Kind.Worker,
+        self.management = Management(kind=Management.Kind.User,
                                      target_id=self.worker.id,
                                      manager=self.supervisor)
 

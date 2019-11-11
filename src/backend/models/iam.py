@@ -49,7 +49,7 @@ class User(db.Model):
 class Management(db.Model):
     # management kinds/types
     class Kind:
-        Worker = "worker" # manage only a single worker
+        User = "user" # manage only a single user
         Team = "team" # worker
 
     # model fields

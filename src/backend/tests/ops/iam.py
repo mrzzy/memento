@@ -113,7 +113,7 @@ class TestIAMOps(TestCase):
                               "password",
                               "joel@jmail.com",
                               org_id, team_id)
-        manage_id = create_manage(Management.Kind.Worker,
+        manage_id = create_manage(Management.Kind.User,
                                   worker_id,
                                   manager_id)
 

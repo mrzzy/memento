@@ -210,7 +210,7 @@ def delete_user(user_id):
     # cascade delete
     # cascade delete mangement 
     manage_ids = query_manage(manager_id=user_id) + \
-        query_manage(kind=Management.Kind.Worker, target_id=user_id)
+        query_manage(kind=Management.Kind.User, target_id=user_id)
     for manage_id in manage_ids: delete_manage(delete_manage)
     # cascade delete assignments created
     assign_ids = query_assigns(assigner_id=user_id)
@@ -231,15 +231,21 @@ def delete_user(user_id):
 # query id of managements
 # kind - show only managements with the given kind (worker/team)
 # target_id - show only mangements for target with given id
+# org_id - show only managements that belong to the given organisation
 # manager_id - show only mangements with manager with given id
 # skip - skip the first skip organisations
 # limit - output ids limit to the first limit organisations
-def query_manage(kind=None, target_id=None, manager_id=None, skip=0, limit=None):
+def query_manage(kind=None, org_id=None, target_id=None,
+                 manager_id=None, skip=0, limit=None):
     manage_ids = Management.query.with_entities(Management.id)
     # apply filters
     if not kind is None: manage_ids = manage_ids.filter_by(kind=kind)
     if not target_id is None: manage_ids = manage_ids.filter_by(target_id=target_id)
     if not manager_id is None: manage_ids = manage_ids.filter_by(manager_id=manager_id)
+    if not org_id is None:
+        manage_ids = manage_ids.join(User, User.id == Management.manager_id)
+        manage_ids = manage_ids.filter(User.org_id == org_id)
+
     # apply skip & limit
     manage_ids = [ i[0] for i in manage_ids ]
     manage_ids = apply_bound(manage_ids, skip, limit)

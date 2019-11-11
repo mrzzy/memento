@@ -8,9 +8,8 @@ from ..app import db
 from ..models.iam import *
 from ..mapping.iam import *
 from .assignment import *
-from .notification import query_channels, delete_channel
-
 from ..utils import map_dict, apply_bound
+from .notification import query_channels, delete_channel
 
 ## Organisation Ops
 # query ids of organisations. 
@@ -24,9 +23,11 @@ def query_orgs(skip=0, limit=None):
     return org_ids
 
 # get organisation by id
+# throws LookupError if no org with org_id is found
 # returns organisation as a dict
 def get_org(org_id):
     org = Organisation.query.get(org_id)
+    if org is None: raise LookupError
     # map model fields to dict
     return map_dict(org, org_mapping)
 
@@ -41,21 +42,27 @@ def create_org(name, logo_url=None):
 
     return org.id
 
-# update an organisation
+# update the organisation with given org_id
 # org_id - update organisation with given id
 # name - name of the organisation, must be uniqu
 # logo_url - logo url for organisation. Optional.
+# throws LookupError if no org with org_id is found
 def update_org(org_id, name=None, logo_url=None):
     org = Organisation.query.get(org_id)
+    if org is None: raise LookupError
+
+    # update org fields
     if not name is None: org.name = name
     org.logo_url = logo_url
     db.session.commit()
 
 # delete an organisation 
+# throws LookupError if no org with org_id is found
 # also cascade deletes all objects depending on organisation
 # org_id - delete organisation with given id
 def delete_org(org_id):
     org = Organisation.query.get(org_id)
+    if org is None: raise LookupError
 
     # cascade delete dependent teams and users
     user_ids = query_users(org_id=org_id)
@@ -65,7 +72,6 @@ def delete_org(org_id):
 
     db.session.delete(org)
     db.session.commit()
-
 
 ## Team Ops
 # query ids of teams.
@@ -81,9 +87,11 @@ def query_teams(org_id=None, skip=0, limit=None):
     return team_ids
 
 # get team by team_id
+# throws LookupError if no team with team_id is found
 # returns team as a dict
 def get_team(team_id):
     team = Team.query.get(team_id)
+    if team is None: raise LookupError
     # map model fields to dict
     return map_dict(team, team_mapping)
 
@@ -102,8 +110,11 @@ def create_team(org_id, name):
 # team_id - id of team being updated
 # org_id - id of organisation that team belongs to 
 # name - name for team
+# throws LookupError if no team with team_id is found
 def update_team(team_id, org_id=None, name=None):
     team = Team.query.get(team_id)
+    if team is None: raise LookupError
+    # update team fields
     if not org_id is None: team.org_id = org_id
     if not name is None: team.name = name
     db.session.commit()
@@ -111,8 +122,10 @@ def update_team(team_id, org_id=None, name=None):
 
 # delete team for id 
 # also cascade deletes all objects depending on team
+# throws LookupError if no team with team_id is found
 def delete_team(team_id):
     team = Team.query.get(team_id)
+    if team is None: raise LookupError
     # cascade delete
     manage_ids = query_manage(kind=Management.Kind.Team, target_id=team_id)
     for manage_id in manage_ids: delete_manage(delete_manage)
@@ -143,8 +156,10 @@ def query_users(org_id=None, team_id=None, kind=None, skip=0, limit=None):
 
 # get user by id
 # returns user as dict
+# throws LookupError if no user with user_id is found
 def get_user(user_id):
     user = User.query.get(user_id)
+    if user is None: raise LookupError
     # map fields to dict
     return map_dict(user, user_mapping)
 
@@ -171,9 +186,12 @@ def create_user(kind, name, password, email, org_id, team_id=None):
 # email - email address of the user
 # org_id - id of organisation that the user belongs to
 # team_id - id of the team that the user belongs to, optional
+# throws LookupError if no user with user_id is found
 def update_user(user_id, kind=None, name=None, password=None,
                 email=None, org_id=None, team_id=None):
     user = User.query.get(user_id)
+    if user is None: raise LookupError
+    # update user fields
     if not kind is None: user.kind = kind
     if not name is None: user.name = name
     if not password is None: user.password = password
@@ -185,8 +203,10 @@ def update_user(user_id, kind=None, name=None, password=None,
 # delete a user
 # also cascade deletes all objects depending on user
 # user_id - delete organisation with given id
+# throws LookupError if no user with user_id is found
 def delete_user(user_id):
     user = User.query.get(user_id)
+    if user is None: raise LookupError
     # cascade delete
     # cascade delete mangement 
     manage_ids = query_manage(manager_id=user_id) + \
@@ -228,8 +248,10 @@ def query_manage(kind=None, target_id=None, manager_id=None, skip=0, limit=None)
 
 # get management for id
 # returns managements as a dict
+# throws LookupError if no manage with manage_id is found
 def get_manage(manage_id):
     manage = Management.query.get(manage_id)
+    if manage is None: raise LookupError
     # map fields to dict
     return map_dict(manage, manage_mapping)
 
@@ -249,15 +271,20 @@ def create_manage(kind, target_id, manager_id):
 # kind - kind of management target (worker/team)
 # target_id - id of the worker/team that is being managed
 # manager_id - id of the user that is assigned to manage target
+# throws LookupError if no manage with manage_id is found
 def update_manage(manage_id, kind=None, target_id=None, manager_id=None):
     manage = Management.query.get(manage_id)
+    if manage is None: raise LookupError
+    # update management fields
     if not kind is None: manage.kind = kind
     if not target_id is None: manage.target_id = target_id
     if not manager_id is None: manage.manager_id = manager_id
     db.session.commit()
 
 # delete the managment for the given manage id
+# throws LookupError if no manage with manage_id is found
 def delete_manage(manage_id):
     manage = Management.query.get(manage_id)
+    if manage is None: raise LookupError
     db.session.delete(manage)
     db.session.commit()

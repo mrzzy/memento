@@ -11,6 +11,14 @@ from ...ops.iam import *
 class TestIAMOps(TestCase):
     def test_org_ops(self):
         self.assertEqual(query_orgs(), [])
+
+        got_lookup_error = False
+        try:
+            get_org(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
         org_id = create_org("kompany", "http://logo.jpg")
 
         org = get_org(org_id)
@@ -26,6 +34,14 @@ class TestIAMOps(TestCase):
 
     def test_team_ops(self):
         self.assertEqual(query_teams(), [])
+
+        got_lookup_error = False
+        try:
+            get_team(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
         org_id = create_org("kompany", "http://logo.jpg")
         team_id = create_team(org_id, "designer")
 
@@ -45,6 +61,14 @@ class TestIAMOps(TestCase):
 
     def test_user_ops(self):
         self.assertEqual(query_users(), [])
+
+        got_lookup_error = False
+        try:
+            get_user(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
         org_id = create_org("kompany", "http://logo.jpg")
         team_id = create_team(org_id, "designer")
         user_id = create_user(User.Kind.Worker,
@@ -67,8 +91,16 @@ class TestIAMOps(TestCase):
         self.assertEqual(query_users(), [])
         delete_org(org_id)
 
-    def test_mange_ops(self):
+    def test_manage_ops(self):
         self.assertEqual(query_manage(), [])
+
+        got_lookup_error = False
+        try:
+            get_manage(2)
+        except LookupError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
         org_id = create_org("kompany", "http://logo.jpg")
         team_id = create_team(org_id, "designer")
         manager_id = create_user(User.Kind.Supervisor,

@@ -56,4 +56,4 @@ def parse_bool(value):
 
         if val_lower == "true" or val_lower == "t" or val_lower == "1": return True
         elif val_lower == "false" or val_lower == "f" or val_lower == "0": return False
-        else: return False
+        else: raise NotImplementedError(f"Unparsable bool value: {value}")

@@ -23,9 +23,8 @@ def query_channels(user_id=None, pending=None, skip=0, limit=None):
     if not user_id is None: channel_ids.filter_by(user_id=user_id)
     if not pending is None:
         now = datetime.utcnow()
-        channel_ids = channel_ids.join(Notification, Channel.id == Notification.channel_id)
+        channel_ids = channel_ids.outerjoin(Notification, Channel.id == Notification.channel_id)
         if pending: channel_ids = channel_ids.filter(Notification.firing_time > now)
-        else: channel_ids = channel_ids.filter(Notification.firing_time <= now)
     # apply skip & limit
     channel_ids = [ i[0] for i in channel_ids ]
     return apply_bound(channel_ids, skip, limit)

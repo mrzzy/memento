@@ -2,8 +2,12 @@
 Guidelines to follow when contributing to NP-Portfolio-2.
 
 ## Setup
+
 ### Backend
-Setup without docker:
+Dependencies & Prerequisites:
+- python version 3.7
+
+Development setup without docker:
 1. Install module dependencies:
 ```
 pip install -r src/backend/requirements.txt
@@ -11,6 +15,10 @@ pip install -r src/backend/requirements.txt
 2. Perform database migrations
 ```
 flask db upgrade
+```
+3. Run the backend server
+```
+flask run
 ```
 
 ## Branches

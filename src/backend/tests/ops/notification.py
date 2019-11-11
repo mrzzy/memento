@@ -47,7 +47,7 @@ class TestsNotficationOps(TestCase):
         delete_org(org_id)
 
     def test_notify_ops(self):
-        self.assertEqual(query_notify(), [])
+        self.assertEqual(query_notifys(), [])
 
         got_lookup_error = False
         try:
@@ -62,13 +62,13 @@ class TestsNotficationOps(TestCase):
 
         notify = get_notify(notify_id)
         self.assertEqual(notify["title"], "fish")
-        self.assertEqual(query_notify(), [channel_id])
-        self.assertEqual(query_notify(pending=True), [])
+        self.assertEqual(query_notifys(), [notify_id])
+        self.assertEqual(query_notifys(pending=True), [])
 
         update_notify(notify_id, title="gym")
         notify = get_notify(notify_id)
         self.assertEqual(notify["title"], "gym")
 
         delete_notify(notify_id)
-        self.assertEqual(query_notify(), [])
+        self.assertEqual(query_notifys(), [])
         delete_org(org_id)

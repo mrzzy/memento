@@ -68,7 +68,7 @@ def delete_channel(channel_id):
     if channel is None: raise LookupError
 
     # cascade delete notifications
-    notify_ids = query_notify(channel_id=channel_id)
+    notify_ids = query_notifys(channel_id=channel_id)
     for notify_id in notify_ids: delete_notify(notify_id)
 
     db.session.delete(channel)
@@ -80,7 +80,7 @@ def delete_channel(channel_id):
 # channel_id - show only notifications sent on channel with channel id
 # skip - skip the first skip channels
 # limit - output ids limit to the first limit channels
-def query_notify(pending=None, channel_id=None, skip=0, limit=None):
+def query_notifys(pending=None, channel_id=None, skip=0, limit=None):
     notify_ids = Notification.query.with_entities(Notification.id)
     # apply filters
     if not pending is None:

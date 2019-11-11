@@ -195,23 +195,23 @@ def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None,
     if not item_id is None: assign_ids.filter_by(item_id=item_id)
     if not assigner_id is None: assign_ids.filter_by(assigner_id=assigner_id)
     if not assignee_id is None: assign_ids.filter_by(assignee_id=assignee_id)
-    if not pending is None:
-        # task assignments
+
+    if not pending is None or not limit_by is None: 
         assign_ids = assign_ids.join(Task, Assignment.item_id == Task.id)
-        completed = not pending
-        assign_ids = assign_ids.filter(Task.completed == completed)
-        # event assignments
         assign_ids = assign_ids.join(Event, Assignment.item_id == Event.id)
-        now = datetime.utcnow()
-        assign_ids = assign_ids.filter(Event.start_time >= now)
-    if not limit_by is None:
-        now = datetime.utcnow()
-        # tasks assignments
-        assign_ids = assign_ids.join(Task, Assignment.item_id == Task.id)
-        assign_ids = assign_ids.filter(Task.deadline <= limit_by)
-        # event assignments
-        assign_ids = assign_ids.join(Event, Assignment.item_id == Event.id)
-        assign_ids = assign_ids.filter(Event.start_time <= limit_by)
+        if not pending is None:
+            # task assignments
+            completed = not pending
+            assign_ids = assign_ids.filter(Task.completed == completed)
+            # event assignments
+            now = datetime.utcnow()
+            assign_ids = assign_ids.filter(Event.start_time >= now)
+        if not limit_by is None:
+            now = datetime.utcnow()
+            # tasks assignments
+            assign_ids = assign_ids.filter(Task.deadline <= limit_by)
+            # event assignments
+            assign_ids = assign_ids.filter(Event.start_time <= limit_by)
 
     # apply skip & limit
     assign_ids = [ i[0] for i in assign_ids ]

@@ -114,8 +114,8 @@ class TestAssigmentOps(TestCase):
         assign = get_assign(assign_id)
         self.assertEqual(assign["assigneeId"], worker_id)
         self.assertEqual(query_assigns(), [assign_id])
-        self.assertEqual(query_assigns(pending=False, limit_by=datetime.utcnow),
-                         [assign_id])
+        self.assertEqual(query_assigns(pending=False,
+                                       limit_by=datetime.utcnow()), [])
 
         # swap worker and manager in assignment as a proof of concept
         update_assign(assign_id, assigner_id=worker_id, assignee_id=manager_id)

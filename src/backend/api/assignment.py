@@ -123,3 +123,55 @@ def route_event(event_id=None):
         return jsonify({"success": True })
     else:
         raise NotImplementedError
+
+## Assignment API
+# api - query assignments
+@assign.route(f"/api/v{API_VERSION}/{assign.name}/assigns")
+def route_assigns():
+    # parse query params
+    skip = int(request.args.get("skip", 0))
+    kind = request.args.get("kind", None)
+    limit = request.args.get("limit", None)
+    if not limit is None: limit = int(limit)
+    assigner_id = request.args.get("assigner", None)
+    if not assigner_id is None: assigner_id = int(assigner_id)
+    assignee_id = request.args.get("assignee", None)
+    if not assignee_id is None: assignee_id = int(assignee_id)
+    item_id = request.args.get("item", None)
+    if not item_id is None: item_id = int(item_id)
+    pending = request.args.get("pending", None)
+    if not pending is None: pending = parse_bool(pending)
+    limit_by = request.args.get("limit-by", None)
+    if not limit_by is None: limit_by = parse_datetime(limit_by)
+
+    # perform query
+    assign_ids = query_assigns(kind, item_id, assignee_id, assignee_id,
+                               pending, limit_by, skip, limit)
+    return jsonify(assign_ids)
+
+# api - read, create, update, delete assignments
+@assign.route(f"/api/v{API_VERSION}/{assign.name}/assign", methods=["POST"])
+@assign.route(f"/api/v{API_VERSION}/{assign.name}/assign/<assign_id>",
+              methods=["GET", "PATCH", "DELETE"])
+def route_assign(assign_id=None):
+    if request.method == "GET" and assign_id:
+        # get assign for id
+        assign = get_assign(assign_id)
+        return jsonify(assign)
+    elif request.method == "POST" and request.is_json:
+        # create assign with params in json
+        params = parse_params(request, assign_mapping)
+        assign_id = create_assign(**params)
+        return jsonify({ "id": assign_id })
+    elif request.method == "PATCH" and assign_id and request.is_json:
+        # parse params in json
+        params = parse_params(request, assign_mapping)
+        # update assign with params in json
+        update_assign(assign_id, **params)
+        return jsonify({"success": True })
+    elif request.method == "DELETE" and assign_id:
+        # delete assign with params in json
+        delete_assign(assign_id)
+        return jsonify({"success": True })
+    else:
+        raise NotImplementedError

@@ -1,8 +1,8 @@
 # tag files
 tag*
-
 # virtualenvs
 venv/
-
 # dotenv files
 .env
+# visual studio configs
+.vscode/

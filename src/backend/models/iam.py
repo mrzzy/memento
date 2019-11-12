@@ -61,13 +61,13 @@ class User(db.Model):
 
     @validates('kind')
     def validate_kind(self, key, kind):
-        kind_list = ['worker','supervisor','admin','service']
+        kind_list = ['worker', 'Worker' ,'supervisor', 'Supervisor','admin','Admin','service','Service']
         if not kind:
             raise AssertionError ('kind must not be empty')
         elif len(kind) < 2 or len(kind) > 64:
             raise AssertionError ('must be between 2 and 64 characters long')
         elif kind not in kind_list:
-            raise AssertionError ('Enter either worker, supervisor, admin or service')
+            raise AssertionError ('Enter either Worker, Supervisor, Admin or Service')
         else:
             return kind
 
@@ -116,12 +116,13 @@ class Management(db.Model):
 
     @validates('kind')
     def validate_kind(self, key, kind):
+        kind_list = ['Worker', 'worker', 'Team', 'team']
         if not kind:
             raise AssertionError ('kind must not be empty')
         elif len(kind) < 1 or len(kind) > 64:        
             raise AssertionError ('must be between 1 and 64 characters long')
-        elif kind != "worker" or kind != "team":
-            raise AssertionError ('Enter either worker or team')
+        elif kind not in kind_list:
+            raise AssertionError ('Enter either Worker or Team')
         else:
             return kind
 

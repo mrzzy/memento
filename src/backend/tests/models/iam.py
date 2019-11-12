@@ -24,7 +24,7 @@ class TestIAMModels(TestCase):
         self.supervisor = User(kind=User.Kind.Supervisor,
                                organisation=self.organisation,
                                name="Joel",
-                               password="password",
+                               password="Pa$$w0rd",
                                email="joel@email.com")
         db.session.add(self.supervisor)
         db.session.commit()
@@ -33,7 +33,7 @@ class TestIAMModels(TestCase):
                            organisation=self.organisation,
                            team=self.team,
                            name="James",
-                           password="password",
+                           password="Pa$$w0rd",
                            email="james@email.com")
         db.session.add(self.worker)
         db.session.commit()
@@ -64,15 +64,17 @@ class TestIAMModels(TestCase):
     def test_validate_user(self):
         self.create_test_data()
         
-        self.user = User(
-            name="Joe",
-            password="1232323eeiejojA",
-            kind=User.Kind.Admin,
-            organisation=self.organisation,
-            email="joe@gmail.com"
-        )
+       
+
         got_exception = False
         try:
+            self.user = User(
+                name="Joe",
+                password="Pa$$wrd",
+                kind=User.Kind.Admin,
+                organisation=self.organisation,
+                email="joe@gmail.com"
+            )
             db.session.add(self.user)
             db.session.commit()
         except AssertionError:

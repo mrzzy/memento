@@ -81,6 +81,8 @@ class Event(db.Model):
     def validate_start_time(self, key, start_time):
         if not start_time:
             raise AssertionError("Start time cannot be empty.")
+        else:
+            return start_time
         
 class Assignment(db.Model):
     # assignment item/types
@@ -101,9 +103,10 @@ class Assignment(db.Model):
 
     @validates('kind')
     def validate_kind(self, key, kind):
+        kind_list = ['Task','task','Event','event']
         if not kind:
             raise AssertionError ('kind must not be empty')
-        elif kind != "task" or kind !="event":
-            raise AssertionError ('Enter either task or event')
+        elif kind not in kind_list:
+            raise AssertionError ('Enter either Task or Event')
         else:
             return kind

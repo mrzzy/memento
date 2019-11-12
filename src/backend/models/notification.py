@@ -36,10 +36,11 @@ class Notification(db.Model):
 
     @validates('kind')
     def validate_kind (self, key, kind):
+        kind_list = ['Event','event','Task','task','Notice','notice']
         if not kind:
             raise AssertionError("kind must not be empty")
-        elif kind != "event" or kind != "task":
-            raise AssertionError("Enter either task or event")
+        elif kind not in kind_list:
+            raise AssertionError('Enter either Event , Task or Notice')
         else:
             return kind
 

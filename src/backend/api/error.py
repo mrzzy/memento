@@ -42,6 +42,7 @@ def route_bad_request(error):
         "message": "Submitted a malformed request."
     }), 400
 
+
 # error handler for method not allowed/implmented (NotImplementedError)
 @err.app_errorhandler(405)
 @err.app_errorhandler(NotImplementedError)
@@ -50,3 +51,13 @@ def route_method_not_allowed(error):
         "error": "method-not-allowed",
         "message": "Method used is not allowed/Implemented."
     }), 405
+
+# error handler for request failing validation
+@err.app_errorhandler(422)
+@err.app_errorhandler(AssertionError)
+def route_validation(error):
+    return jsonify({
+        "error": "validation-failed",
+        "message": error.message
+    }), 422
+

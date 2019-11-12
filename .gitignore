@@ -3,3 +3,6 @@ tag*
 
 # virtualenvs
 venv/
+
+# node packages
+node_modules/

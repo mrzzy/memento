@@ -100,7 +100,7 @@ def route_event(event_id=None):
         event = get_event(event_id)
         # convert to iso date format
         # add "Z" to signal utc timezone
-        event["start_time"] = event["start_time"].isoformat() + "Z"
+        event["startTime"] = event["startTime"].isoformat() + "Z"
         return jsonify(event)
     elif request.method == "POST" and request.is_json:
         # create event with params in json

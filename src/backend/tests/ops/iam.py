@@ -15,7 +15,7 @@ class TestIAMOps(TestCase):
         got_lookup_error = False
         try:
             get_org(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
@@ -38,7 +38,7 @@ class TestIAMOps(TestCase):
         got_lookup_error = False
         try:
             get_team(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
@@ -65,7 +65,7 @@ class TestIAMOps(TestCase):
         got_lookup_error = False
         try:
             get_user(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
@@ -97,7 +97,7 @@ class TestIAMOps(TestCase):
         got_lookup_error = False
         try:
             get_manage(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 

@@ -26,7 +26,7 @@ class TestsNotficationOps(TestCase):
         got_lookup_error = False
         try:
             get_channel(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
@@ -52,7 +52,7 @@ class TestsNotficationOps(TestCase):
         got_lookup_error = False
         try:
             get_notify(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 

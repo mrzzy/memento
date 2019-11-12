@@ -7,19 +7,24 @@
 from flask import abort, Blueprint, jsonify
 from sqlalchemy.exc import IntegrityError
 
+## custom exceptions
+# raised when something is not found
+class NotFoundError(Exception):
+    pass
+
 ## error handlers
 err = Blueprint("err", __name__)
 
-# error handler for object not found error (LookupError)
+# error handler for object not found error (NotFoundError)
 @err.app_errorhandler(404)
-@err.app_errorhandler(LookupError)
+@err.app_errorhandler(NotFoundError)
 def route_not_found(error):
     return jsonify({
         "error": "not-found",
         "message": "Requested object not found."
     }), 404
 
-# error handler for conflict in db errro (IntegrityError)
+# error handler for conflict in db errror (IntegrityError)
 @err.app_errorhandler(409)
 @err.app_errorhandler(IntegrityError)
 def route_conflict(error):

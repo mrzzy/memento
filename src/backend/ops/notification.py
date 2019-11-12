@@ -10,6 +10,7 @@ from ..app import db
 from ..models.notification import *
 from ..mapping.notification import *
 from ..utils import apply_bound, map_dict
+from ..api.error import NotFoundError
 
 ## Channel Ops
 # query ids of channels
@@ -31,10 +32,10 @@ def query_channels(user_id=None, pending=None, skip=0, limit=None):
 
 # get channel for channel id
 # returns channel as a dict
-# throws LookupError if no channel with channel_id is found
+# throws NotFoundError if no channel with channel_id is found
 def get_channel(channel_id):
     channel = Channel.query.get(channel_id)
-    if channel is None: raise LookupError
+    if channel is None: raise NotFoundError
     # map fields to dict
     return map_dict(channel, channel_mapping)
 
@@ -51,10 +52,10 @@ def create_channel(kind, user_id):
 # update channel with channel_id
 # kind - kind of channel (task/event/notice)
 # user_id - id of user using this channel
-# throws LookupError if no channel with channel_id is found
+# throws NotFoundError if no channel with channel_id is found
 def update_channel(channel_id, kind=None, user_id=None):
     channel = Channel.query.get(channel_id)
-    if channel is None: raise LookupError
+    if channel is None: raise NotFoundError
     # update channel fields
     if not kind is None: channel.kind = kind
     if not user_id is None: channel.user_id = user_id
@@ -62,10 +63,10 @@ def update_channel(channel_id, kind=None, user_id=None):
 
 # delete the channel with the given channel id
 # also cascade deletes any dependent objects
-# throws LookupError if no channel with channel_id is found
+# throws NotFoundError if no channel with channel_id is found
 def delete_channel(channel_id):
     channel = Channel.query.get(channel_id)
-    if channel is None: raise LookupError
+    if channel is None: raise NotFoundError
 
     # cascade delete notifications
     notify_ids = query_notifys(channel_id=channel_id)
@@ -96,10 +97,10 @@ def query_notifys(pending=None, channel_id=None, skip=0, limit=None):
     return apply_bound(notify_id, skip, limit)
 
 # get notification for notify_id
-# throws LookupError if no notify with notify_id is found
+# throws NotFoundError if no notify with notify_id is found
 def get_notify(notify_id):
     notify = Notification.query.get(notify_id)
-    if notify is None: raise LookupError
+    if notify is None: raise NotFoundError
     # map fields to dict
     return map_dict(notify, notify_mapping)
 
@@ -121,11 +122,11 @@ def create_notify(title, firing_time, channel_id, description=""):
 # firing_time - firing datetime of the notification
 # channel_id - id of the channel to send the notification
 # returns the id of the new notification
-# throws LookupError if no notify with notify_id is found
+# throws NotFoundError if no notify with notify_id is found
 def update_notify(notify_id, title=None, firing_time=None, channel_id=None,
                   description=None):
     notify = Notification.query.get(notify_id)
-    if notify is None: raise LookupError
+    if notify is None: raise NotFoundError
     # update notification fields
     if not title is None: notify.title = title
     if not firing_time is None: notify.firing_time = firing_time
@@ -134,9 +135,9 @@ def update_notify(notify_id, title=None, firing_time=None, channel_id=None,
     db.session.commit()
 
 # delete notification with the given notify_id
-# throws LookupError if no notify with notify_id is found
+# throws NotFoundError if no notify with notify_id is found
 def delete_notify(notify_id):
     notify = Notification.query.get(notify_id)
-    if notify is None: raise LookupError
+    if notify is None: raise NotFoundError
     db.session.delete(notify)
     db.session.commit()

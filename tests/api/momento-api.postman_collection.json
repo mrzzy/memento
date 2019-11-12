@@ -331,7 +331,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/teams?org=1",
+							"raw": "http://{{api_host}}/api/v0/iam/teams?org={{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -345,7 +345,7 @@
 							"query": [
 								{
 									"key": "org",
-									"value": "1"
+									"value": "{{org_id}}"
 								}
 							]
 						}
@@ -515,7 +515,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"admin\",\n\t\"name\": \"Joel\",\n\t\"password\": \"password\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"kind\": \"admin\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -609,7 +609,7 @@
 									"    const user = pm.response.json();",
 									"    assert(user.kind === \"admin\");",
 									"    assert(user.name === \"Joel\");",
-									"    assert(user.password === \"password\");",
+									"    assert(user.password === \"P@$$w0rd\");",
 									"    assert(user.email === \"joel@gmail.com\");",
 									"});"
 								],
@@ -800,7 +800,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manages?kind=worker&org=1&manager=1",
+							"raw": "http://{{api_host}}/api/v0/iam/manages?kind=user&org=1&manager=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -814,7 +814,7 @@
 							"query": [
 								{
 									"key": "kind",
-									"value": "worker"
+									"value": "user"
 								},
 								{
 									"key": "org",
@@ -850,8 +850,8 @@
 									"pm.test(\"response has expected contents\", () => {",
 									"    const manage = pm.response.json();",
 									"    assert(manage.kind === \"user\");",
-									"    assert(manage.managerId  == 1);",
-									"    assert(manage.targetId == 1);",
+									"    assert(manage.managerId === pm.globals.get(\"user_id\"));",
+									"    assert(manage.targetId === pm.globals.get(\"user_id\"));",
 									"});",
 									""
 								],
@@ -1357,7 +1357,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"supervisor\",\n\t\"name\": \"James\",\n\t\"password\": \"password\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"kind\": \"supervisor\",\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1431,7 +1431,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"worker\",\n\t\"name\": \"Joel\",\n\t\"password\": \"password\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"kind\": \"worker\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1669,7 +1669,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"authorId\": 1,\n    \"completed\": true,\n    \"deadline\": \"2099-11-11T11:51:53.334Z\",\n    \"description\": \"Complete the fishing quota by going fishing\",\n    \"duration\": 3600,\n    \"name\": \"fishing\"\n}",
+							"raw": "{\n    \"authorId\": {{supervisor_id}},\n    \"completed\": true,\n    \"deadline\": \"2099-11-11T11:51:53.334Z\",\n    \"description\": \"Complete the fishing quota by going fishing\",\n    \"duration\": 3600,\n    \"name\": \"fishing\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2029,7 +2029,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assigns?pending=1&assigneeId={{worker_id}}",
+							"raw": "http://{{api_host}}/api/v0/assignment/assigns?pending=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2044,10 +2044,6 @@
 								{
 									"key": "pending",
 									"value": "1"
-								},
-								{
-									"key": "assigneeId",
-									"value": "{{worker_id}}"
 								}
 							]
 						}
@@ -2074,10 +2070,10 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const assign = pm.response.json();",
-									"    assert(assign.itemId === 1);",
+									"    assert(assign.itemId === pm.globals.get(\"task_id\"));",
 									"    assert(assign.kind === \"task\");",
-									"    assert(assign.assigneeId === 2);",
-									"    assert(assign.assignerId === 1);",
+									"    assert(assign.assigneeId === pm.globals.get(\"worker_id\"));",
+									"    assert(assign.assignerId === pm.globals.get(\"supervisor_id\"));",
 									"});",
 									""
 								],
@@ -2146,7 +2142,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"assigneeId\": 2,\n    \"assignerId\": 1,\n    \"itemId\": {{event_id}},\n    \"kind\": \"event\"\n}",
+							"raw": "{\n    \"assigneeId\": {{worker_id}},\n    \"assignerId\": {{supervisor_id}},\n    \"itemId\": {{event_id}},\n    \"kind\": \"event\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2468,6 +2464,80 @@
 					"response": []
 				},
 				{
+					"name": "create team",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save org_id for later tests",
+									"    pm.globals.set(\"team_id\",  response.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"designers\",\n\t\"orgId\": {{org_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v0/iam/team",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"iam",
+								"team"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "create user",
 					"event": [
 						{
@@ -2518,7 +2588,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"admin\",\n\t\"name\": \"Joel\",\n\t\"password\": \"password\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"kind\": \"admin\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2929,7 +2999,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify/1",
+							"raw": "http://{{api_host}}/api/v0/notification/notify/{{notify_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2939,7 +3009,7 @@
 								"v0",
 								"notification",
 								"notify",
-								"1"
+								"{{notify_id}}"
 							]
 						}
 					},

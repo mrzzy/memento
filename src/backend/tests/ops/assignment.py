@@ -17,12 +17,12 @@ class TestAssigmentOps(TestCase):
         org_id = create_org("kompany")
         manager_id = create_user(User.Kind.Supervisor,
                               "John",
-                              "password",
+                              "P@$$w0rd",
                               "john@jmail.com",
                               org_id)
         worker_id = create_user(User.Kind.Worker,
                               "Joel",
-                              "password",
+                              "P@$$w0rd",
                               "joel@jmail.com",
                               org_id)
 
@@ -34,7 +34,7 @@ class TestAssigmentOps(TestCase):
         got_lookup_error = False
         try:
             get_task(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
@@ -65,7 +65,7 @@ class TestAssigmentOps(TestCase):
         got_lookup_error = False
         try:
             get_event(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
@@ -96,7 +96,7 @@ class TestAssigmentOps(TestCase):
         got_lookup_error = False
         try:
             get_assign(2)
-        except LookupError:
+        except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 

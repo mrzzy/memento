@@ -12,6 +12,7 @@ from ...models import *
 
 from .iam import TestIAMModels
 
+
 # unit tests for Notification models
 class TestNotificationModels(TestCase):
     def create_test_data(self):

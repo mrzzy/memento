@@ -126,9 +126,6 @@ class Management(db.Model):
         elif len(kind) < 1 or len(kind) > 64:
             raise AssertionError ('must be between 1 and 64 characters long')
         elif kind not in kind_list:
-            raise AssertionError ('Enter either Worker or Team')
+            raise AssertionError (f"Management types must be one of: {kind_list}")
         else:
             return kind
-
-
-

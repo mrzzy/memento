@@ -17,12 +17,12 @@ class TestAssigmentOps(TestCase):
         org_id = create_org("kompany")
         manager_id = create_user(User.Kind.Supervisor,
                               "John",
-                              "password",
+                              "P@$$w0rd",
                               "john@jmail.com",
                               org_id)
         worker_id = create_user(User.Kind.Worker,
                               "Joel",
-                              "password",
+                              "P@$$w0rd",
                               "joel@jmail.com",
                               org_id)
 

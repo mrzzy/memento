@@ -30,13 +30,11 @@ class Task(db.Model):
             raise AssertionError ("must be between 2 to 256 characters long")
         else:
             return name
-        
+
     @validates('description')
     def validate_description(self, key, description):
-        if not description:
-            raise AssertionError ("Description must not be empty")
-        elif len(description) < 10 or len(description) > 2048:
-            raise AssertionError ("must be between 10 to 2048 characters long")
+        if len(description) > 2048:
+            raise AssertionError ("Description should not exceed 2048 charactersx")
         else:
             return description
 
@@ -60,13 +58,11 @@ class Event(db.Model):
             raise AssertionError ("must be between 2 to 256 characters long")
         else:
             return name
-    
+
     @validates('description')
     def validate_description(self, key, description):
-        if not description:
-            raise AssertionError ("Description must not be empty")
-        elif len(description) < 10 or len(description) > 2048:
-            raise AssertionError ("must be between 10 to 2048 characters long")
+        if len(description) > 2048:
+            raise AssertionError ("Description should not exceed 2048 charactersx")
         else:
             return description
 

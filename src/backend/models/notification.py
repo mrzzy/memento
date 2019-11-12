@@ -58,10 +58,7 @@ class Notification(db.Model):
 
     @validates('description')
     def validate_description (self, key, description):
-        if not description:
-            raise AssertionError('description must not be empty') 
-
-        elif len(description) < 10 or len(description) > 1024:
-            raise AssertionError ('must be between 10 to 1024 characters long')
+        if len(description) > 1024:
+            raise AssertionError("Description must not exceed 1024 characters")
         else:
             return description

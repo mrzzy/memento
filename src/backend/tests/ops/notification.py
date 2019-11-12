@@ -15,7 +15,7 @@ class TestsNotficationOps(TestCase):
         org_id = create_org("kompany")
         user_id = create_user(User.Kind.Supervisor,
                               "John",
-                              "password",
+                              "P@$$w0rd",
                               "john@jmail.com",
                               org_id)
         return org_id, user_id

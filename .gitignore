@@ -3,3 +3,6 @@ tag*
 
 # virtualenvs
 venv/
+
+# visual studio configs
+.vscode/

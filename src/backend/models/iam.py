@@ -20,7 +20,7 @@ class Organisation(db.Model):
 class Team(db.Model):
     # model fields
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(256), unique=True, nullable=False)
+    name = db.Column(db.String(256), nullable=False)
     # relationships 
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"),
                        nullable=False)
@@ -38,7 +38,7 @@ class User(db.Model):
     # model fields
     id = db.Column(db.Integer, primary_key=True)
     kind = db.Column(db.String(64), nullable=False)
-    name = db.Column(db.String(256), unique=True, nullable=False)
+    name = db.Column(db.String(256), nullable=False)
     password = db.Column(db.String(512), nullable=False)
     email = db.Column(db.String(512), unique=True, nullable=False)
     # relationships 

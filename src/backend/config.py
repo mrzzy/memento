@@ -13,6 +13,7 @@ from .utils import parse_bool
 ## config
 # database configuration
 SQL_DATABASE = os.environ.get("SQL_DATABASE", "sqlite")
+SQLALCHEMY_DATABASE_URI = ""
 if SQL_DATABASE == "sqlite":
     SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI",
                                              "sqlite:///" + os.path.join(gettempdir(),
@@ -28,6 +29,9 @@ elif SQL_DATABASE == "postgresql":
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "SQLALCHEMY_DATABASE_URI",
         f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DATABASE_HOST}/{POSTGRES_DB}")
+else:
+    raise NotImplementedError(f"Database not supported: {SQL_DATABASE}")
+
 SQLALCHEMY_TRACK_MODIFICATIONS = \
     parse_bool(os.environ.get("SQLALCHEMY_TRACK_MODIFICATIONS", False))
 SQLALCHEMY_ECHO =  parse_bool(os.environ.get("SQLALCHEMY_ECHO", False))

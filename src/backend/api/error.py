@@ -25,7 +25,7 @@ def route_not_found(error):
 def route_conflict(error):
     return jsonify({
         "error": "conflict",
-        "message": "Requested operation will cause a conflict."
+        "message": "Requested operation will cause a conflict/data integrity issue."
     }), 409
 
 # error handler for malformed request error

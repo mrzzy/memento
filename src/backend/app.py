@@ -35,5 +35,5 @@ def route_root():
 
 # health check route
 @app.route('/healthz')
-def healh_check():
+def health_check():
     return "OK"

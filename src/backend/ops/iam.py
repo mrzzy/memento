@@ -211,7 +211,7 @@ def delete_user(user_id):
     # cascade delete mangement 
     manage_ids = query_manage(manager_id=user_id) + \
         query_manage(kind=Management.Kind.User, target_id=user_id)
-    for manage_id in manage_ids: delete_manage(delete_manage)
+    for manage_id in manage_ids: delete_manage(manage_id)
     # cascade delete assignments created
     assign_ids = query_assigns(assigner_id=user_id)
     for assign_id in assign_ids: delete_assign(assign_id)

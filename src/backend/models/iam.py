@@ -17,7 +17,7 @@ class Organisation(db.Model):
     # relationships 
     teams = db.relationship("Team", backref=db.backref("organisation"), lazy=True)
     members = db.relationship("User", backref=db.backref("organisation"), lazy=True)
-    
+
     @validates('name')
     def validate_name(self, key, name):
         if not name:
@@ -26,7 +26,6 @@ class Organisation(db.Model):
             raise AssertionError(' must be between 2 and 256 characters long')
         else:
             return name
-        
 
 # defines a team in an organisation  that users can be belng too
 class Team(db.Model):
@@ -37,7 +36,6 @@ class Team(db.Model):
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"),
                        nullable=False)
     members = db.relationship("User", backref=db.backref("team"), lazy=True)
-
 
 
 # defines a user in the organisation.
@@ -61,7 +59,13 @@ class User(db.Model):
 
     @validates('kind')
     def validate_kind(self, key, kind):
-        kind_list = ['worker', 'Worker' ,'supervisor', 'Supervisor','admin','Admin','service','Service']
+        kind_list = [
+            User.Kind.Worker,
+            User.Kind.Supervisor,
+            User.Kind.Admin,
+            User.Kind.Service
+        ]
+
         if not kind:
             raise AssertionError ('kind must not be empty')
         elif len(kind) < 2 or len(kind) > 64:
@@ -116,10 +120,10 @@ class Management(db.Model):
 
     @validates('kind')
     def validate_kind(self, key, kind):
-        kind_list = ['Worker', 'worker', 'Team', 'team']
+        kind_list = [Management.Kind.User, Management.Kind.Team]
         if not kind:
             raise AssertionError ('kind must not be empty')
-        elif len(kind) < 1 or len(kind) > 64:        
+        elif len(kind) < 1 or len(kind) > 64:
             raise AssertionError ('must be between 1 and 64 characters long')
         elif kind not in kind_list:
             raise AssertionError ('Enter either Worker or Team')

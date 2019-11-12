@@ -24,6 +24,18 @@ class Channel(db.Model):
     notifications = db.relationship("Notification", backref=db.backref("channel"),
                                     lazy=True)
 
+    @validates('kind')
+    def validate_kind(self, key, kind):
+        kind_list = [Channel.Kind.Task,
+                     Channel.Kind.Event,
+                     Channel.Kind.Notice]
+        if not kind:
+            raise AssertionError("kind must not be empty")
+        elif kind not in kind_list:
+            raise AssertionError('Enter either Event , Task or Notice')
+        else:
+            return kind
+
 # defines a notification that is send to a channel
 class Notification(db.Model):
     # model fields
@@ -34,16 +46,6 @@ class Notification(db.Model):
 
     # relationships
     channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=True)
-
-    @validates('kind')
-    def validate_kind (self, key, kind):
-        kind_list = ['Event','event','Task','task','Notice','notice']
-        if not kind:
-            raise AssertionError("kind must not be empty")
-        elif kind not in kind_list:
-            raise AssertionError('Enter either Event , Task or Notice')
-        else:
-            return kind
 
     @validates('title')
     def validate_title (self, key, title):

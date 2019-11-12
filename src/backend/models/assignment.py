@@ -83,7 +83,7 @@ class Event(db.Model):
             raise AssertionError("Start time cannot be empty.")
         else:
             return start_time
-        
+
 class Assignment(db.Model):
     # assignment item/types
     class Kind:
@@ -103,7 +103,7 @@ class Assignment(db.Model):
 
     @validates('kind')
     def validate_kind(self, key, kind):
-        kind_list = ['Task','task','Event','event']
+        kind_list = [Assignment.Kind.Task, Assignment.Kind.Event]
         if not kind:
             raise AssertionError ('kind must not be empty')
         elif kind not in kind_list:

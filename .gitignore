@@ -3,3 +3,6 @@ tag*
 
 # virtualenvs
 venv/
+
+# dotenv files
+.env

@@ -31,7 +31,6 @@ scaling:
   backend:
     replicaCount: 1
 
-
 # security
 podSecurityContext: {}
   # fsGroup: 2000
@@ -52,10 +51,10 @@ tolerations: []
 affinity: {}
 
 # services
-service:
-  type: ClusterIP
-  port: 80
-  
+services:
+  backend:
+    type: ClusterIP
+    port: 80
 
 # ingress
 ingress:

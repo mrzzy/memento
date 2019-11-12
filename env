@@ -1,9 +1,13 @@
 # flask app
 FLASK_APP=app.py
 
-# database 
-POSTGRES_USER=
+# postgres database config
+POSTGRES_USER=docker
 POSTGRES_PASSWORD=
-SQLALCHEMY_TRACK_MODIFICATIONS=
-SQLALCHEMY_DATABASE_URI="sqlite:////tmp/test.db"
-SQLALCHEMY_ECHO=true
+POSTGRES_DB=memento
+
+# backend config
+SQL_DATABASE=sqlite
+DATABASE_HOST=
+SQLALCHEMY_TRACK_MODIFICATIONS=false
+SQLALCHEMY_ECHO=false

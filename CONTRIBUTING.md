@@ -2,6 +2,15 @@
 Guidelines to follow when contributing to NP-Portfolio-2.
 
 ## Setup
+Development Setup with Docker-Compose:
+1. Build docker images
+```
+docker-compose build
+```
+2. Bring up development stack
+```
+docker-compose up
+```
 
 ### Backend
 Dependencies & Prerequisites:
@@ -10,7 +19,8 @@ Dependencies & Prerequisites:
 Development setup without docker:
 1. Install module dependencies:
 ```
-pip install -r src/backend/requirements.txt
+cd src/backend
+pip install -r requirements.txt
 ```
 2. Perform database migrations
 ```
@@ -18,9 +28,8 @@ flask db upgrade
 ```
 3. Run the backend server
 ```
-flask run
+python run.py
 ```
-
 ## Branches
 Branches used in the project:
 - develop - main develop branch

@@ -16,6 +16,8 @@ from ..mapping.notification import *
 from ..ops.notification import *
 
 notify = Blueprint("notification", __name__)
+notify_ws = Blueprint("notification websockets", __name__)
+
 
 ## Channel API
 # api - query channels

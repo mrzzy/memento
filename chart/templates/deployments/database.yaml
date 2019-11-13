@@ -62,7 +62,7 @@ spec:
           volumeMounts:
             - name: database-data
               mountPath: "/var/lib/postgresql/data"
-              subPath: "memento_database_data"
+              subPath: memento-database-data
       volumes:
         - name: database-data
           persistentVolumeClaim:

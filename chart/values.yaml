@@ -10,6 +10,12 @@ fullnameOverride: ""
 releaseKind: dev
 environment: development
 
+# credentials
+credentials:
+  database:
+    user: memento
+    password: jLDjxG88Cm2vqR6E
+
 # images
 images:
   backend:

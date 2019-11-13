@@ -42,6 +42,12 @@ spec:
             - name: http
               containerPort: 5000
               protocol: TCP
+          # inject configuration using environment
+          envFrom:
+            - configMapRef:
+                name: {{ include "memento.fullname" . }}-config-env
+            - secretRef:
+                name: {{ include "memento.fullname" . }}-database
           livenessProbe:
             httpGet:
               path: /healthz

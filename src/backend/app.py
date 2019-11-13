@@ -16,24 +16,16 @@ app.config.from_object(config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# api components
-from .api.error import err
-from .api.iam import iam
-from .api.assignment import assign
-from .api.notification import notify
+# register api components
+from .api import register_api
+register_api(app)
 
-# register api component bluerints
-app.register_blueprint(err)
-app.register_blueprint(iam)
-app.register_blueprint(assign)
-app.register_blueprint(notify)
-
-# root route
+# root route - backend status
 @app.route('/')
-def route_root():
+def route_status():
     return "Memento Backend API is up and running!"
 
-# health check route
+# k8s health check route
 @app.route('/healthz')
 def health_check():
     return "OK"

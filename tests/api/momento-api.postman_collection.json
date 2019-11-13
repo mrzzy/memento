@@ -3277,6 +3277,56 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "status",
+			"item": [],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "get api status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "caa1739e-7b23-4e0f-a287-b51303716fce",
+						"exec": [
+							"const assert = require(\"assert\");",
+							"",
+							"pm.test(\"status code ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test(\"response is parsable json\", ()  => {",
+							"    pm.response.json();",
+							"})",
+							"",
+							"pm.test(\"response has expected contents\", () => {",
+							"    const response = pm.response.json();",
+							"    assert(response.status === \"OK\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{api_host}}/api/v0/status",
+					"protocol": "http",
+					"host": [
+						"{{api_host}}"
+					],
+					"path": [
+						"api",
+						"v0",
+						"status"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"protocolProfileBehavior": {}

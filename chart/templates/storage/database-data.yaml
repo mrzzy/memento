@@ -1,0 +1,20 @@
+#
+# Memento
+# Helm Chart
+# Database Data 
+# Persistent Volume Claim
+#
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "memento.fullname" . }}-database-data
+  labels:
+{{ include "memento.labels" . | indent 4 }}
+    component: database
+spec:
+  resources:
+    requests:
+      storage: 8Gi
+  accessModes:
+    - ReadWriteOnce

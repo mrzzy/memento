@@ -80,7 +80,7 @@ ingress:
   hosts:
     - host: memento.mrzzy.co
       paths: [ "/api" ]
-      serviceName: backend
+      serviceName: memento-backend
       servicePort: 80
 
   tls: []

@@ -18,6 +18,10 @@ credentials:
 
 # images
 images:
+  database:
+    repository: postgres
+    tag: 12.0-alpine
+    pullPolicy: IfNotPresent 
   backend:
     repository: mrzzy/memento-backend
     tag: latest

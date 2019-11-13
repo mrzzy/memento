@@ -1,0 +1,82 @@
+# 
+# Memento
+# Helm Chart
+# Database Deployment
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "memento.fullname" . }}-database
+  labels:
+{{ include "memento.labels" . | indent 4 }}
+    component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "memento.fullname" . }}
+      component: database
+  template:
+    metadata:
+      labels:
+        app: {{ include "memento.fullname" . }}
+        component: database
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ template "memento.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- with .Values.images.database }}
+          image: "{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          # inject configuration using environment
+          envFrom:
+            - configMapRef:
+                name: {{ include "memento.fullname" . }}-config-env
+            - secretRef:
+                name: {{ include "memento.fullname" . }}-database
+          livenessProbe:
+            tcpSocket:
+              port: postgres
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: postgres
+            periodSeconds: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: database-data
+              mountPath: "/var/lib/postgresql/data"
+              subPath: "memento_database_data"
+      volumes:
+        - name: database-data
+          persistentVolumeClaim:
+            claimName: {{ include "memento.fullname" . }}-database-data
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

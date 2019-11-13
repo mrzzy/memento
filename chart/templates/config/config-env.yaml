@@ -4,7 +4,8 @@
 # Environment Configmap
 #
 
-{{ $fullName := include "memento.fullname" . -}}
+{{ $dbPort := .Values.services.database.port -}}
+{{ $dbSvcName := .Values.services.database.name -}}
 
 apiVersion: v1
 kind: ConfigMap
@@ -19,6 +20,6 @@ data:
   # backend config
   FLASK_APP: app.py
   SQL_DATABASE: postgresql
-  DATABASE_HOST: "{{ $fullName }}-database:{{ .Values.services.database.port }}"
+  DATABASE_HOST: "{{ $dbSvcName }}:{{ $dbPort }}"
   SQLALCHEMY_TRACK_MODIFICATIONS: false
   SQLALCHEMY_ECHO: false

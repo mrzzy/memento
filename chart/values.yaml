@@ -63,9 +63,11 @@ affinity: {}
 # services
 services:
   database:
+    name: postgresql
     type: ClusterIP
     port: 5432
   backend:
+    name: memento-backend
     type: ClusterIP
     port: 80
 

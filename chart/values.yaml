@@ -58,6 +58,9 @@ affinity: {}
 
 # services
 services:
+  database:
+    type: ClusterIP
+    port: 5432
   backend:
     type: ClusterIP
     port: 80

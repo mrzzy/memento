@@ -5,14 +5,14 @@
 #
 
 import time
-import asyncio
+import gevent
 from flask import jsonify
 from datetime import datetime
 
 from ..app import db
 from ..models.notification import *
 from ..mapping.notification import *
-from ..utils import apply_bound, map_dict, run_async
+from ..utils import apply_bound, map_dict
 from ..api.error import NotFoundError
 from ..messaging.broker import LocalBroker
 
@@ -195,7 +195,7 @@ def schedule_notify(notify_id):
         # publish firing message on channel
         print(f"publishing notification: {notify.title}")
         message_broker.publish(f"channel/{notify.channel_id}", f"notify/{notify_id}")
-    run_async(fire_notify)
+    gevent.spawn(fire_notify)
 
 # reschedule all pending notifications for firing (ie after backend reboot.)
 def reschedule_all_notifies():

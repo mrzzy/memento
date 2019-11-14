@@ -4,6 +4,8 @@
 # Run Server
 #
 
+from gevent import monkey
+monkey.patch_all()
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 

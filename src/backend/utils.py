@@ -4,7 +4,6 @@
 # Utilites
 #
 
-import asyncio
 
 # reverse mapping - swap mappings ordering
 # returns reverse mapping
@@ -59,11 +58,3 @@ def parse_bool(value):
         if val_lower == "true" or val_lower == "t" or val_lower == "1": return True
         elif val_lower == "false" or val_lower == "f" or val_lower == "0": return False
         else: raise NotImplementedError(f"Unparsable bool value: {value}")
-
-# run the given function with the given arguments asyncronously
-event_loop = None
-def run_async(fn, *args):
-    global event_loop
-    if event_loop is None:
-        event_loop = asyncio.get_event_loop()
-    event_loop.run_in_executor(None, fn, *args)

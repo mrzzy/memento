@@ -4,6 +4,7 @@
 # Notification API
 #
 
+import json
 from datetime import datetime
 from flask import request, Blueprint, jsonify
 from sqlalchemy.exc import IntegrityError
@@ -129,7 +130,6 @@ def route_subscribe(socket):
 
     # build callback to handle subscribed notifications
     def callback(message):
-        print(f"handing message: {message}")
         if not socket.closed:
             if message == "close":
                 socket.close()
@@ -140,10 +140,13 @@ def route_subscribe(socket):
                 # add "Z" to signal utc timezone
                 notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
                 # forward notification to subscribed
-                socket.send(jsonify(notify))
+                socket.send(json.dumps(notify))
             else:
                 raise NotImplementedError(f"Unknown message: {message}")
 
     # subscribe to channels with callack
     for channel_id in channel_ids:
         subscribe_channel(channel_id, callback)
+
+    # required to prevent websocket from closing
+    while True: time.sleep(600)

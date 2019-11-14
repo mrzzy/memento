@@ -95,17 +95,34 @@ async function GETTaskFromUserId(userId) {
     let tasksForUser = [];
 
     for (let i = 0; i < assignmentIdList.length; i++) {
-        const assignment = await GETAssignment(assignmentIdList[i]);
-        if (assignment.assigneeId == userId) {
-            const task = await GETTaskFromTaskId(assignment.itemId);
-            task.id = assignment.itemId;
-            tasksForUser.push(task);
-        }
+        let assignment = await GETAssignment(assignmentIdList[i])
+            .then(assignment => {
+                console.log(assignment);
+                if (assignment.assigneeId == userId) {
+                    let task = GETTaskFromTaskId(assignment.itemId);
+                    tasksForUser.push(task);
+                }
+            });
     }
 
     return tasksForUser;
 }
 
+async function UpdateTasks(taskId, data) {
+    if (taskId == null) {
+        console.error("taskId is null.")
+    }
+    else
+    {
+        const response = await fetch('https://memento.mrzzy.co/api/v0/assignment/task/' + taskId, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        console.log(response);
+        const json = await response.json();
+    }
+}
 //-----------------------------------Assignments---------------------------------//
 async function CreateAssignment(data) {
     const response = await fetch('https://memento.mrzzy.co/api/v0/assignment/assign', {
@@ -128,4 +145,4 @@ async function GETAssignment(id) {
     return json;
 }
 
-export { DeleteOrg, CreateOrg, GETOrg, GETUsers, CreateUsers, CreateTasks, GETTasks, CreateAssignment, GETAssignmentIds, GETAssignment, GETTaskFromUserId, GETUserFromId };
+export { DeleteOrg, CreateOrg, GETOrg, GETUsers, CreateUsers, GETUserFromId, CreateTasks, GETTasks, CreateAssignment, GETAssignmentIds, GETAssignment, GETTaskFromUserId, UpdateTasks };

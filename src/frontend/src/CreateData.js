@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { DeleteOrg, CreateOrg, GETOrg, GETUsers, GETUserFromId, CreateUsers, CreateTasks, GETTasks, CreateAssignment, GETAssignmentIds, GETAssignment, GETTaskFromUserId } from './iamAPI.js';
+import { DeleteOrg, CreateOrg, GETOrg, GETUsers, GETUserFromId, CreateUsers, CreateTasks, GETTasks, CreateAssignment, GETAssignmentIds, GETAssignment, GETTaskFromUserId, UpdateTasks } from './iamAPI.js';
 import { assignmentExpression } from '@babel/types';
 
 
@@ -22,6 +22,10 @@ class CreateData extends React.Component {
         this.createUser = this.createUser.bind(this);
         this.createTasks = this.createTasks.bind(this);
         this.createAssigment = this.createAssigment.bind(this);
+
+        //UPDATE Methods
+        this.UpdateTasks = this.UpdateTasks.bind(this);
+
     }
 
 
@@ -120,6 +124,20 @@ class CreateData extends React.Component {
         DeleteOrg(orgId);
     }
 
+    //Update Methods
+    UpdateTasks() {
+        let taskId = document.getElementById("updateTaskId").value;
+        const data = {
+            authorId: 17,
+            completed: false,
+                deadline: "2019-12-30T09:39:25.954000Z",
+                description: "Do the presentation and pitch. Make sure to stay under time limit.",
+                duration: 600,
+                name: "Pitch"       
+                    }
+        UpdateTasks(taskId, data);
+    }
+
     render() {
         return (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -186,6 +204,15 @@ class CreateData extends React.Component {
                 </div>
 
                 <div id="showId" style={{position: "absolute", right: "25vw", top: "50vh"}}></div>
+
+                <h1>----UPDATE Methods----</h1>
+                <div>
+                <h2>Update Tasks</h2>
+                    Tasks Id: <input id="updateTaskId" />
+                    <button onClick={this.UpdateTasks}>Update Task</button>
+                </div>
+
+            <div id="showId" style={{ position: "absolute", right: "25vw", top: "50vh" }}></div>
             </div>  
         );
     }

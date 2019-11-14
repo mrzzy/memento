@@ -10,3 +10,4 @@ node_modules/
 .env
 # visual studio configs
 .vscode/
+.vs/

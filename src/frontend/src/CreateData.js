@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { DeleteOrg, CreateOrg, GETOrg, GETUsers, CreateUsers, CreateTasks, GETTasks, CreateAssignment, GETAssignmentIds, GETAssignment, GETTaskFromUserId } from './iamAPI.js';
+import { DeleteOrg, CreateOrg, GETOrg, GETUsers, GETUserFromId, CreateUsers, CreateTasks, GETTasks, CreateAssignment, GETAssignmentIds, GETAssignment, GETTaskFromUserId } from './iamAPI.js';
 import { assignmentExpression } from '@babel/types';
 
 
@@ -12,6 +12,7 @@ class CreateData extends React.Component {
         // GET Methods
         this.getOrganisation = this.getOrganisation.bind(this);
         this.getUserIds = this.getUserIds.bind(this);
+        this.getUserFromUserId = this.getUserFromUserId.bind(this);
         this.getTaskIds = this.getTaskIds.bind(this);
         this.getAssignmentIds = this.getAssignmentIds.bind(this);
         this.getAssignmentFromId = this.getAssignmentFromId.bind(this);
@@ -31,6 +32,11 @@ class CreateData extends React.Component {
 
     getUserIds() {
         GETUsers().then(userId => { document.getElementById("showId").innerHTML = "User Ids: " + userId; })
+    }
+
+    getUserFromUserId() {
+        let userId = document.getElementById("getUserFromUserId").value;
+        GETUserFromId(userId).then(user => { console.log(user) });
     }
 
     getTaskIds() {
@@ -119,7 +125,11 @@ class CreateData extends React.Component {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
                 <h1>----GET Methods----</h1>
                 <button onClick={this.getOrganisation}>GET Organization</button>
-                <button onClick={this.getUserIds}>Get user</button>
+                <button onClick={this.getUserIds}>Get user IDs</button>
+                <div>
+                    <input id="getUserFromUserId" />
+                    <button onClick={this.getUserFromUserId}>Get User From User ID</button>
+                </div>
                 <button onClick={this.getTaskIds}>Get tasks</button>
                 <div>
                     <input id="getTasksUserId" />

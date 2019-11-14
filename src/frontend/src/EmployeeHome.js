@@ -1,4 +1,5 @@
 import React from 'react';
+import { GETTaskFromUserId } from './iamAPI';
 import './App.css';
 import NavigationEmployee from './Navigation';
 
@@ -7,43 +8,43 @@ import NavigationEmployee from './Navigation';
 const dummyTaskList = [
     {
         id: 0,
-        title: "Storyboarding",
-        subtitle: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+        name: "Storyboarding",
+        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
         duration: 1,
         completed: true
     },
     {
         id: 1,
-        title: "Something else",
-        subtitle: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+        name: "Something else",
+        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
         duration: 600,
         completed: false
     },
     {
         id: 2,
-        title: "React",
-        subtitle: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence. Don't be fooled by my calm exterior, I'm dying inside.",
+        name: "React",
+        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence. Don't be fooled by my calm exterior, I'm dying inside.",
         duration: 1800,
         completed: false
     },
     {
         id: 3,
-        title: "Speak",
-        subtitle: "Why you or anyone you know, would pay for a pair of nike shoes.",
+        name: "Speak",
+        description: "Why you or anyone you know, would pay for a pair of nike shoes.",
         duration: 3600,
         completed: false
     },
     {
         id: 4,
-        title: "Retype Everything",
-        subtitle: "Redo the code because it looks lowkey terrible. It looks terrible. It looks highkey terrible. Just change it.",
+        name: "Retype Everything",
+        description: "Redo the code because it looks lowkey terrible. It looks terrible. It looks highkey terrible. Just change it.",
         duration: 8649,
         completed: false
     },
     {
         id: 5,
-        title: "Spill Some Milk",
-        subtitle: "I just have to like... style this I guess?",
+        name: "Spill Some Milk",
+        description: "I just have to like... style this I guess?",
         duration: 5,
         completed: false
     }
@@ -51,15 +52,36 @@ const dummyTaskList = [
 
 
 /* ----------------EMPLOYEE HOME---------------- */
-function EmployeeHome() {
-    return (
-        <div>
-            <NavigationEmployee />
-            <h1 className="pagetitle">HOME</h1>
-            <Calendar />
-            <TaskList allTasksList={dummyTaskList} />
-        </div>
-    );
+class EmployeeHome extends React.Component {
+    constructor() {
+        super();
+        this.state = {taskList: null}
+    }
+
+    componentDidMount() {
+        const self = this;
+        GETTaskFromUserId(16)
+            .then(tasks => {
+                self.setState({ taskList: tasks });
+            });
+    }
+
+    render() {
+        if (this.state.taskList === null || this.state.taskList === []) {
+            return null;
+        }
+
+        else {
+            return (
+                <div>
+                    <NavigationEmployee />
+                    <h1 className="pagetitle">HOME</h1>
+                    <Calendar />
+                    <TaskList allTasksList={this.state.taskList} />
+                </div>
+            );
+        }
+    }
 }
 
 
@@ -189,8 +211,9 @@ class ToDoList extends React.Component {
     }
 
     componentDidMount() {
-        let unifinishedTasks = this.state.allTasksList.filter(task => task.completed === false);
-        this.setState({ unfinishedTasksList: unifinishedTasks });
+        let allTasksList = [...this.state.allTasksList];
+        let unfinishedTasks = allTasksList.filter(task => task.completed === false);
+        this.setState({ unfinishedTasksList: unfinishedTasks });
     }
 
     updateCompletedTask(id) {
@@ -219,7 +242,6 @@ class ToDoList extends React.Component {
     }
 
     render() {
-
         return (
             <div className="toDoList">
                 <h2>TO DO LIST</h2>
@@ -228,8 +250,8 @@ class ToDoList extends React.Component {
                         <Task
                             key={task.id}
                             taskId={task.id}
-                            title={task.title}
-                            subtitle={task.subtitle}
+                            name={task.name}
+                            description={task.description}
                             duration={task.duration}
                             remove={this.removeTask}
                             secondsToHMS={this.props.secondsToHMS}
@@ -245,7 +267,7 @@ class ToDoList extends React.Component {
 class Task extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { title: props.title, subtitle: props.subtitle, duration: props.duration };
+        this.state = { name: props.name, description: props.description, duration: props.duration };
         this.startTask = this.startTask.bind(this);
     }
 
@@ -254,14 +276,13 @@ class Task extends React.Component {
     }
 
     render() {
-
         let duration = this.props.secondsToHMS(this.state.duration);
 
         return (
             <div className="task">
                 <div>
-                    <h2>{this.state.title}</h2>
-                    <p>{this.state.subtitle}</p>
+                    <h2>{this.state.name}</h2>
+                    <p>{this.state.description}</p>
                 </div>
                 <div className="duration">{duration[0]}h {duration[1]}m</div>
                 {this.props.currentTaskNull ? <button onClick={this.startTask}>START</button> : null}
@@ -321,8 +342,8 @@ class CurrentTask extends React.Component {
                 <div className="currentTask">
                     <h2>TASK OF THE DAY</h2>
                     <div className="currentTaskContent withTask">
-                        <h2>{this.state.currentTask.title}</h2>
-                        <p>{this.state.currentTask.subtitle}</p>
+                        <h2>{this.state.currentTask.name}</h2>
+                        <p>{this.state.currentTask.description}</p>
                         <div className="countdown"><span className="countdownH">{zeroHour + this.state.hour}</span>:
                             <span className="countdownM">{zeroMin + this.state.minute}</span>:
                             <span className="countdownS">{zeroSec + this.state.second}</span></div>

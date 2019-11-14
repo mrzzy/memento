@@ -165,17 +165,24 @@ def delete_notify(notify_id):
     db.session.delete(notify)
     db.session.commit()
 
-# schedule the firing of the given notification on the specified channel
+# schedule the firing of the given pending notification 
+# raises ValueError if attempting to schedule a notification that is not pending.
 # notify_id - id of the notification to send
 def schedule_notify(notify_id):
     notify = Notification.query.get(notify_id)
     if notify is None: raise NotFoundError
 
-    # check if notification
-    time_to_fire = notify.firing_time - datetime.now()
+    # check if notification is pending to fire
+    time_till_fire = (notify.firing_time - datetime.now()).total_seconds()
+    if time_till_fire < 0.0:
+        # notification no longer pending
+        raise ValueError(
+            f"Attempted to schedule a notification that is not pending: {notify_id.name}")
+
     def fire_notify():
+        print(f"handling notification: {notify.title}")
         # wait till notification firing time
-        time.sleep(time_to_fire.second)
+        time.sleep(time_till_fire)
         # publish firing message on channel
         message_broker.publish(f"channel/{notify.channel_id}", f"notify/{notify_id}")
     run_async(fire_notify)

@@ -3,7 +3,11 @@ Click==7.0
 Flask==1.1.1
 Flask-Cors==3.0.8
 Flask-Migrate==2.5.2
+Flask-Sockets==0.2.1
 Flask-SQLAlchemy==2.4.1
+gevent==1.4.0
+gevent-websocket==0.10.1
+greenlet==0.4.15
 itsdangerous==1.1.0
 Jinja2==2.10.3
 Mako==1.1.0

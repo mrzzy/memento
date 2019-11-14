@@ -8,6 +8,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_sockets import Sockets
 
 from . import config
 
@@ -15,13 +16,15 @@ from . import config
 app = Flask(__name__)
 app.config.from_object(config)
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+starmigrate = Migrate(app, db)
 cors = CORS(app, allow_headers='Content-Type')
+sockets = Sockets(app)
 
 # register api components
 from .api import register_api
-register_api(app)
+register_api(app, sockets)
 
+## basic routes
 # root route - backend status
 @app.route('/')
 def route_status():

@@ -11,6 +11,9 @@ from .utils import parse_bool
 
 
 ## config
+# server config
+BACKEND_PORT=os.environ.get("BACKEND_PORT", "5000")
+
 # database configuration
 SQL_DATABASE = os.environ.get("SQL_DATABASE", "sqlite")
 SQLALCHEMY_DATABASE_URI = ""

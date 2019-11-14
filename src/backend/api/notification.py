@@ -4,6 +4,7 @@
 # Notification API
 #
 
+import json
 from datetime import datetime
 from flask import request, Blueprint, jsonify
 from sqlalchemy.exc import IntegrityError
@@ -16,6 +17,7 @@ from ..mapping.notification import *
 from ..ops.notification import *
 
 notify = Blueprint("notification", __name__)
+notify_ws = Blueprint("notification", __name__)
 
 ## Channel API
 # api - query channels
@@ -61,7 +63,7 @@ def route_channel(channel_id=None):
     else:
         raise NotImplementedError
 
-## notify API
+## Notify API
 # api - query notifications
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/notifys")
 def route_notifys():
@@ -93,8 +95,11 @@ def route_notify(notify_id=None):
     elif request.method == "POST" and request.is_json:
         # create notify with params in json
         params = parse_params(request, notify_mapping)
+
         # parse datetime in iso format
-        params["firing_time"] = parse_datetime(params["firing_time"])
+        if not params["firing_time"] is None:
+            params["firing_time"] = parse_datetime(params["firing_time"])
+
         notify_id = create_notify(**params)
         return jsonify({ "id": notify_id })
     elif request.method == "PATCH" and notify_id and request.is_json:
@@ -112,4 +117,36 @@ def route_notify(notify_id=None):
     else:
         raise NotImplementedError
 
+# api - subscribe to recieve notifications over websocket
+@notify_ws.route(f"/api/v{API_VERSION}/{notify_ws.name}/subscribe")
+def route_subscribe(socket):
+    # parse request args
+    channel_id = request.args.get("channel", None)
+    if not channel_id is None:
+        channel_ids = [ int(channel_id) ]
+    else:
+        # channel id is not specified, assume all channels
+        channel_ids = query_channels()
 
+    # build callback to handle subscribed notifications
+    def callback(message):
+        if not socket.closed:
+            if message == "close":
+                socket.close()
+            elif "notify/" in message:
+                _, notify_id = message.split("/")
+                notify = get_notify(notify_id)
+                # convert to iso date format
+                # add "Z" to signal utc timezone
+                notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
+                # forward notification to subscribed
+                socket.send(json.dumps(notify))
+            else:
+                raise NotImplementedError(f"Unknown message: {message}")
+
+    # subscribe to channels with callack
+    for channel_id in channel_ids:
+        subscribe_channel(channel_id, callback)
+
+    # required to prevent websocket from closing
+    while True: time.sleep(600)

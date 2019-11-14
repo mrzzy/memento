@@ -16,8 +16,7 @@ from ..mapping.notification import *
 from ..ops.notification import *
 
 notify = Blueprint("notification", __name__)
-notify_ws = Blueprint("notification websockets", __name__)
-
+notify_ws = Blueprint("notification", __name__)
 
 ## Channel API
 # api - query channels
@@ -63,7 +62,7 @@ def route_channel(channel_id=None):
     else:
         raise NotImplementedError
 
-## notify API
+## Notify API
 # api - query notifications
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/notifys")
 def route_notifys():
@@ -114,4 +113,34 @@ def route_notify(notify_id=None):
     else:
         raise NotImplementedError
 
+# api - subscribe to recieve notifications over websocket
+@notify_ws.route(f"/api/v{API_VERSION}/{notify_ws.name}/subscribe")
+def route_subscribe(socket):
+    # parse request args
+    channel_id = request.args.get("channel", None)
+    if not channel_id is None:
+        channel_ids = [ int(channel_id) ]
+    else:
+        # channel id is not specified, assume all channels
+        channel_ids = query_channels()
 
+    # build callback to handle subscribed notifications
+    def callback(message):
+        print(f"handing message: {message}")
+        if not socket.closed:
+            if message == "close":
+                socket.close()
+            elif "notify/" in message:
+                _, notify_id = message.split("/")
+                notify = get_notify(notify_id)
+                # convert to iso date format
+                # add "Z" to signal utc timezone
+                notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
+                # forward notification to subscribed
+                socket.send(jsonify(notify))
+            else:
+                raise NotImplementedError(f"Unknown message: {message}")
+
+    # subscribe to channels with callack
+    for channel_id in channel_ids:
+        subscribe_channel(callback, channel_id)

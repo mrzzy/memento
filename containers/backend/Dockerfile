@@ -37,4 +37,4 @@ COPY src/backend /backend/
 EXPOSE 5000
 ENV FLASK_APP=app.py
 ENTRYPOINT [ "/scripts/entrypoint.sh" ]
-CMD flask run --host=0.0.0.0
+CMD python run.py

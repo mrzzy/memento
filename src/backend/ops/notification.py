@@ -5,6 +5,7 @@
 #
 
 import time
+import asyncio
 from flask import jsonify
 from datetime import datetime
 
@@ -132,7 +133,7 @@ def create_notify(title, firing_time, channel_id, description=""):
     db.session.commit()
 
     # notify users of notification change 
-    schedule_notify(notify.id, notify.channel_id)
+    schedule_notify(notify.id)
 
     return notify.id
 
@@ -154,7 +155,7 @@ def update_notify(notify_id, title=None, firing_time=None, channel_id=None,
     db.session.commit()
 
     # notify users of notification change 
-    schedule_notify(notify.id, notify.channel_id)
+    schedule_notify(notify.id)
 
 # delete notification with the given notify_id
 # throws NotFoundError if no notify with notify_id is found
@@ -164,15 +165,17 @@ def delete_notify(notify_id):
     db.session.delete(notify)
     db.session.commit()
 
-# schedule the firing of the given notification on the given channel
+# schedule the firing of the given notification on the specified channel
 # notify_id - id of the notification to send
-# channel_id - id of the channel to send
-def schedule_notify(notify_id, channel_id):
-    # compute wait duration to firing time 
-    notify = get_notify(notify_id)
-    wait_duration = notify["firingTime"] - datetime.utcnow()
+def schedule_notify(notify_id):
+    notify = Notification.query.get(notify_id)
+    if notify is None: raise NotFoundError
+
+    # check if notification
+    time_to_fire = notify.firing_time - datetime.now()
     def fire_notify():
-        # publish that notification fired
-        time.sleep(wait_duration.second)
-        message_broker.publish(f"channel/{channel_id}", f"notify/{notify_id}")
+        # wait till notification firing time
+        time.sleep(time_to_fire.second)
+        # publish firing message on channel
+        message_broker.publish(f"channel/{notify.channel_id}", f"notify/{notify_id}")
     run_async(fire_notify)

@@ -186,3 +186,8 @@ def schedule_notify(notify_id):
         # publish firing message on channel
         message_broker.publish(f"channel/{notify.channel_id}", f"notify/{notify_id}")
     run_async(fire_notify)
+
+# reschedule all pending notifications for firing (ie after backend reboot.)
+def reschedule_all_notifies():
+    notify_ids = query_notifys(pending=True)
+    for notify_id in notify_ids: schedule_notify(notify_id)

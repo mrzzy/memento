@@ -4,13 +4,19 @@
 # Notification Ops
 #
 
+import time
+from flask import jsonify
 from datetime import datetime
 
 from ..app import db
 from ..models.notification import *
 from ..mapping.notification import *
-from ..utils import apply_bound, map_dict
+from ..utils import apply_bound, map_dict, run_async
 from ..api.error import NotFoundError
+from ..messaging.broker import LocalBroker
+
+# notification message broker
+message_broker = LocalBroker()
 
 ## Channel Ops
 # query ids of channels
@@ -68,12 +74,22 @@ def delete_channel(channel_id):
     channel = Channel.query.get(channel_id)
     if channel is None: raise NotFoundError
 
+    # clear subscribers to channel
+    message_broker.publish(f"channel/{channel_id}", "close")
+    message_broker.clear(f"channel/{channel_id}")
+
     # cascade delete notifications
     notify_ids = query_notifys(channel_id=channel_id)
     for notify_id in notify_ids: delete_notify(notify_id)
 
     db.session.delete(channel)
     db.session.commit()
+
+# subscribe to recieve notifications 
+# channel_id - show only notifications from the given channel id
+# callback - callback to run on notification, passes notify_id as str
+def subscribe_channel(callback, channel_id):
+    message_broker.subscribe(f"channel/{channel_id}", callback)
 
 ## Notification Ops
 # query ids of notifications
@@ -115,6 +131,9 @@ def create_notify(title, firing_time, channel_id, description=""):
     db.session.add(notify)
     db.session.commit()
 
+    # notify users of notification change 
+    schedule_notify(notify.id, notify.channel_id)
+
     return notify.id
 
 # update notification with the given notification id
@@ -134,6 +153,9 @@ def update_notify(notify_id, title=None, firing_time=None, channel_id=None,
     if not description is None: notify.description = description
     db.session.commit()
 
+    # notify users of notification change 
+    schedule_notify(notify.id, notify.channel_id)
+
 # delete notification with the given notify_id
 # throws NotFoundError if no notify with notify_id is found
 def delete_notify(notify_id):
@@ -141,3 +163,16 @@ def delete_notify(notify_id):
     if notify is None: raise NotFoundError
     db.session.delete(notify)
     db.session.commit()
+
+# schedule the firing of the given notification on the given channel
+# notify_id - id of the notification to send
+# channel_id - id of the channel to send
+def schedule_notify(notify_id, channel_id):
+    # compute wait duration to firing time 
+    notify = get_notify(notify_id)
+    wait_duration = notify["firingTime"] - datetime.utcnow()
+    def fire_notify():
+        # publish that notification fired
+        time.sleep(wait_duration.second)
+        message_broker.publish(f"channel/{channel_id}", f"notify/{notify_id}")
+    run_async(fire_notify)

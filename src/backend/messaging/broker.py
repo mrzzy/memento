@@ -72,8 +72,9 @@ class LocalBroker(AbstractBroker):
             self.message_board[channel] = {}
 
         # publish message by running registered callbacks
-        for callback in self.message_board.values():
-            callback(message)
+        for channel in self.message_board.values():
+            for callback in channel.values():
+                callback(message)
 
     # clear the given notification channel
     # removes all subscribers on the channel

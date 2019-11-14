@@ -1,5 +1,5 @@
 import React from 'react';
-import { GETTaskFromUserId } from './iamAPI';
+import { GETTaskFromUserId, UpdateTasks, CreateChannel, CreateNotification } from './iamAPI';
 import './App.css';
 import NavigationEmployee from './Navigation';
 
@@ -8,44 +8,51 @@ import NavigationEmployee from './Navigation';
 const dummyTaskList = [
     {
         id: 0,
-        name: "Storyboarding",
+        name: "Pitch",
         description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 1,
+        duration: 60,
         completed: true
     },
     {
         id: 1,
-        name: "Something else",
+        name: "Presentation",
         description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 600,
+        duration: 300,
         completed: false
     },
     {
         id: 2,
-        name: "React",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence. Don't be fooled by my calm exterior, I'm dying inside.",
-        duration: 1800,
+        name: "Pitch",
+        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+        duration: 60,
         completed: false
     },
     {
         id: 3,
-        name: "Speak",
-        description: "Why you or anyone you know, would pay for a pair of nike shoes.",
+        name: "Report Writing",
+        description: "Create a report about our upcoming application.",
         duration: 3600,
         completed: false
     },
     {
         id: 4,
-        name: "Retype Everything",
-        description: "Redo the code because it looks lowkey terrible. It looks terrible. It looks highkey terrible. Just change it.",
+        name: "Create App",
+        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
         duration: 8649,
         completed: false
     },
     {
         id: 5,
-        name: "Spill Some Milk",
-        description: "I just have to like... style this I guess?",
+        name: "Clean Up",
+        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
         duration: 5,
+        completed: false
+    },
+    {
+        id: 6,
+        name: "Shift Boxes",
+        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+        duration: 6,
         completed: false
     }
 ];
@@ -55,16 +62,17 @@ const dummyTaskList = [
 class EmployeeHome extends React.Component {
     constructor() {
         super();
-        this.state = {taskList: null}
+        //this.state = { taskList: null }
+        this.state = { taskList: dummyTaskList }
     }
 
-    componentDidMount() {
-        const self = this;
-        GETTaskFromUserId(16)
-            .then(tasks => {
-                self.setState({ taskList: tasks });
-            });
-    }
+    //componentDidMount() {
+    //    const self = this;
+    //    GETTaskFromUserId(2)
+    //        .then(tasks => {
+    //            self.setState({ taskList: tasks });
+    //        });
+    //}
 
     render() {
         if (this.state.taskList === null || this.state.taskList === []) {
@@ -222,6 +230,10 @@ class ToDoList extends React.Component {
                 let tempTaskList = [...this.state.allTasksList];
                 tempTaskList[i].completed = true;
                 this.setState({ allTasksList: tempTaskList, currentTaskNull: true });
+                //let taskToUpdate = tempTaskList[i];
+                //let idOfTaskToUpdate = tempTaskList[i].id;
+                //delete taskToUpdate.id;
+                //UpdateTasks(idOfTaskToUpdate, taskToUpdate);
                 break;
             }
         }
@@ -318,11 +330,15 @@ class CurrentTask extends React.Component {
         let endTiming = new Date().getTime() + (task.duration * 1000);
         let countDownTimerId = setInterval(this.updateCountDown, 200);
         this.setState({ hour: hms[0], minute: hms[1], second: hms[2], endTime: endTiming, countDownTimer: countDownTimerId, currentTask: task });
+        //let firingTime = new Date(endTiming).toISOString();
+        //console.log(firingTime);
+        //CreateNotification(task, firingTime, 3);
     }
 
     finishTask() {
         this.props.updateToDoListElement(this.state.currentTask.id);
         clearInterval(this.state.countDownTimer);
+        CreateNotification(this.state.currentTask, null, 3);
         this.setState({ hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: null });
         //window.alert("You have run out of time.");
         this.props.createPopUp();

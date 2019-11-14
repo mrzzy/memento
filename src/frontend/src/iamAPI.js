@@ -95,20 +95,21 @@ async function GETTaskFromUserId(userId) {
     let tasksForUser = [];
 
     for (let i = 0; i < assignmentIdList.length; i++) {
-        let assignment = await GETAssignment(assignmentIdList[i])
-            .then(assignment => {
-                console.log(assignment);
-                if (assignment.assigneeId == userId) {
-                    let task = GETTaskFromTaskId(assignment.itemId);
-                    tasksForUser.push(task);
-                }
-            });
+        let assignment = await GETAssignment(assignmentIdList[i]);
+        if (assignment.assigneeId == userId) {
+            let task = await GETTaskFromTaskId(assignment.itemId);
+            task.id = assignment.itemId;
+            tasksForUser.push(task);
+        }
     }
 
     return tasksForUser;
 }
 
 async function UpdateTasks(taskId, data) {
+    console.log("Task ID: " + taskId);
+    console.log("Data to update to: ");
+    console.log(data);
     if (taskId == null) {
         console.error("taskId is null.")
     }
@@ -145,4 +146,39 @@ async function GETAssignment(id) {
     return json;
 }
 
-export { DeleteOrg, CreateOrg, GETOrg, GETUsers, CreateUsers, GETUserFromId, CreateTasks, GETTasks, CreateAssignment, GETAssignmentIds, GETAssignment, GETTaskFromUserId, UpdateTasks };
+//-----------------------------------Channel---------------------------------//
+async function CreateChannel(kind, userId) {
+    const response = await fetch('https://memento.mrzzy.co/api/v0/notification/channel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: kind, userId: userId })
+    })
+    const json = await response.json();
+    return json;
+}
+
+
+//-----------------------------------Notification---------------------------------//
+async function CreateNotification(task, firingTime, channelId) {
+    const response = await fetch('https://memento.mrzzy.co/api/v0/notification/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            title: task.name,
+            description: "a",
+            firingTime: firingTime,
+            channelId: channelId
+        })
+    })
+    console.log("Sent to server: ");
+    console.log(JSON.stringify({
+        title: task.name,
+        description: "a",
+        firingTime: firingTime,
+        channelId: channelId
+    }));
+    const json = await response.json();
+    return json;
+}
+
+export { DeleteOrg, CreateOrg, GETOrg, GETUsers, CreateUsers, GETUserFromId, CreateTasks, GETTasks, CreateAssignment, GETAssignmentIds, GETAssignment, GETTaskFromUserId, UpdateTasks, CreateChannel, CreateNotification };

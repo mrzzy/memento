@@ -94,8 +94,11 @@ def route_notify(notify_id=None):
     elif request.method == "POST" and request.is_json:
         # create notify with params in json
         params = parse_params(request, notify_mapping)
+
         # parse datetime in iso format
-        params["firing_time"] = parse_datetime(params["firing_time"])
+        if not params["firing_time"] is None:
+            params["firing_time"] = parse_datetime(params["firing_time"])
+
         notify_id = create_notify(**params)
         return jsonify({ "id": notify_id })
     elif request.method == "PATCH" and notify_id and request.is_json:
@@ -143,4 +146,4 @@ def route_subscribe(socket):
 
     # subscribe to channels with callack
     for channel_id in channel_ids:
-        subscribe_channel(callback, channel_id)
+        subscribe_channel(channel_id, callback)

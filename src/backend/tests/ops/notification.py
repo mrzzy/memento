@@ -58,7 +58,7 @@ class TestsNotficationOps(TestCase):
 
         org_id, user_id = self.create_test_data()
         channel_id = create_channel(Channel.Kind.Notice, user_id)
-        notify_id = create_notify("fish", datetime.utcnow(), channel_id)
+        notify_id = create_notify("fish", channel_id)
 
         notify = get_notify(notify_id)
         self.assertEqual(notify["title"], "fish")

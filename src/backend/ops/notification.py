@@ -89,7 +89,8 @@ def delete_channel(channel_id):
 # subscribe to recieve notifications 
 # channel_id - show only notifications from the given channel id
 # callback - callback to run on notification, passes notify_id as str
-def subscribe_channel(callback, channel_id):
+def subscribe_channel(channel_id, callback):
+    print(f"subscribe to recieve notifications on channel:{channel_id}")
     message_broker.subscribe(f"channel/{channel_id}", callback)
 
 ## Notification Ops
@@ -123,10 +124,16 @@ def get_notify(notify_id):
 
 # create an notification
 # title - title of the notification
-# firing_time - firing datetime of the notification
 # channel_id - id of the channel to send the notification
+# firing_time - firing datetime of the notification
+# description - description of the notification
 # returns the id of the new notification
-def create_notify(title, firing_time, channel_id, description=""):
+def create_notify(title, channel_id, firing_time=None, description=""):
+    # check if firing_time is none
+    # if so, assume that notification fires now.
+    if firing_time is None: firing_time = datetime.utcnow()
+
+    # create notification
     notify = Notification(title=title, firing_time=firing_time,
                           channel_id=channel_id, description=description)
     db.session.add(notify)
@@ -172,18 +179,21 @@ def schedule_notify(notify_id):
     notify = Notification.query.get(notify_id)
     if notify is None: raise NotFoundError
 
+    # max secs after firing time for a notification to be considered still
+    # pending and valid to be scheduled.
+    schedule_window = 1.0
     # check if notification is pending to fire
-    time_till_fire = (notify.firing_time - datetime.now()).total_seconds()
-    if time_till_fire < 0.0:
+    time_till_fire = (notify.firing_time - datetime.utcnow()).total_seconds()
+    if time_till_fire < -schedule_window:
         # notification no longer pending
         raise ValueError(
-            f"Attempted to schedule a notification that is not pending: {notify_id.name}")
+            f"Attempted to schedule a notification that is not pending: {notify.title}")
 
     def fire_notify():
-        print(f"handling notification: {notify.title}")
         # wait till notification firing time
         time.sleep(time_till_fire)
         # publish firing message on channel
+        print(f"publishing notification: {notify.title}")
         message_broker.publish(f"channel/{notify.channel_id}", f"notify/{notify_id}")
     run_async(fire_notify)
 

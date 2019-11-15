@@ -54,20 +54,21 @@ async def subscribe_channel(api_host, channel_id, is_secure):
             or n_failure < 3:
         # try to connect to the backend
         try:
-            socket = await websockets.client.connect(subscribe_url)
+            socket = await websockets.client.connect(subscribe_url, ping_interval=None)
+
+            # connected to backend - listening for notifications
+            time_since_failure = timedelta(seconds=0)
+            print(f"listening for notifications on channel {channel_id}")
+            while socket.open:
+                notify_json = await socket.recv()
+                notify = json.loads(notify_json)
+                print(f"recieved notification {notify['title']}")
         except Exception as e:
             n_failure += 1
             print(f"failure {n_failure}: could not not connect...")
             last_failure_timestamp = datetime.now()
             continue
 
-        # connected to backend - listening for notifications
-        time_since_failure = timedelta(seconds=0)
-        print(f"listening for notifications on channel {channel_id}")
-        while socket.open:
-            notify_json = await socket.recv()
-            notify = json.loads(notify_json)
-            print(f"recieved notification {notify['title']}")
 
 async def main():
     options = parse_options()

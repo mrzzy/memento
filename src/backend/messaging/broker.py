@@ -4,6 +4,8 @@
 # Messaging Broker
 #
 
+import gevent
+
 from abc import ABC, abstractmethod
 from uuid import uuid4
 
@@ -77,7 +79,7 @@ class LocalBroker(AbstractBroker):
 
         # publish message by running registered callbacks
         for subscribe_id, callback in self.message_board[channel].items():
-            callback(subscribe_id, message)
+            gevent.spawn(callback, subscribe_id, message)
 
     # clear the given notification channel
     # removes all subscribers on the channel

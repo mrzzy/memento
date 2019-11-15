@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "08a97e30-622d-4a8c-bc12-7e1f6e1f8d7b",
+		"_postman_id": "c93524ad-bed8-404c-89b6-ff1989f43208",
 		"name": "momento/api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2709,7 +2709,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channels?pending=0",
+							"raw": "http://{{api_host}}/api/v0/notification/channels",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2719,12 +2719,6 @@
 								"v0",
 								"notification",
 								"channels"
-							],
-							"query": [
-								{
-									"key": "pending",
-									"value": "0"
-								}
 							]
 						}
 					},
@@ -2895,7 +2889,81 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": \"2099-11-11T11:51:53.334Z\",\n\t\"channelId\": {{channel_id}}\n}",
+							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": \"2019-11-15T11:51:23.270Z\",\n\t\"channelId\": {{channel_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v0/notification/notify",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"notification",
+								"notify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create notifcation fire now",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cc3b98ee-7f15-4c51-bf4b-9143668f37ed",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save notify_id for later tests",
+									"    pm.globals.set(\"notify_id\",  response.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "5e6097c2-a931-4b03-bccf-8df2a46ee17a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": null,\n\t\"channelId\": {{channel_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3280,53 +3348,54 @@
 		},
 		{
 			"name": "status",
-			"item": [],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "get api status",
-			"event": [
+			"item": [
 				{
-					"listen": "test",
-					"script": {
-						"id": "caa1739e-7b23-4e0f-a287-b51303716fce",
-						"exec": [
-							"const assert = require(\"assert\");",
-							"",
-							"pm.test(\"status code ok\", () => {",
-							"    pm.response.to.have.status(200);",
-							"})",
-							"",
-							"pm.test(\"response is parsable json\", ()  => {",
-							"    pm.response.json();",
-							"})",
-							"",
-							"pm.test(\"response has expected contents\", () => {",
-							"    const response = pm.response.json();",
-							"    assert(response.status === \"OK\");",
-							"});"
-						],
-						"type": "text/javascript"
-					}
+					"name": "get api status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "caa1739e-7b23-4e0f-a287-b51303716fce",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.status === \"OK\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v0/status",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v0",
+								"status"
+							]
+						}
+					},
+					"response": []
 				}
 			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{api_host}}/api/v0/status",
-					"protocol": "http",
-					"host": [
-						"{{api_host}}"
-					],
-					"path": [
-						"api",
-						"v0",
-						"status"
-					]
-				}
-			},
-			"response": []
+			"protocolProfileBehavior": {}
 		}
 	],
 	"protocolProfileBehavior": {}

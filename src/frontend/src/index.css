@@ -1,7 +1,5 @@
 :root {
     --main-color: #FFD159;
-    --semi-dark: #239F95;
-    --semi-light: #42CFC4;
     --header-font: 'Montserrat', sans-serif; /*Used as family font*/
     --regular-font: 'Roboto', sans-serif;
 }
@@ -9,9 +7,6 @@
 body {
     margin: 0;
     margin-bottom: 30px;
-    /*font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;*/
     font-family: var(--regular-font);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -93,6 +88,7 @@ code {
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
+    cursor: pointer;
 
     /*NO SELECT*/
     -webkit-touch-callout: none; /* iOS Safari */
@@ -168,13 +164,6 @@ div::-webkit-scrollbar {
     white-space: nowrap;
     font-size: 25px;
 }
-
-/*.task div:last-child {
-    display: inline-flex;
-    width: 40%;
-    align-items: center;
-    justify-content: flex-end;
-}*/
 
 .task h2 {
     font-family: var(--regular-font);

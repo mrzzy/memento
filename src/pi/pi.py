@@ -4,6 +4,7 @@
 # Jack in a box
 # 
 
+import time
 import json
 import asyncio
 import argparse
@@ -65,14 +66,18 @@ async def subscribe_channel(api_host, channel_id, is_secure):
                 print(f"recieved notification {notify['title']}")
         except Exception as e:
             n_failure += 1
-            print(f"failure {n_failure}: could not not connect...")
+            print(f"failure {n_failure}: could not not connect.")
             last_failure_timestamp = datetime.now()
-            continue
+            time.sleep(1)
+
+    if n_failure >= 3: print("could not connect: giving up.")
 
 
 async def main():
     options = parse_options()
-    await subscribe_channel(options["api_host"], options["channel_id"], options["is_secure"])
+    await subscribe_channel(options["api_host"],
+                            options["channel_id"],
+                            options["is_secure"])
 
 # setup async event loop
 event_loop = asyncio.get_event_loop().run_until_complete(main())

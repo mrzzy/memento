@@ -62,7 +62,8 @@ const dummyTaskList = [
 class EmployeeHome extends React.Component {
     constructor() {
         super();
-        this.state = { taskList: null }
+        this.state = { taskList: [] }
+        this.taskListElement = React.createRef();
         /* To use for testing when the server is down
          * uncomment to see website with tasks */
         // this.state = { taskList: dummyTaskList }
@@ -73,33 +74,19 @@ class EmployeeHome extends React.Component {
         // Default user id for testing.
         GETTaskFromUserId(17)
             .then(tasks => {
-                self.setState({ taskList: tasks });
+                self.taskListElement.current.updateAllTasksList(tasks);
             });
     }
 
     render() {
-
-        // Prevent the list of tasks from loading before they've been fetched.
-        if (this.state.taskList === null) {
-            return (
-                <div>
-                    <NavigationEmployee />
-                    <h1 className="pagetitle">HOME</h1>
-                    <Calendar />
-                </div>
-            );
-        }
-
-        else {
-            return (
-                <div>
-                    <NavigationEmployee />
-                    <h1 className="pagetitle">HOME</h1>
-                    <Calendar />
-                    <TaskList allTasksList={this.state.taskList} />
-                </div>
-            );
-        }
+        return (
+            <div>
+                <NavigationEmployee />
+                <h1 className="pagetitle">HOME</h1>
+                <Calendar />
+                <TaskList allTasksList={this.state.taskList} ref={this.taskListElement} />
+            </div>
+        );
     }
 }
 
@@ -125,6 +112,10 @@ class TaskList extends React.Component {
 
     updateToDoListElement(id) {
         this.toDoListElement.current.updateCompletedTask(id); // To update the completed property of task object to true
+    }
+
+    updateAllTasksList(tasks) {
+        this.toDoListElement.current.updateAllTasksList(tasks);
     }
 
     createPopUp() {
@@ -235,6 +226,11 @@ class ToDoList extends React.Component {
         this.setState({ unfinishedTasksList: unfinishedTasks });
     }
 
+    updateAllTasksList(tasks) {
+        let unfinishedTasks = tasks.filter(task => task.completed === false);
+        this.setState({ unfinishedTasksList: unfinishedTasks, allTasksList: tasks });
+    }
+
     updateCompletedTask(id) {
         // Loop through the list of tasks to find the specific task.
         for (let i = 0; i < this.state.allTasksList.length; i++) {
@@ -343,7 +339,7 @@ class CurrentTask extends React.Component {
         this.setState({ hour: hms[0], minute: hms[1], second: hms[2], endTime: endTiming, countDownTimer: countDownTimerId, currentTask: task });
 
         // To create a notification  for the raspberry pi
-        let firingTime = new Date(endTiming).toisostring();
+        let firingTime = new Date(endTiming).toISOString();
         CreateNotification(task, firingTime, 3);
     }
 

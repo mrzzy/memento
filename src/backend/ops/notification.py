@@ -184,6 +184,9 @@ def reschedule_all_notifies():
 #   notify - the notification as dict, other
 # returns a subscribe_id of the subscription
 def subscribe_channel(channel_id, callback):
+    channel = Channel.query.get(channel_id)
+    if channel is None: raise NotFoundError
+
     return message_broker.subscribe(f"channel/{channel_id}", callback)
 
 # unsubscribe to stop recieving notifications from channel

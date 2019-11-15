@@ -51,7 +51,6 @@ async def subscribe_channel(api_host, channel_id, is_secure):
         # try to connect to the backend
         try:
             socket = await websockets.client.connect(subscribe_url, ping_interval=None)
-            n_failure = 0
 
             # connected to backend - listening for notifications
             time_since_failure = timedelta(seconds=0)
@@ -65,6 +64,8 @@ async def subscribe_channel(api_host, channel_id, is_secure):
                 notify_json = await socket.recv()
                 notify = json.loads(notify_json)
                 print(f"recieved notification {notify['title']}")
+                # reset failure counter
+                n_failure = 0
 
         except Exception as e:
             n_failure += 1

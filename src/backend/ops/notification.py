@@ -86,14 +86,6 @@ def delete_channel(channel_id):
     db.session.delete(channel)
     db.session.commit()
 
-# subscribe to recieve notifications 
-# channel_id - show only notifications from the given channel id
-# callback - callback to run on notification, passes notify_id as str
-# returns the subscription id
-def subscribe_channel(channel_id, callback):
-    print(f"subscribe to recieve notifications on channel:{channel_id}")
-    return message_broker.subscribe(f"channel/{channel_id}", callback)
-
 ## Notification Ops
 # query ids of notifications
 # pending - show only pending notifications
@@ -121,7 +113,14 @@ def get_notify(notify_id):
     notify = Notification.query.get(notify_id)
     if notify is None: raise NotFoundError
     # map fields to dict
-    return map_dict(notify, notify_mapping)
+    notify_dict = map_dict(notify, notify_mapping)
+
+    # return db connection to pool
+    # required to prevent the connection pool from 
+    # running out of connnections and causing timeouts
+    db.session.remove()
+
+    return notify_dict
 
 # create an notification
 # title - title of the notification
@@ -172,6 +171,24 @@ def delete_notify(notify_id):
     if notify is None: raise NotFoundError
     db.session.delete(notify)
     db.session.commit()
+# reschedule all pending notifications for firing (ie after backend reboot.)
+def reschedule_all_notifies():
+    notify_ids = query_notifys(pending=True)
+    for notify_id in notify_ids: schedule_notify(notify_id)
+
+## Subscription Ops
+# subscribe to recieve notifications from channel
+# channel_id - id of the channel to recieve notification from
+# callback(notify) - callback to run on notification
+#   notify - the notification as dict, other
+# returns a subscribe_id of the subscription
+def subscribe_channel(channel_id, callback):
+    return message_broker.subscribe(f"channel/{channel_id}", callback)
+
+# unsubscribe to stop recieving notifications from channel
+# subscribe_id - id of the subscription to unsubscribe
+def unsubscribe_channel(subscribe_id):
+    message_broker.unsubscribe(subscribe_id)
 
 # schedule the firing of the given pending notification 
 # raises ValueError if attempting to schedule a notification that is not pending.
@@ -199,7 +216,19 @@ def schedule_notify(notify_id):
         message_broker.publish(f"channel/{channel_id}", f"notify/{notify_id}")
     gevent.spawn(fire_notify)
 
-# reschedule all pending notifications for firing (ie after backend reboot.)
-def reschedule_all_notifies():
-    notify_ids = query_notifys(pending=True)
-    for notify_id in notify_ids: schedule_notify(notify_id)
+# defines a handler to handle notification/channel messages published
+# returns a notification as dict if handled a notification message
+# returns None if recieved a channel close message
+def handle_notify(subscribe_id, message):
+    if "notify/" in message:
+        # recieved notification message
+        _, notify_id = message.split("/")
+        notify = get_notify(notify_id)
+        return notify
+    elif "close/" in message:
+        # recieved channel close message: unsubscribe from channel
+        unsubscribe_channel(subscribe_id)
+        return None
+    else:
+        raise NotImplementedError(f"Unknown message: {message}")
+

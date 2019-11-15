@@ -4,9 +4,12 @@
 # Notification Models 
 #
 
-from ..app import db
-from sqlalchemy.orm import validates
 import re
+from datetime import datetime
+
+from sqlalchemy.orm import validates
+
+from ..app import db
 
 # defines a channel where notifications are sent
 class Channel(db.Model):
@@ -62,3 +65,13 @@ class Notification(db.Model):
             raise AssertionError("Description must not exceed 1024 characters")
         else:
             return description
+
+    ## convenience properties
+    # checks if the notification is pending firing
+    # returns True if pending firing False otherwise
+    @property
+    def pending(self):
+        time_till_fire = (self.firing_time - datetime.utcnow()).total_seconds()
+        # max secs after firing time for a notification to be considered still pending 
+        pending_window = 60.0
+        return True if time_till_fire > -pending_window else False

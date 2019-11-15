@@ -76,7 +76,7 @@ def delete_channel(channel_id):
     if channel is None: raise NotFoundError
 
     # clear subscribers to channel
-    message_broker.publish(f"channel/{channel_id}", "close")
+    message_broker.publish(f"channel/{channel_id}", "close/{channel_id}")
     message_broker.clear(f"channel/{channel_id}")
 
     # cascade delete notifications
@@ -89,9 +89,10 @@ def delete_channel(channel_id):
 # subscribe to recieve notifications 
 # channel_id - show only notifications from the given channel id
 # callback - callback to run on notification, passes notify_id as str
+# returns the subscription id
 def subscribe_channel(channel_id, callback):
     print(f"subscribe to recieve notifications on channel:{channel_id}")
-    message_broker.subscribe(f"channel/{channel_id}", callback)
+    return message_broker.subscribe(f"channel/{channel_id}", callback)
 
 ## Notification Ops
 # query ids of notifications
@@ -176,25 +177,26 @@ def delete_notify(notify_id):
 # raises ValueError if attempting to schedule a notification that is not pending.
 # notify_id - id of the notification to send
 def schedule_notify(notify_id):
+    # extract notification fields
     notify = Notification.query.get(notify_id)
     if notify is None: raise NotFoundError
+    channel_id = notify.channel_id
+    firing_time = notify.firing_time
 
     # max secs after firing time for a notification to be considered still
     # pending and valid to be scheduled.
     schedule_window = 1.0
     # check if notification is pending to fire
-    time_till_fire = (notify.firing_time - datetime.utcnow()).total_seconds()
+    time_till_fire = (firing_time - datetime.utcnow()).total_seconds()
     if time_till_fire < -schedule_window:
         # notification no longer pending
-        raise ValueError(
-            f"Attempted to schedule a notification that is not pending: {notify.title}")
+        raise ValueError( "Attempted to schedule a notification that is not pending")
 
     def fire_notify():
         # wait till notification firing time
         time.sleep(time_till_fire)
         # publish firing message on channel
-        print(f"publishing notification: {notify.title}")
-        message_broker.publish(f"channel/{notify.channel_id}", f"notify/{notify_id}")
+        message_broker.publish(f"channel/{channel_id}", f"notify/{notify_id}")
     gevent.spawn(fire_notify)
 
 # reschedule all pending notifications for firing (ie after backend reboot.)

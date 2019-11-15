@@ -130,19 +130,23 @@ def route_subscribe(socket):
 
     # build callback to handle subscribed notifications
     def callback(message):
-        if not socket.closed:
-            if message == "close":
-                socket.close()
-            elif "notify/" in message:
-                _, notify_id = message.split("/")
-                notify = get_notify(notify_id)
-                # convert to iso date format
-                # add "Z" to signal utc timezone
-                notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
-                # forward notification to subscribed
-                socket.send(json.dumps(notify))
-            else:
-                raise NotImplementedError(f"Unknown message: {message}")
+        print("handling message")
+        if "notify/" in message and not socket.closed:
+            _, notify_id = message.split("/")
+            notify = get_notify(notify_id)
+            # convert to iso date format
+            # add "Z" to signal utc timezone
+            notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
+            # forward notification to subscribed
+            socket.send(json.dumps(notify))
+            # return db connection to pool
+            # required to prevent the connection pool from 
+            # running out of connnections  and causing timeouts
+            db.session.remove()
+        elif "close/" in message or socket.closed:
+            if not socket.closed: socket.close()
+        else:
+            raise NotImplementedError(f"Unknown message: {message}")
 
     # subscribe to channels with callack
     for channel_id in channel_ids:

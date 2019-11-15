@@ -42,7 +42,6 @@ def route_bad_request(error):
         "message": "Submitted a malformed request."
     }), 400
 
-
 # error handler for method not allowed/implmented (NotImplementedError)
 @err.app_errorhandler(405)
 @err.app_errorhandler(NotImplementedError)
@@ -61,3 +60,10 @@ def route_validation(error):
         "message": error.message
     }), 422
 
+# error handler for internal server errors
+@err.app_errorhandler(500)
+def route_validation(error):
+    return jsonify({
+        "error": "intenal-server-error",
+        "message": "Backend server encounted an unexpected error."
+    })

@@ -71,7 +71,7 @@ class EmployeeHome extends React.Component {
     componentDidMount() {
         const self = this;
         // Default user id for testing.
-        GETTaskFromUserId(2)
+        GETTaskFromUserId(17)
             .then(tasks => {
                 self.setState({ taskList: tasks });
             });

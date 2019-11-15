@@ -3,8 +3,8 @@ import { GETTaskFromUserId, UpdateTasks, CreateChannel, CreateNotification } fro
 import './App.css';
 import NavigationEmployee from './Navigation';
 
-/* Will rewrite all of this after hackathon */
 /* ----------------DUMMY DATA.---------------- */
+// Used for testing when the server is down
 const dummyTaskList = [
     {
         id: 0,
@@ -62,21 +62,32 @@ const dummyTaskList = [
 class EmployeeHome extends React.Component {
     constructor() {
         super();
-        //this.state = { taskList: null }
-        this.state = { taskList: dummyTaskList }
+        this.state = { taskList: null }
+        /* To use for testing when the server is down
+         * uncomment to see website with tasks */
+        // this.state = { taskList: dummyTaskList }
     }
 
-    //componentDidMount() {
-    //    const self = this;
-    //    GETTaskFromUserId(2)
-    //        .then(tasks => {
-    //            self.setState({ taskList: tasks });
-    //        });
-    //}
+    componentDidMount() {
+        const self = this;
+        // Default user id for testing.
+        GETTaskFromUserId(2)
+            .then(tasks => {
+                self.setState({ taskList: tasks });
+            });
+    }
 
     render() {
-        if (this.state.taskList === null || this.state.taskList === []) {
-            return null;
+
+        // Prevent the list of tasks from loading before they've been fetched.
+        if (this.state.taskList === null) {
+            return (
+                <div>
+                    <NavigationEmployee />
+                    <h1 className="pagetitle">HOME</h1>
+                    <Calendar />
+                </div>
+            );
         }
 
         else {
@@ -109,19 +120,19 @@ class TaskList extends React.Component {
     }
 
     updateCurrentTaskElement(task) {
-        this.currentTaskElement.current.updateCurrentTask(task);
+        this.currentTaskElement.current.updateCurrentTask(task); // To update the current task component when a user starts a task
     }
 
     updateToDoListElement(id) {
-        this.toDoListElement.current.updateCompletedTask(id);
+        this.toDoListElement.current.updateCompletedTask(id); // To update the completed property of task object to true
     }
 
     createPopUp() {
-        this.popUpElement.current.setState({ visible: true });
+        this.popUpElement.current.setState({ visible: true }); // To create pop up notification when time is up
     }
 
     secondsToHMS(duration) {
-        // Math.floor(equation) to get the integer part 
+        // Math.floor(equation) to get the integer part (e.g. 10 from 10.6)
         // % gets remainder of an equation.
         let hoursAndMin = Math.floor(duration / 60);
         let seconds = Math.floor(duration % 60);
@@ -161,15 +172,15 @@ class Calendar extends React.Component {
     }
 
     componentDidMount() {
-        let date = new Date();
-        let time = new Date(date.getTime());
+        let date = new Date(); // for today's date
+        let time = new Date(date.getTime()); // to get the date of the first day of the next month
         time.setMonth(date.getMonth() + 1);
         time.setDate(0);
-        let daysLeft = (time.getDate() > date.getDate() ? time.getDate() - date.getDate() : 0);
-
+        
+        let daysLeft = (time.getDate() > date.getDate() ? time.getDate() - date.getDate() : 0); // get the no. days of the month left
         let ans = [];
         for (let i = date.getDate(); i <= (date.getDate() + daysLeft); i++) {
-            ans.push(i);
+            ans.push(i); // get the days of the month left
         }
 
         this.setState({daysLeftList: ans});
@@ -194,7 +205,6 @@ class Calendar extends React.Component {
                 return "FRI";
             case 6:
                 return "SAT";
-
         }
     }
         
@@ -219,21 +229,22 @@ class ToDoList extends React.Component {
     }
 
     componentDidMount() {
+        // To get all the tasks that have not been finished.
         let allTasksList = [...this.state.allTasksList];
         let unfinishedTasks = allTasksList.filter(task => task.completed === false);
         this.setState({ unfinishedTasksList: unfinishedTasks });
     }
 
     updateCompletedTask(id) {
+        // Loop through the list of tasks to find the specific task.
         for (let i = 0; i < this.state.allTasksList.length; i++) {
             if (this.state.allTasksList[i].id === id) {
                 let tempTaskList = [...this.state.allTasksList];
                 tempTaskList[i].completed = true;
                 this.setState({ allTasksList: tempTaskList, currentTaskNull: true });
-                //let taskToUpdate = tempTaskList[i];
-                //let idOfTaskToUpdate = tempTaskList[i].id;
-                //delete taskToUpdate.id;
-                //UpdateTasks(idOfTaskToUpdate, taskToUpdate);
+
+                // update the task in the database
+                UpdateTasks(tempTaskList[i]);
                 break;
             }
         }
@@ -328,32 +339,30 @@ class CurrentTask extends React.Component {
     updateCurrentTask(task) {
         let hms = this.props.secondsToHMS(task.duration);
         let endTiming = new Date().getTime() + (task.duration * 1000);
-        let countDownTimerId = setInterval(this.updateCountDown, 200);
+        let countDownTimerId = setInterval(this.updateCountDown, 200); // set for updateCountDown to be called every 200ms to ensure count down is smooth
         this.setState({ hour: hms[0], minute: hms[1], second: hms[2], endTime: endTiming, countDownTimer: countDownTimerId, currentTask: task });
-        //let firingTime = new Date(endTiming).toISOString();
-        //console.log(firingTime);
-        //CreateNotification(task, firingTime, 3);
+
+        // To create a notification  for the raspberry pi
+        let firingTime = new Date(endTiming).toisostring();
+        CreateNotification(task, firingTime, 3);
     }
 
     finishTask() {
-        this.props.updateToDoListElement(this.state.currentTask.id);
+        this.props.updateToDoListElement(this.state.currentTask.id); // to update to do list component's allTaskList
         clearInterval(this.state.countDownTimer);
-        CreateNotification(this.state.currentTask, null, 3);
         this.setState({ hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: null });
-        //window.alert("You have run out of time.");
         this.props.createPopUp();
     }
 
     render() {
-        // The zero before each number e.g. 08 : 23 : 03 (hours minute second)
+        // return the current task if they are working on one
         if (this.state.currentTask != null) {
+
+            // The zero before each number (e.g. 08 : 23 : 03 ----> hours minute second)
             var zeroHour = (this.state.hour.toString().length > 1) ? "" : "0";
             var zeroMin = (this.state.minute.toString().length > 1) ? "" : "0";
             var zeroSec = (this.state.second.toString().length > 1) ? "" : "0";
-        }
 
-        // return the current task if they are working on
-        if (this.state.currentTask != null) {
             return (
                 <div className="currentTask">
                     <h2>TASK OF THE DAY</h2>
@@ -385,7 +394,7 @@ class CurrentTask extends React.Component {
     }
 }
 
-/*POP UP DIALOG*/
+/* ---------------------1.4 POP UP DIALOG--------------------- */
 class PopUp extends React.Component {
     constructor(props) {
         super(props);

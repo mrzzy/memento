@@ -8,6 +8,8 @@ import os
 import sys
 import unittest
 
+from gevent import monkey; monkey.patch_all()
+
 # hack to get relative imports to work
 sys.path.append("..")
 

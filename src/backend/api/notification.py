@@ -95,7 +95,6 @@ def route_notify(notify_id=None):
     elif request.method == "POST" and request.is_json:
         # create notify with params in json
         params = parse_params(request, notify_mapping)
-
         # parse datetime in iso format
         if not params["firing_time"] is None:
             params["firing_time"] = parse_datetime(params["firing_time"])
@@ -128,25 +127,31 @@ def route_subscribe(socket):
         # channel id is not specified, assume all channels
         channel_ids = query_channels()
 
-    # build callback to handle subscribed notifications
-    def callback(message):
-        if not socket.closed:
-            if message == "close":
-                socket.close()
-            elif "notify/" in message:
-                _, notify_id = message.split("/")
-                notify = get_notify(notify_id)
-                # convert to iso date format
-                # add "Z" to signal utc timezone
-                notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
-                # forward notification to subscribed
-                socket.send(json.dumps(notify))
-            else:
-                raise NotImplementedError(f"Unknown message: {message}")
+    # build callback to handle subscriptions
+    def handler(subscribe_id, message):
+        # check if client is still connected
+        if socket.closed:
+            # client disconnected: unsubscribe from further callbacks
+            unsubscribe_channel(subscribe_id)
+            return
+
+        # handle notification message
+        print(f"handling message: {message}")
+        notify = handle_notify(subscribe_id, message)
+        if not notify is None:
+            # convert to iso date format
+            # add "Z" to signal utc timezone
+            notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
+            # send notification to client
+            socket.send(json.dumps(notify))
+        else:
+            # channel has closed: disconnect the client
+            socket.close()
 
     # subscribe to channels with callack
     for channel_id in channel_ids:
-        subscribe_channel(channel_id, callback)
+        print(f"subscribe channel: {channel_id}")
+        subscribe_channel(channel_id, handler)
 
     # required to prevent websocket from closing
     while True: time.sleep(600)

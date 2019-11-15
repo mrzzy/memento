@@ -4,6 +4,7 @@
 # Jack in a box
 # 
 
+import time
 import json
 import asyncio
 import argparse
@@ -12,7 +13,6 @@ import websockets
 from datetime import datetime,timedelta
 from dateutil.parser import parse as parse_datetim
 
-FAILURE_TIMEOUT = 2.0
 FAILURE_THRESHOLD = 3
 
 # parse command line arguments
@@ -41,37 +41,44 @@ async def subscribe_channel(api_host, channel_id, is_secure):
     # build subscribe url
     protocol = "wss" if is_secure else "ws"
     subscribe_url = f"{protocol}://{api_host}/api/v0/notification/subscribe"
-    print(subscribe_url)
     if not channel_id is None:
         subscribe_url += f"?channel={channel_id}"
 
     # track failure times to determine if connection
     # dropping is due to inability connect or timeout
-    last_failure_timestamp = datetime.min
     n_failure = 0
-    time_since_failure = timedelta(seconds=0)
-    while (datetime.now() - last_failure_timestamp).total_seconds() > FAILURE_TIMEOUT \
-            or n_failure < 3:
+    while n_failure < FAILURE_THRESHOLD:
         # try to connect to the backend
         try:
-            socket = await websockets.client.connect(subscribe_url)
+            socket = await websockets.client.connect(subscribe_url, ping_interval=None)
+            n_failure = 0
+
+            # connected to backend - listening for notifications
+            time_since_failure = timedelta(seconds=0)
+            if channel_id  is None:
+                print("listening for notifications on all channels")
+            else:
+                print(f"listening for notifications on channel {channel_id}")
+
+            while socket.open:
+                # read notifications from serve
+                notify_json = await socket.recv()
+                notify = json.loads(notify_json)
+                print(f"recieved notification {notify['title']}")
+
         except Exception as e:
             n_failure += 1
-            print(f"failure {n_failure}: could not not connect...")
-            last_failure_timestamp = datetime.now()
-            continue
+            print(f"failure {n_failure}: could not not connect.")
+            time.sleep(1)
 
-        # connected to backend - listening for notifications
-        time_since_failure = timedelta(seconds=0)
-        print(f"listening for notifications on channel {channel_id}")
-        while socket.open:
-            notify_json = await socket.recv()
-            notify = json.loads(notify_json)
-            print(f"recieved notification {notify['title']}")
+    if n_failure >= 3: print("could not connect: giving up.")
+
 
 async def main():
     options = parse_options()
-    await subscribe_channel(options["api_host"], options["channel_id"], options["is_secure"])
+    await subscribe_channel(options["api_host"],
+                            options["channel_id"],
+                            options["is_secure"])
 
 # setup async event loop
 event_loop = asyncio.get_event_loop().run_until_complete(main())

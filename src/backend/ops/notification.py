@@ -33,6 +33,7 @@ def query_channels(user_id=None, pending=None, skip=0, limit=None):
         now = datetime.utcnow()
         channel_ids = channel_ids.outerjoin(Notification, Channel.id == Notification.channel_id)
         if pending: channel_ids = channel_ids.filter(Notification.firing_time > now)
+        else: channel_ids = channel_ids.filter(Notification.firing_time <= now)
     # apply skip & limit
     channel_ids = [ i[0] for i in channel_ids ]
     return apply_bound(channel_ids, skip, limit)
@@ -76,7 +77,7 @@ def delete_channel(channel_id):
     if channel is None: raise NotFoundError
 
     # clear subscribers to channel
-    message_broker.publish(f"channel/{channel_id}", "close")
+    message_broker.publish(f"channel/{channel_id}", "close/{channel_id}")
     message_broker.clear(f"channel/{channel_id}")
 
     # cascade delete notifications
@@ -85,13 +86,6 @@ def delete_channel(channel_id):
 
     db.session.delete(channel)
     db.session.commit()
-
-# subscribe to recieve notifications 
-# channel_id - show only notifications from the given channel id
-# callback - callback to run on notification, passes notify_id as str
-def subscribe_channel(channel_id, callback):
-    print(f"subscribe to recieve notifications on channel:{channel_id}")
-    message_broker.subscribe(f"channel/{channel_id}", callback)
 
 ## Notification Ops
 # query ids of notifications
@@ -120,7 +114,14 @@ def get_notify(notify_id):
     notify = Notification.query.get(notify_id)
     if notify is None: raise NotFoundError
     # map fields to dict
-    return map_dict(notify, notify_mapping)
+    notify_dict = map_dict(notify, notify_mapping)
+
+    # return db connection to pool
+    # required to prevent the connection pool from 
+    # running out of connnections and causing timeouts
+    db.session.remove()
+
+    return notify_dict
 
 # create an notification
 # title - title of the notification
@@ -140,7 +141,7 @@ def create_notify(title, channel_id, firing_time=None, description=""):
     db.session.commit()
 
     # notify users of notification change 
-    schedule_notify(notify.id)
+    if notify.pending: schedule_notify(notify.id)
 
     return notify.id
 
@@ -162,7 +163,7 @@ def update_notify(notify_id, title=None, firing_time=None, channel_id=None,
     db.session.commit()
 
     # notify users of notification change 
-    schedule_notify(notify.id)
+    if notify.pending: schedule_notify(notify.id)
 
 # delete notification with the given notify_id
 # throws NotFoundError if no notify with notify_id is found
@@ -171,33 +172,60 @@ def delete_notify(notify_id):
     if notify is None: raise NotFoundError
     db.session.delete(notify)
     db.session.commit()
+# reschedule all pending notifications for firing (ie after backend reboot.)
+def reschedule_all_notifies():
+    notify_ids = query_notifys(pending=True)
+    for notify_id in notify_ids: schedule_notify(notify_id)
+
+## Subscription Ops
+# subscribe to recieve notifications from channel
+# channel_id - id of the channel to recieve notification from
+# callback(notify) - callback to run on notification
+#   notify - the notification as dict, other
+# returns a subscribe_id of the subscription
+def subscribe_channel(channel_id, callback):
+    return message_broker.subscribe(f"channel/{channel_id}", callback)
+
+# unsubscribe to stop recieving notifications from channel
+# subscribe_id - id of the subscription to unsubscribe
+def unsubscribe_channel(subscribe_id):
+    message_broker.unsubscribe(subscribe_id)
 
 # schedule the firing of the given pending notification 
 # raises ValueError if attempting to schedule a notification that is not pending.
 # notify_id - id of the notification to send
 def schedule_notify(notify_id):
+    # extract notification fields
     notify = Notification.query.get(notify_id)
     if notify is None: raise NotFoundError
+    channel_id = notify.channel_id
+    firing_time = notify.firing_time
 
-    # max secs after firing time for a notification to be considered still
-    # pending and valid to be scheduled.
-    schedule_window = 1.0
-    # check if notification is pending to fire
-    time_till_fire = (notify.firing_time - datetime.utcnow()).total_seconds()
-    if time_till_fire < -schedule_window:
+    if not notify.pending:
         # notification no longer pending
-        raise ValueError(
-            f"Attempted to schedule a notification that is not pending: {notify.title}")
+        raise ValueError( "Attempted to schedule a notification that is not pending")
 
     def fire_notify():
         # wait till notification firing time
-        time.sleep(time_till_fire)
+        time_till_fire = (firing_time - datetime.utcnow()).total_seconds()
+        time.sleep(max(0, time_till_fire))
         # publish firing message on channel
-        print(f"publishing notification: {notify.title}")
-        message_broker.publish(f"channel/{notify.channel_id}", f"notify/{notify_id}")
+        message_broker.publish(f"channel/{channel_id}", f"notify/{notify_id}")
     gevent.spawn(fire_notify)
 
-# reschedule all pending notifications for firing (ie after backend reboot.)
-def reschedule_all_notifies():
-    notify_ids = query_notifys(pending=True)
-    for notify_id in notify_ids: schedule_notify(notify_id)
+# defines a handler to handle notification/channel messages published
+# returns a notification as dict if handled a notification message
+# returns None if recieved a channel close message
+def handle_notify(subscribe_id, message):
+    if "notify/" in message:
+        # recieved notification message
+        _, notify_id = message.split("/")
+        notify = get_notify(notify_id)
+        return notify
+    elif "close/" in message:
+        # recieved channel close message: unsubscribe from channel
+        unsubscribe_channel(subscribe_id)
+        return None
+    else:
+        raise NotImplementedError(f"Unknown message: {message}")
+

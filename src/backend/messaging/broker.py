@@ -4,6 +4,8 @@
 # Messaging Broker
 #
 
+import gevent
+
 from abc import ABC, abstractmethod
 from uuid import uuid4
 
@@ -47,21 +49,25 @@ class LocalBroker(AbstractBroker):
     # subscribe to message sent on the given channel 
     # running the given callback when a message is sent on the channel
     # channel - name of the channel to subscribe to
-    # callback - callback to run when recieving message, message passed to first argument
+    # callback(subscribe_id, message) - callback to run when recieving message
     # returns a subscribe_id that identifies the subscription
     def subscribe(self, channel, callback):
         # check if channel exists otherwise create one
         if not channel in self.message_board:
             self.message_board[channel] = {}
         # record callback for channel
-        subscribe_id = uuid4()
+        subscribe_id = f"{channel}//{uuid4()}"
         self.message_board[channel][subscribe_id] = callback
 
+        return subscribe_id
+
     # unsubscribe from given channel 
-    # channel - channel to unsubscribe from
+    # does not do anything if not subscribed to the channel
     # subscribe_id - the id of subscription to unsubscribe from
-    def unsubscribe(self, channel, subscribe_id):
-        del self.message_board[channel][subscribe_id]
+    def unsubscribe(self, subscribe_id):
+        channel, _= subscribe_id.split("//")
+        if subscribe_id in self.message_board[channel]:
+            del self.message_board[channel][subscribe_id]
 
     # publish the given message on the given channel
     # channel - name of the channel to publish the channel
@@ -72,9 +78,8 @@ class LocalBroker(AbstractBroker):
             self.message_board[channel] = {}
 
         # publish message by running registered callbacks
-        for channel in self.message_board.values():
-            for callback in channel.values():
-                callback(message)
+        for subscribe_id, callback in self.message_board[channel].items():
+            gevent.spawn(callback, subscribe_id, message)
 
     # clear the given notification channel
     # removes all subscribers on the channel

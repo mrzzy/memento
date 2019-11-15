@@ -58,10 +58,12 @@ class LocalBroker(AbstractBroker):
         self.message_board[channel][subscribe_id] = callback
 
     # unsubscribe from given channel 
+    # does not do anything if not already is subscribed to the channel
     # channel - channel to unsubscribe from
     # subscribe_id - the id of subscription to unsubscribe from
     def unsubscribe(self, channel, subscribe_id):
-        del self.message_board[channel][subscribe_id]
+        if subscribe_id in self.message_board[channel]:
+            del self.message_board[channel][subscribe_id]
 
     # publish the given message on the given channel
     # channel - name of the channel to publish the channel
@@ -72,9 +74,8 @@ class LocalBroker(AbstractBroker):
             self.message_board[channel] = {}
 
         # publish message by running registered callbacks
-        for channel in self.message_board.values():
-            for callback in channel.values():
-                callback(message)
+        for callback in self.message_board[channel].values():
+            callback(message)
 
     # clear the given notification channel
     # removes all subscribers on the channel

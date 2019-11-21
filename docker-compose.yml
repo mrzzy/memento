@@ -11,6 +11,8 @@ services:
     ports:
       - "5432:5432"
     env_file: ".env"
+    volumes:
+      - database-data:/var/lib/postgresql/data
   # memento-backend container
   backend:
     image: mrzzy/memento-backend
@@ -19,8 +21,6 @@ services:
       dockerfile: containers/backend/Dockerfile
     ports:
       - "5000:5000"
-    volumes:
-      - database-data:/usr/local/pgsql/data
     env_file: ".env"
     depends_on:
       - postgres

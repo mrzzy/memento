@@ -15,7 +15,7 @@ services:
       - database-data:/var/lib/postgresql/data
   # memento-backend container
   backend:
-    image: mrzzy/memento-backend
+    image: mrzzy/memento-backend:0.1-apiv1
     build:
       context: .
       dockerfile: containers/backend/Dockerfile

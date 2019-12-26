@@ -5,7 +5,6 @@
 
 ## config vars
 CONTAINERS_DIR:=containers
-SRC_DIR:=src
 # docker image build confg 
 IMG_PREFIX:=mrzzy/memento-
 IMAGES:=$(foreach IMG,$(wildcard $(CONTAINERS_DIR)/*),$(IMG_PREFIX)$(notdir $(IMG)) )
@@ -20,7 +19,7 @@ API_HOST:=localhost:5000
 images: $(IMAGES)
 
 $(IMG_PREFIX)%: $(CONTAINERS_DIR)/%/Dockerfile
-	docker build -t $@ -f $< $(SRC_DIR)/$(subst $(IMG_PREFIX),,$@)
+	docker build -t $@ -f $< .
 
 # test targets
 test: test-api

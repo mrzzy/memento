@@ -4,22 +4,22 @@
 #
 
 ## config vars
-CONTAINERS_DIR:=containers
-# docker image build confg 
-IMG_PREFIX:=mrzzy/memento-
-IMAGES:=$(foreach IMG,$(wildcard $(CONTAINERS_DIR)/*),$(IMG_PREFIX)$(notdir $(IMG)) )
-
 # test config 
 API_HOST:=localhost:5000
 
 ## targets
-.DEFAULT: 
-.PHONY: test api-test images
+.DEFAULT:  images
+.PHONY: test api-test images push run
 
-images: $(IMAGES)
+## docker image targets
+images:
+	docker-compose build
 
-$(IMG_PREFIX)%: $(CONTAINERS_DIR)/%/Dockerfile
-	docker build -t $@ -f $< .
+push:
+	docker-compose push
+
+run:
+	docker-compose up
 
 # test targets
 test: test-api

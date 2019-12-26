@@ -45,11 +45,11 @@ Branches used in the project:
     - `frontend/` - website fontend
     - `backend/` - backend service
         - `models/` - backend models
-            - `iam/` - identity and user managment 
+            - `identity/` - identity managment 
             - `notification/` - notification 
             - `asssignment/` - assignment 
         - `api/` - backend api routes
-            - `iam/` - identity and user managment 
+            - `identity/` - identity and user managment 
             - `notification/` - notification 
             - `asssignment/` - assignment 
         - `mapping/` - mappings between models and json representation

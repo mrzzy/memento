@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "iam",
+			"name": "identity",
 			"item": [
 				{
 					"name": "create organisation",
@@ -67,7 +67,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org",
+							"raw": "http://{{api_host}}/api/v0/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -75,7 +75,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"org"
 							]
 						}
@@ -106,7 +106,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/orgs",
+							"raw": "http://{{api_host}}/api/v0/identity/orgs",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -114,7 +114,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"orgs"
 							]
 						}
@@ -152,7 +152,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -160,7 +160,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -217,7 +217,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -225,7 +225,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -292,7 +292,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team",
+							"raw": "http://{{api_host}}/api/v0/identity/team",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -300,7 +300,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"team"
 							]
 						}
@@ -331,7 +331,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/teams?org={{org_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/teams?org={{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -339,7 +339,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"teams"
 							],
 							"query": [
@@ -383,7 +383,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -391,7 +391,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"team",
 								"{{team_id}}"
 							]
@@ -448,7 +448,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -456,7 +456,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"team",
 								"{{team_id}}"
 							]
@@ -523,7 +523,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user",
+							"raw": "http://{{api_host}}/api/v0/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -531,7 +531,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"user"
 							]
 						}
@@ -562,7 +562,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/users?team={{team_id}}&org={{org_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/users?team={{team_id}}&org={{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -570,7 +570,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"users"
 							],
 							"query": [
@@ -621,7 +621,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -629,7 +629,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"user",
 								"{{user_id}}"
 							]
@@ -686,7 +686,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -694,7 +694,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"user",
 								"{{user_id}}"
 							]
@@ -761,7 +761,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manage",
+							"raw": "http://{{api_host}}/api/v0/identity/manage",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -769,7 +769,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"manage"
 							]
 						}
@@ -800,7 +800,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manages?kind=user&org=1&manager=1",
+							"raw": "http://{{api_host}}/api/v0/identity/manages?kind=user&org=1&manager=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -808,7 +808,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"manages"
 							],
 							"query": [
@@ -863,7 +863,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/manage/{{manage_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -871,7 +871,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"manage",
 								"{{manage_id}}"
 							]
@@ -928,7 +928,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/manage/{{manage_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -936,7 +936,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"manage",
 								"{{manage_id}}"
 							]
@@ -984,7 +984,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/manage/{{manage_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -992,7 +992,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"manage",
 								"{{manage_id}}"
 							]
@@ -1049,7 +1049,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -1057,7 +1057,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"user",
 								"{{user_id}}"
 							]
@@ -1071,7 +1071,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -1079,7 +1079,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"team",
 								"{{team_id}}"
 							]
@@ -1136,7 +1136,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -1144,7 +1144,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -1217,7 +1217,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org",
+							"raw": "http://{{api_host}}/api/v0/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -1225,7 +1225,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"org"
 							]
 						}
@@ -1291,7 +1291,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team",
+							"raw": "http://{{api_host}}/api/v0/identity/team",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -1299,7 +1299,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"team"
 							]
 						}
@@ -1365,7 +1365,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user",
+							"raw": "http://{{api_host}}/api/v0/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -1373,7 +1373,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"user"
 							]
 						}
@@ -1439,7 +1439,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user",
+							"raw": "http://{{api_host}}/api/v0/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -1447,7 +1447,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"user"
 							]
 						}
@@ -2367,7 +2367,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2375,7 +2375,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -2448,7 +2448,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org",
+							"raw": "http://{{api_host}}/api/v0/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2456,7 +2456,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"org"
 							]
 						}
@@ -2522,7 +2522,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team",
+							"raw": "http://{{api_host}}/api/v0/identity/team",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2530,7 +2530,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"team"
 							]
 						}
@@ -2596,7 +2596,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user",
+							"raw": "http://{{api_host}}/api/v0/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2604,7 +2604,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"user"
 							]
 						}
@@ -3327,7 +3327,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -3335,7 +3335,7 @@
 							"path": [
 								"api",
 								"v0",
-								"iam",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]

@@ -10,13 +10,13 @@ from datetime import datetime
 from ...app import db
 from ...models import *
 
-from .iam import TestIAMModels
+from .identity import TestIdentityModels
 
 
 # unit tests for Notification models
 class TestNotificationModels(TestCase):
     def create_test_data(self):
-        TestIAMModels.create_test_data(self)
+        TestIdentityModels.create_test_data(self)
         self.channel = Channel(kind=Channel.Kind.Notice,
                                user_id=self.worker.id)
 
@@ -35,7 +35,7 @@ class TestNotificationModels(TestCase):
         db.session.commit()
         db.session.delete(self.channel)
         db.session.commit()
-        TestIAMModels.delete_test_data(self)
+        TestIdentityModels.delete_test_data(self)
 
     def test_create_delete(self):
         self.create_test_data()

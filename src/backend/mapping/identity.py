@@ -1,7 +1,7 @@
 #
 # Memento
 # Backend
-# IAM mappings
+# Identity mappings
 #
 
 # defines the mapping from org model fields to json api representation
@@ -32,4 +32,3 @@ manage_mapping = [
     ("kind", "kind"),
     ("manager_id",  "managerId")
 ]
-

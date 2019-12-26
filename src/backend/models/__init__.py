@@ -4,6 +4,6 @@
 # Models module
 #
 
-from .iam import *
+from .identity import *
 from .notification import *
 from .assignment import *

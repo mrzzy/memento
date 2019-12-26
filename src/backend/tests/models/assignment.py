@@ -11,12 +11,12 @@ from datetime import datetime
 from ...app import db
 from ...models import *
 
-from .iam import TestIAMModels
+from .identity import TestIdentityModels
 
 # unit tests for Assignment models
 class TestAssignmentModels(TestCase):
     def create_test_data(self):
-        TestIAMModels.create_test_data(self)
+        TestIdentityModels.create_test_data(self)
 
         self.task = Task(name="Fishing",
                          description="Time to catch some endanged whales",
@@ -48,7 +48,7 @@ class TestAssignmentModels(TestCase):
         db.session.commit()
         db.session.delete(self.event)
         db.session.commit()
-        TestIAMModels.delete_test_data(self)
+        TestIdentityModels.delete_test_data(self)
 
     def test_create_delete(self):
         self.create_test_data()

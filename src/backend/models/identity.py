@@ -1,7 +1,7 @@
 #
 # Memento
 # Backend
-# IAM Models 
+# Identity Models 
 #
 
 from ..app import db

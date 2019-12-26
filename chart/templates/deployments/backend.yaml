@@ -1,0 +1,75 @@
+# 
+# Memento
+# Helm Chart
+# Backend Deployment
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "memento.fullname" . }}-backend
+  labels:
+{{ include "memento.labels" . | indent 4 }}
+    component: backend
+spec:
+  replicas: {{ .Values.scaling.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "memento.fullname" . }}
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: {{ include "memento.fullname" . }}
+        component: backend
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ template "memento.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- with .Values.images.backend }}
+          image: "{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          # inject configuration using environment
+          envFrom:
+            - configMapRef:
+                name: {{ include "memento.fullname" . }}-config-env
+            - secretRef:
+                name: {{ include "memento.fullname" . }}-database
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 8
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 4
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

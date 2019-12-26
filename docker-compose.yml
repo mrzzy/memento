@@ -1,0 +1,28 @@
+#
+# Memento
+# Docker Compose
+# Development Stack
+#
+
+version: "3"
+services:
+  postgres:
+    image: postgres:12.0-alpine
+    ports:
+      - "5432:5432"
+    env_file: ".env"
+    volumes:
+      - database-data:/var/lib/postgresql/data
+  # memento-backend container
+  backend:
+    image: mrzzy/memento-backend:0.1-apiv1
+    build:
+      context: .
+      dockerfile: containers/backend/Dockerfile
+    ports:
+      - "5000:5000"
+    env_file: ".env"
+    depends_on:
+      - postgres
+volumes:
+  database-data:

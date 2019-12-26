@@ -1,0 +1,23 @@
+# 
+# Memento
+# Helm Chart
+# Backend Service
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.backend.name }}
+  labels:
+{{ include "memento.labels" . | indent 4 }}
+    component: backend
+spec:
+  type: {{ .Values.services.backend.type }}
+  ports:
+    - port: {{ .Values.services.backend.port }}
+      targetPort: 5000
+      protocol: TCP
+      name: http
+  selector:
+      app: {{ include "memento.fullname" . }}
+      component: backend

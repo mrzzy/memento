@@ -1,2 +1,13 @@
 # tag files
 tag*
+# virtualenvs
+venv/
+
+# node packages
+node_modules/
+
+# dotenv files
+.env
+# visual studio configs
+.vscode/
+.vs/

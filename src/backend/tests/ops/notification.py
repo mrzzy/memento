@@ -10,7 +10,7 @@ from datetime import datetime
 
 from gevent.lock import Semaphore
 
-from ...ops.iam import *
+from ...ops.identity import *
 from ...ops.notification import *
 
 class TestsNotficationOps(TestCase):

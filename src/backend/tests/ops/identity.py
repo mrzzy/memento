@@ -1,14 +1,14 @@
 #
 # Memento
 # Backend
-# IAM Tests
+# Identity Tests
 #
 
 from unittest import TestCase
 
-from ...ops.iam import *
+from ...ops.identity import *
 
-class TestIAMOps(TestCase):
+class TestIdentityOps(TestCase):
     def test_org_ops(self):
         self.assertEqual(query_orgs(), [])
 

@@ -1,12 +1,12 @@
 #
 # Memento
 # Backend
-# IAM Operations
+# Identity Operations
 #
 
 from ..app import db
-from ..models.iam import *
-from ..mapping.iam import *
+from ..models.identity import *
+from ..mapping.identity import *
 from .assignment import *
 from ..utils import map_dict, apply_bound
 from .notification import query_channels, delete_channel

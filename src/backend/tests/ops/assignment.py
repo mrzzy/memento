@@ -8,7 +8,7 @@ from unittest import TestCase
 from datetime import datetime
 
 
-from ...ops.iam import *
+from ...ops.identity import *
 from ...ops.assignment import *
 
 class TestAssigmentOps(TestCase):

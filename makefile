@@ -9,7 +9,7 @@ API_HOST:=localhost:5000
 
 ## targets
 .DEFAULT:  images
-.PHONY: test api-test images push run
+.PHONY: test api-test images push run clean
 
 ## docker image targets
 images:
@@ -20,6 +20,10 @@ push:
 
 run: images
 	docker-compose up
+
+clean:
+	docker-compose down -v
+
 
 # test targets
 test: test-api

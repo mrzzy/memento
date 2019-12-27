@@ -29,16 +29,16 @@ def route_tasks():
     if not author_id is None: author_id = int(author_id)
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
-    limit_by = request.args.get("limit-by", None)
-    if not limit_by is None: limit_by = parse_datetime(limit_by)
+    due_by = request.args.get("due-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
 
     # perform query
-    task_ids = query_tasks(pending, author_id, limit_by, skip, limit)
+    task_ids = query_tasks(pending, author_id, due_by, skip, limit)
     return jsonify(task_ids)
 
 # api - read, create, update, delete tasks
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/task", methods=["POST"])
-@assign.route(f"/api/v{API_VERSION}/{assign.name}/task/<task_id>", 
+@assign.route(f"/api/v{API_VERSION}/{assign.name}/task/<task_id>",
               methods=["GET", "PATCH", "DELETE"])
 def route_task(task_id=None):
     if request.method == "GET" and task_id:
@@ -83,11 +83,11 @@ def route_events():
     if not author_id is None: author_id = int(author_id)
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
-    limit_by = request.args.get("limit-by", None)
-    if not limit_by is None: limit_by = parse_datetime(limit_by)
+    due_by = request.args.get("limit-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
 
     # perform query
-    event_ids = query_events(pending, author_id, limit_by, skip, limit)
+    event_ids = query_events(pending, author_id, due_by, skip, limit)
     return jsonify(event_ids)
 
 # api - read, create, update, delete events
@@ -141,12 +141,12 @@ def route_assigns():
     if not item_id is None: item_id = int(item_id)
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
-    limit_by = request.args.get("limit-by", None)
-    if not limit_by is None: limit_by = parse_datetime(limit_by)
+    due_by = request.args.get("due-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
 
     # perform query
     assign_ids = query_assigns(kind, item_id, assignee_id, assignee_id,
-                               pending, limit_by, skip, limit)
+                               pending, due_by, skip, limit)
     return jsonify(assign_ids)
 
 # api - read, create, update, delete assignments

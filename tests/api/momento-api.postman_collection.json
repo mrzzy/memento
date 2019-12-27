@@ -67,14 +67,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/org",
+							"raw": "http://{{api_host}}/api/v1/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"org"
 							]
@@ -106,14 +106,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/orgs",
+							"raw": "http://{{api_host}}/api/v1/identity/orgs",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"orgs"
 							]
@@ -152,14 +152,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"org",
 								"{{org_id}}"
@@ -217,14 +217,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"org",
 								"{{org_id}}"
@@ -292,14 +292,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/team",
+							"raw": "http://{{api_host}}/api/v1/identity/team",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"team"
 							]
@@ -331,14 +331,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/teams?org={{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/teams?org={{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"teams"
 							],
@@ -383,14 +383,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"team",
 								"{{team_id}}"
@@ -448,14 +448,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"team",
 								"{{team_id}}"
@@ -523,14 +523,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/user",
+							"raw": "http://{{api_host}}/api/v1/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"user"
 							]
@@ -562,14 +562,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/users?team={{team_id}}&org={{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/users?team={{team_id}}&org={{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"users"
 							],
@@ -621,14 +621,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"user",
 								"{{user_id}}"
@@ -686,14 +686,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"user",
 								"{{user_id}}"
@@ -761,14 +761,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/manage",
+							"raw": "http://{{api_host}}/api/v1/identity/manage",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"manage"
 							]
@@ -800,14 +800,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/manages?kind=user&org=1&manager=1",
+							"raw": "http://{{api_host}}/api/v1/identity/manages?kind=user&org=1&manager=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"manages"
 							],
@@ -863,14 +863,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/manage/{{manage_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"manage",
 								"{{manage_id}}"
@@ -928,14 +928,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/manage/{{manage_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"manage",
 								"{{manage_id}}"
@@ -984,14 +984,14 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/manage/{{manage_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"manage",
 								"{{manage_id}}"
@@ -1049,14 +1049,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"user",
 								"{{user_id}}"
@@ -1071,14 +1071,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"team",
 								"{{team_id}}"
@@ -1136,14 +1136,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"org",
 								"{{org_id}}"
@@ -1217,14 +1217,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/org",
+							"raw": "http://{{api_host}}/api/v1/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"org"
 							]
@@ -1291,14 +1291,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/team",
+							"raw": "http://{{api_host}}/api/v1/identity/team",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"team"
 							]
@@ -1365,14 +1365,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/user",
+							"raw": "http://{{api_host}}/api/v1/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"user"
 							]
@@ -1439,14 +1439,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/user",
+							"raw": "http://{{api_host}}/api/v1/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"user"
 							]
@@ -1513,14 +1513,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/task",
+							"raw": "http://{{api_host}}/api/v1/assignment/task",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"task"
 							]
@@ -1552,14 +1552,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/tasks?author={{supervisor_id}}&pending=1",
+							"raw": "http://{{api_host}}/api/v1/assignment/tasks?author={{supervisor_id}}&pending=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"tasks"
 							],
@@ -1612,14 +1612,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/task/{{task_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/task/{{task_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"task",
 								"{{task_id}}"
@@ -1677,14 +1677,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/task/{{task_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/task/{{task_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"task",
 								"{{task_id}}"
@@ -1752,14 +1752,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/event",
+							"raw": "http://{{api_host}}/api/v1/assignment/event",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"event"
 							]
@@ -1791,14 +1791,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/events?author={{supervisor_id}}&pending=1",
+							"raw": "http://{{api_host}}/api/v1/assignment/events?author={{supervisor_id}}&pending=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"events"
 							],
@@ -1850,14 +1850,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/event/{{event_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/event/{{event_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"event",
 								"{{event_id}}"
@@ -1915,14 +1915,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/event/{{event_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/event/{{event_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"event",
 								"{{event_id}}"
@@ -1990,14 +1990,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assign",
+							"raw": "http://{{api_host}}/api/v1/assignment/assign",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assign"
 							]
@@ -2029,14 +2029,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assigns?pending=1",
+							"raw": "http://{{api_host}}/api/v1/assignment/assigns?pending=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assigns"
 							],
@@ -2085,14 +2085,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assign/{{assign_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/assign/{{assign_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assign",
 								"{{assign_id}}"
@@ -2150,14 +2150,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assign/{{assign_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/assign/{{assign_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assign",
 								"{{assign_id}}"
@@ -2215,14 +2215,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assign/{{assign_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/assign/{{assign_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assign",
 								"{{assign_id}}"
@@ -2237,14 +2237,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/event/{{event_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/event/{{event_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"event",
 								"{{event_id}}"
@@ -2302,14 +2302,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/task/{{task_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/task/{{task_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"task",
 								"{{task_id}}"
@@ -2367,14 +2367,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"org",
 								"{{org_id}}"
@@ -2448,14 +2448,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/org",
+							"raw": "http://{{api_host}}/api/v1/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"org"
 							]
@@ -2522,14 +2522,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/team",
+							"raw": "http://{{api_host}}/api/v1/identity/team",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"team"
 							]
@@ -2596,14 +2596,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/user",
+							"raw": "http://{{api_host}}/api/v1/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"user"
 							]
@@ -2670,14 +2670,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channel",
+							"raw": "http://{{api_host}}/api/v1/notification/channel",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"channel"
 							]
@@ -2709,14 +2709,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channels",
+							"raw": "http://{{api_host}}/api/v1/notification/channels",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"channels"
 							]
@@ -2757,14 +2757,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channel/{{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/channel/{{channel_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"channel",
 								"{{channel_id}}"
@@ -2822,14 +2822,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channel/{{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/channel/{{channel_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"channel",
 								"{{channel_id}}"
@@ -2897,14 +2897,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify",
+							"raw": "http://{{api_host}}/api/v1/notification/notify",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify"
 							]
@@ -2971,14 +2971,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify",
+							"raw": "http://{{api_host}}/api/v1/notification/notify",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify"
 							]
@@ -3010,14 +3010,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notifys?pending=1&channel={{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notifys?pending=1&channel={{channel_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notifys"
 							],
@@ -3067,14 +3067,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify/{{notify_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notify/{{notify_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify",
 								"{{notify_id}}"
@@ -3132,14 +3132,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify/{{notify_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notify/{{notify_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify",
 								"{{notify_id}}"
@@ -3197,14 +3197,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify/{{notify_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notify/{{notify_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify",
 								"{{notify_id}}"
@@ -3262,14 +3262,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channel/{{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/channel/{{channel_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"channel",
 								"{{channel_id}}"
@@ -3327,14 +3327,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/identity/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"identity",
 								"org",
 								"{{org_id}}"
@@ -3380,14 +3380,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/status",
+							"raw": "http://{{api_host}}/api/v1/status",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"status"
 							]
 						}

@@ -20,6 +20,8 @@ services:
       context: .
       dockerfile: containers/backend/Dockerfile
       target: develop
+      args:
+        API_VERSION: 1
     ports:
       - "5000:5000"
     env_file: ".env"

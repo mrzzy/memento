@@ -18,7 +18,7 @@ images:
 push:
 	docker-compose push
 
-run:
+run: images
 	docker-compose up
 
 # test targets

@@ -4,7 +4,7 @@
 # Development Stack
 #
 
-version: "3"
+version: "3.4"
 services:
   postgres:
     image: postgres:12.0-alpine
@@ -19,10 +19,13 @@ services:
     build:
       context: .
       dockerfile: containers/backend/Dockerfile
+      target: develop
     ports:
       - "5000:5000"
     env_file: ".env"
     depends_on:
       - postgres
+    volumes:
+      - "./src/backend:/backend:ro"
 volumes:
   database-data:

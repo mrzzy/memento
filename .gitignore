@@ -11,3 +11,6 @@ node_modules/
 # visual studio configs
 .vscode/
 .vs/
+
+# vim sessions
+.session.vim

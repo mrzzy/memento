@@ -77,14 +77,14 @@ class TestIAMOps(TestCase):
                               "joel@jmail.com",
                               org_id, team_id)
 
-        user = get_user(team_id)
+        user = get_user(user_id)
         self.assertEqual(user["name"], "Joel")
         self.assertEqual(query_users(), [user_id])
         self.assertEqual(query_users(team_id=team_id), [user_id])
         self.assertEqual(query_users(team_id=-1), [])
 
         update_user(user_id, name="James")
-        user = get_user(team_id)
+        user = get_user(user_id)
         self.assertEqual(user["name"], "James")
 
         delete_user(user_id)

@@ -20,5 +20,6 @@ from backend.app import app
 if __name__ == "__main__":
     port = int(config.BACKEND_PORT)
     server = pywsgi.WSGIServer(('', port), app, handler_class=WebSocketHandler)
-    print("[OK] Memento Backend listening on port 5000.")
+    print(f"[OK] Started Memento Backend: API v{config.API_VERSION}"
+          f", port {config.BACKEND_PORT}")
     server.serve_forever()

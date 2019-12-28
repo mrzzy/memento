@@ -752,7 +752,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"managerId\": {{user_id}},\n\t\"targetId\": {{user_id}}\n}",
+							"raw": "{\n\t\"managerId\": {{user_id}},\n\t\"manageeId\": {{user_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -845,7 +845,7 @@
 									"pm.test(\"response has expected contents\", () => {",
 									"    const manage = pm.response.json();",
 									"    assert(manage.managerId === pm.globals.get(\"user_id\"));",
-									"    assert(manage.targetId === pm.globals.get(\"user_id\"));",
+									"    assert(manage.manageeId === pm.globals.get(\"user_id\"));",
 									"});",
 									""
 								],

@@ -81,6 +81,6 @@ class Management(db.Model):
     # model fields
     id = db.Column(db.Integer, primary_key=True)
     # relationships
-    target_id = db.Column(db.Integer, nullable=False)
+    managee_id = db.Column(db.Integer, nullable=False)
     manager_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     manager = db.relationship("User", lazy=True)

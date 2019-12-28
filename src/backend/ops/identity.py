@@ -122,27 +122,21 @@ def update_team(team_id, org_id=None, name=None):
 
 
 # delete team for id 
-# also cascade deletes all objects depending on team
 # throws NotFoundError if no team with team_id is found
 def delete_team(team_id):
     team = Team.query.get(team_id)
     if team is None: raise NotFoundError
-    # cascade delete
-    manage_ids = query_manage(target_id=team_id)
-    for manage_id in manage_ids: delete_manage(delete_manage)
 
     db.session.delete(team)
     db.session.commit()
-
 
 ## User Ops
 # query ids of users
 # org_id - show only users that belong to organisation given by org_id
 # team_id - show only users that belong to team given by team_id
-# kind - show only users that are of this kind
 # skip - skip the first skip organisations
 # limit - output ids limit to the first limit organisations
-def query_users(org_id=None, team_id=None, kind=None, skip=0, limit=None):
+def query_users(org_id=None, team_id=None, skip=0, limit=None):
     user_ids = User.query.with_entities(User.id)
     # apply filters
     if not org_id is None: user_ids = user_ids.filter_by(org_id=org_id)
@@ -207,7 +201,7 @@ def delete_user(user_id):
     # cascade delete
     # cascade delete mangement 
     manage_ids = query_manage(manager_id=user_id) + \
-        query_manage(target_id=user_id)
+        query_manage(managee_id=user_id)
     for manage_id in manage_ids: delete_manage(manage_id)
     # cascade delete assignments created
     assign_ids = query_assigns(assigner_id=user_id)
@@ -226,17 +220,16 @@ def delete_user(user_id):
 
 ## Management Ops
 # query id of managements
-# kind - show only managements with the given kind (worker/team)
-# target_id - show only mangements for target with given id
+# managee_id - show only mangements for target with given id
 # org_id - show only managements that belong to the given organisation
 # manager_id - show only mangements with manager with given id
 # skip - skip the first skip organisations
 # limit - output ids limit to the first limit organisations
-def query_manage(kind=None, org_id=None, target_id=None,
+def query_manage(org_id=None, managee_id=None,
                  manager_id=None, skip=0, limit=None):
     manage_ids = Management.query.with_entities(Management.id)
     # apply filters
-    if not target_id is None: manage_ids = manage_ids.filter_by(target_id=target_id)
+    if not managee_id is None: manage_ids = manage_ids.filter_by(managee_id=managee_id)
     if not manager_id is None: manage_ids = manage_ids.filter_by(manager_id=manager_id)
     if not org_id is None:
         manage_ids = manage_ids.join(User, User.id == Management.manager_id)
@@ -258,25 +251,25 @@ def get_manage(manage_id):
     return map_dict(manage, manage_mapping)
 
 # create a management
-# target_id - id of the worker/team that is being managed
+# managee_id - id of the worker/team that is being managed
 # manager_id - id of the user that is assigned to manage target
 # returns the id of the management
-def create_manage(target_id, manager_id):
-    manage = Management(target_id=target_id, manager_id=manager_id)
+def create_manage(managee_id, manager_id):
+    manage = Management(managee_id=managee_id, manager_id=manager_id)
     db.session.add(manage)
     db.session.commit()
 
     return manage.id
 
 # update management for given manage_id
-# target_id - id of the worker/team that is being managed
+# managee_id - id of the worker/team that is being managed
 # manager_id - id of the user that is assigned to manage target
 # throws NotFoundError if no manage with manage_id is found
-def update_manage(manage_id, target_id=None, manager_id=None):
+def update_manage(manage_id, managee_id=None, manager_id=None):
     manage = Management.query.get(manage_id)
     if manage is None: raise NotFoundError
     # update management fields
-    if not target_id is None: manage.target_id = target_id
+    if not managee_id is None: manage.managee_id = managee_id
     if not manager_id is None: manage.manager_id = manager_id
     db.session.commit()
 

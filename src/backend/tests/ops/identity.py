@@ -114,7 +114,7 @@ class TestIdentityOps(TestCase):
                                   manager_id)
 
         manage = get_manage(manage_id)
-        self.assertEqual(manage["targetId"], worker_id)
+        self.assertEqual(manage["manageeId"], worker_id)
         self.assertEqual(query_manage(), [manage_id])
         self.assertEqual(query_manage(manager_id=manager_id), [manage_id])
         self.assertEqual(query_manage(manager_id=-1), [])
@@ -123,7 +123,7 @@ class TestIdentityOps(TestCase):
 
         update_manage(manage_id, team_id)
         manage = get_manage(manage_id)
-        self.assertEqual(manage["targetId"], team_id)
+        self.assertEqual(manage["manageeId"], team_id)
 
         delete_manage(manage_id)
         self.assertEqual(query_manage(), [])

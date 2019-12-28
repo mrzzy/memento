@@ -105,10 +105,9 @@ def route_users():
     if not org_id is None: org_id = int(org_id)
     team_id = request.args.get("team", None)
     if not team_id is None: team_id = int(team_id)
-    kind = request.args.get("kind", None)
 
     # perform query with op
-    user_ids = query_users(org_id, team_id, kind, skip, limit)
+    user_ids = query_users(org_id, team_id, skip, limit)
     return jsonify(user_ids)
 
 # api - read, create, update, delete users
@@ -145,16 +144,15 @@ def route_manages():
     skip = int(request.args.get("skip", 0))
     limit = request.args.get("limit", None)
     if not limit is None: limit = int(limit)
-    kind = request.args.get("kind", None)
     org_id = request.args.get("org", None)
     if not org_id is None: org_id = int(org_id)
-    target_id = request.args.get("target", None)
-    if not target_id is None: target_id = int(target_id)
+    managee_id = request.args.get("target", None)
+    if not managee_id is None: managee_id = int(managee_id)
     manager_id = request.args.get("manager", None)
     if not manager_id is None: manager_id = int(manager_id)
 
     # perform query with op
-    manage_ids = query_manage(kind, org_id, target_id, manager_id, skip, limit)
+    manage_ids = query_manage(org_id, managee_id, manager_id, skip, limit)
     return jsonify(manage_ids)
 
 # api - read, create, update, delete managements

@@ -36,7 +36,7 @@ class TestIdentityModels(TestCase):
         db.session.add(self.worker)
         db.session.commit()
 
-        self.management = Management(target_id=self.worker.id,
+        self.management = Management(managee_id=self.worker.id,
                                      manager=self.supervisor)
 
         db.session.add(self.management)

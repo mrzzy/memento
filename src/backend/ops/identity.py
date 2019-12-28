@@ -128,7 +128,7 @@ def delete_team(team_id):
     team = Team.query.get(team_id)
     if team is None: raise NotFoundError
     # cascade delete
-    manage_ids = query_manage(kind=Management.Kind.Team, target_id=team_id)
+    manage_ids = query_manage(target_id=team_id)
     for manage_id in manage_ids: delete_manage(delete_manage)
 
     db.session.delete(team)
@@ -207,7 +207,7 @@ def delete_user(user_id):
     # cascade delete
     # cascade delete mangement 
     manage_ids = query_manage(manager_id=user_id) + \
-        query_manage(kind=Management.Kind.User, target_id=user_id)
+        query_manage(target_id=user_id)
     for manage_id in manage_ids: delete_manage(manage_id)
     # cascade delete assignments created
     assign_ids = query_assigns(assigner_id=user_id)
@@ -236,7 +236,6 @@ def query_manage(kind=None, org_id=None, target_id=None,
                  manager_id=None, skip=0, limit=None):
     manage_ids = Management.query.with_entities(Management.id)
     # apply filters
-    if not kind is None: manage_ids = manage_ids.filter_by(kind=kind)
     if not target_id is None: manage_ids = manage_ids.filter_by(target_id=target_id)
     if not manager_id is None: manage_ids = manage_ids.filter_by(manager_id=manager_id)
     if not org_id is None:
@@ -259,27 +258,24 @@ def get_manage(manage_id):
     return map_dict(manage, manage_mapping)
 
 # create a management
-# kind - kind of management target (worker/team)
 # target_id - id of the worker/team that is being managed
 # manager_id - id of the user that is assigned to manage target
 # returns the id of the management
-def create_manage(kind, target_id, manager_id):
-    manage = Management(kind=kind, target_id=target_id, manager_id=manager_id)
+def create_manage(target_id, manager_id):
+    manage = Management(target_id=target_id, manager_id=manager_id)
     db.session.add(manage)
     db.session.commit()
 
     return manage.id
 
 # update management for given manage_id
-# kind - kind of management target (worker/team)
 # target_id - id of the worker/team that is being managed
 # manager_id - id of the user that is assigned to manage target
 # throws NotFoundError if no manage with manage_id is found
-def update_manage(manage_id, kind=None, target_id=None, manager_id=None):
+def update_manage(manage_id, target_id=None, manager_id=None):
     manage = Management.query.get(manage_id)
     if manage is None: raise NotFoundError
     # update management fields
-    if not kind is None: manage.kind = kind
     if not target_id is None: manage.target_id = target_id
     if not manager_id is None: manage.manager_id = manager_id
     db.session.commit()

@@ -78,27 +78,9 @@ class User(db.Model):
 
 # defines an assignment of management (supervisors) to workers and teams
 class Management(db.Model):
-    # management kinds/types
-    class Kind:
-        User = "user" # manage only a single user
-        Team = "team" # worker
-
     # model fields
     id = db.Column(db.Integer, primary_key=True)
-    kind = db.Column(db.String(64), nullable=False)
     # relationships
     target_id = db.Column(db.Integer, nullable=False)
     manager_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     manager = db.relationship("User", lazy=True)
-
-    @validates('kind')
-    def validate_kind(self, key, kind):
-        kind_list = [Management.Kind.User, Management.Kind.Team]
-        if not kind:
-            raise AssertionError ('kind must not be empty')
-        elif len(kind) < 1 or len(kind) > 64:
-            raise AssertionError ('must be between 1 and 64 characters long')
-        elif kind not in kind_list:
-            raise AssertionError (f"Management types must be one of: {kind_list}")
-        else:
-            return kind

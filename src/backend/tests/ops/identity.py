@@ -110,8 +110,7 @@ class TestIdentityOps(TestCase):
                                 "P@$$w0rd",
                                 "joel@jmail.com",
                                 org_id, team_id)
-        manage_id = create_manage(Management.Kind.User,
-                                  worker_id,
+        manage_id = create_manage(worker_id,
                                   manager_id)
 
         manage = get_manage(manage_id)
@@ -122,7 +121,7 @@ class TestIdentityOps(TestCase):
         self.assertEqual(query_manage(org_id=org_id), [manage_id])
         self.assertEqual(query_manage(org_id=-1), [])
 
-        update_manage(manage_id, Management.Kind.Team, team_id)
+        update_manage(manage_id, team_id)
         manage = get_manage(manage_id)
         self.assertEqual(manage["targetId"], team_id)
 

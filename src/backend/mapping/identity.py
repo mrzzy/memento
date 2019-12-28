@@ -18,7 +18,6 @@ team_mapping = [
 
 # defines the mapping from user model fields to json api representation
 user_mapping = [
-    ("kind", "kind"),
     ("name", "name"),
     ("password", "password"),
     ("email", "email"),
@@ -28,7 +27,6 @@ user_mapping = [
 
 # defines the mapping from user model fields to json api representation
 manage_mapping = [
-    ("target_id", "targetId"),
-    ("kind", "kind"),
+    ("managee_id", "manageeId"),
     ("manager_id",  "managerId")
 ]

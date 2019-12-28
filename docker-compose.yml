@@ -30,6 +30,6 @@ services:
     depends_on:
       - postgres
     volumes:
-      - "./src/backend:/backend:ro"
+      - "./src/backend:/backend"
 volumes:
   database-data:

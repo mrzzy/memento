@@ -15,16 +15,14 @@ class TestAssigmentOps(TestCase):
 
     def create_test_data(self):
         org_id = create_org("kompany")
-        manager_id = create_user(User.Kind.Supervisor,
-                              "John",
-                              "P@$$w0rd",
-                              "john@jmail.com",
-                              org_id)
-        worker_id = create_user(User.Kind.Worker,
-                              "Joel",
-                              "P@$$w0rd",
-                              "joel@jmail.com",
-                              org_id)
+        manager_id = create_user("John",
+                                 "P@$$w0rd",
+                                 "john@jmail.com",
+                                 org_id)
+        worker_id = create_user("Joel",
+                                "P@$$w0rd",
+                                "joel@jmail.com",
+                                org_id)
 
         return org_id, manager_id, worker_id
 

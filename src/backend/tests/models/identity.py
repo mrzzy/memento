@@ -21,16 +21,14 @@ class TestIdentityModels(TestCase):
         db.session.add(self.team)
         db.session.commit()
 
-        self.supervisor = User(kind=User.Kind.Supervisor,
-                               organisation=self.organisation,
+        self.supervisor = User(organisation=self.organisation,
                                name="Joel",
                                password="Pa$$w0rd",
                                email="joel@email.com")
         db.session.add(self.supervisor)
         db.session.commit()
 
-        self.worker = User(kind=User.Kind.Worker,
-                           organisation=self.organisation,
+        self.worker = User(organisation=self.organisation,
                            team=self.team,
                            name="James",
                            password="Pa$$w0rd",
@@ -38,8 +36,7 @@ class TestIdentityModels(TestCase):
         db.session.add(self.worker)
         db.session.commit()
 
-        self.management = Management(kind=Management.Kind.User,
-                                     target_id=self.worker.id,
+        self.management = Management(managee_id=self.worker.id,
                                      manager=self.supervisor)
 
         db.session.add(self.management)
@@ -69,7 +66,6 @@ class TestIdentityModels(TestCase):
             self.user = User(
                 name="Joe",
                 password="Pa$$wrd",
-                kind=User.Kind.Admin,
                 organisation=self.organisation,
                 email="joe@gmail.com"
             )

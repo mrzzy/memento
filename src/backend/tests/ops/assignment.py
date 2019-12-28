@@ -57,7 +57,7 @@ class TestAssigmentOps(TestCase):
 
         delete_task(task_id)
         self.assertEqual(query_tasks(), [])
-        delete_org(task_id)
+        delete_org(org_id)
 
     def test_event_ops(self):
         self.assertEqual(query_events(), [])

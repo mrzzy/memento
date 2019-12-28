@@ -31,7 +31,7 @@ register_api(app, sockets)
 # root route - backend status
 @app.route('/')
 def route_status():
-    return "Memento Backend API is up and running!"
+    return f"Memento Backend - API v{config.API_VERSION} is up and running!"
 
 ## health checks
 # check database connectivity

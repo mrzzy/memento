@@ -22,13 +22,18 @@ run: images
 	docker-compose up
 
 clean:
-	docker-compose down -v
+	docker-compose down -v -t 1
 
 
 # test targets
-test: test-api
+test: test-backend
 
-# run tests for api
-test-api:
+test-backend: images
+	@# run unit tests
+	docker-compose down -t 1
+	docker-compose up -d && sleep 4 # wait for stack to start up
+	docker-compose exec backend ash -c "python test.py"
+	@# run api tests
 	newman run --global-var api_host=$(API_HOST) \
 		tests/api/momento-api.postman_collection.json
+	docker-compose down -t 1

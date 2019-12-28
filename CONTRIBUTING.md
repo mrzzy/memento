@@ -12,6 +12,8 @@ docker-compose build
 docker-compose up
 ```
 
+> Use `make run` if you have both `make` and `docker-compose`
+
 ### Backend
 Dependencies & Prerequisites:
 - python version 3.7

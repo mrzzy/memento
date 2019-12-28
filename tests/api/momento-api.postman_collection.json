@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c93524ad-bed8-404c-89b6-ff1989f43208",
+		"_postman_id": "37e957f3-16c2-4f80-9015-1eb239296e96",
 		"name": "momento/api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -515,7 +515,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"admin\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -607,7 +607,6 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const user = pm.response.json();",
-									"    assert(user.kind === \"admin\");",
 									"    assert(user.name === \"Joel\");",
 									"    assert(user.password === \"P@$$w0rd\");",
 									"    assert(user.email === \"joel@gmail.com\");",
@@ -1357,7 +1356,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"supervisor\",\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1431,7 +1430,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"worker\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2588,7 +2587,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"admin\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"

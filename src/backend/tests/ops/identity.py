@@ -71,8 +71,7 @@ class TestIdentityOps(TestCase):
 
         org_id = create_org("kompany", "http://logo.jpg")
         team_id = create_team(org_id, "designer")
-        user_id = create_user(User.Kind.Worker,
-                              "Joel",
+        user_id = create_user("Joel",
                               "P@$$w0rd",
                               "joel@jmail.com",
                               org_id, team_id)
@@ -103,16 +102,14 @@ class TestIdentityOps(TestCase):
 
         org_id = create_org("kompany", "http://logo.jpg")
         team_id = create_team(org_id, "designer")
-        manager_id = create_user(User.Kind.Supervisor,
-                              "John",
-                              "P@$$w0rd",
-                              "john@jmail.com",
-                              org_id, team_id)
-        worker_id = create_user(User.Kind.Worker,
-                              "Joel",
-                              "P@$$w0rd",
-                              "joel@jmail.com",
-                              org_id, team_id)
+        manager_id = create_user("John",
+                                 "P@$$w0rd",
+                                 "john@jmail.com",
+                                 org_id, team_id)
+        worker_id = create_user("Joel",
+                                "P@$$w0rd",
+                                "joel@jmail.com",
+                                org_id, team_id)
         manage_id = create_manage(Management.Kind.User,
                                   worker_id,
                                   manager_id)

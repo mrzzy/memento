@@ -40,41 +40,14 @@ class Team(db.Model):
 
 # defines a user in the organisation.
 class User(db.Model):
-    # user kinds/types
-    class Kind:
-        Worker = "worker" # worker
-        Supervisor = "supervisor" # supervisor of worker
-        Admin = "admin" # root adminstrative user for the organisation
-        Service = "service" # service account
-
     # model fields
     id = db.Column(db.Integer, primary_key=True)
-    kind = db.Column(db.String(64), nullable=False)
     name = db.Column(db.String(256), nullable=False)
     password = db.Column(db.String(512), nullable=False)
     email = db.Column(db.String(512), unique=True, nullable=False)
     # relationships 
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"), nullable=False)
     team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=True)
-
-    @validates('kind')
-    def validate_kind(self, key, kind):
-        kind_list = [
-            User.Kind.Worker,
-            User.Kind.Supervisor,
-            User.Kind.Admin,
-            User.Kind.Service
-        ]
-
-        if not kind:
-            raise AssertionError ('kind must not be empty')
-        elif len(kind) < 2 or len(kind) > 64:
-            raise AssertionError ('must be between 2 and 64 characters long')
-        elif kind not in kind_list:
-            raise AssertionError ('Enter either Worker, Supervisor, Admin or Service')
-        else:
-            return kind
-
 
     @validates('name')
     def validate_name(self, key, name):

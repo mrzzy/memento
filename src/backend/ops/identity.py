@@ -147,7 +147,6 @@ def query_users(org_id=None, team_id=None, kind=None, skip=0, limit=None):
     # apply filters
     if not org_id is None: user_ids = user_ids.filter_by(org_id=org_id)
     if not team_id is None: user_ids = user_ids.filter_by(team_id=team_id)
-    if not kind is None: user_ids = user_ids.filter_by(kind=kind)
 
     # apply skip & limit
     user_ids = [ i[0] for i in user_ids ]
@@ -165,15 +164,14 @@ def get_user(user_id):
     return map_dict(user, user_mapping)
 
 # create a user
-# kind - kind of user
 # name - name of the user
 # password - password of the user
 # email - email address of the user
 # org_id - id of organisation that the user belongs to
 # team_id - id of the team that the user belongs to, optional
 # returns the id of the created user
-def create_user(kind, name, password, email, org_id, team_id=None):
-    user = User(kind=kind, name=name, password=password,
+def create_user(name, password, email, org_id, team_id=None):
+    user = User(name=name, password=password,
                 email=email, org_id=org_id, team_id=team_id)
     db.session.add(user)
     db.session.commit()
@@ -181,19 +179,17 @@ def create_user(kind, name, password, email, org_id, team_id=None):
     return user.id
 
 # update the user for the given user_id
-# kind - kind of user
 # name - name of the user
 # password - password of the user
 # email - email address of the user
 # org_id - id of organisation that the user belongs to
 # team_id - id of the team that the user belongs to, optional
 # throws NotFoundError if no user with user_id is found
-def update_user(user_id, kind=None, name=None, password=None,
+def update_user(user_id, name=None, password=None,
                 email=None, org_id=None, team_id=None):
     user = User.query.get(user_id)
     if user is None: raise NotFoundError
     # update user fields
-    if not kind is None: user.kind = kind
     if not name is None: user.name = name
     if not password is None: user.password = password
     if not email is None: user.email = email

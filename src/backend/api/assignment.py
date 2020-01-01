@@ -31,9 +31,11 @@ def route_tasks():
     if not pending is None: pending = parse_bool(pending)
     due_by = request.args.get("due-by", None)
     if not due_by is None: due_by = parse_datetime(due_by)
+    assignee_id = request.args.get("assignee", None)
+    if not assignee_id is None: assignee_idf = int(assignee_id)
 
     # perform query
-    task_ids = query_tasks(pending, author_id, due_by, skip, limit)
+    task_ids = query_tasks(pending, author_id, due_by, skip, limit, assignee_id)
     return jsonify(task_ids)
 
 # api - read, create, update, delete tasks
@@ -85,9 +87,11 @@ def route_events():
     if not pending is None: pending = parse_bool(pending)
     due_by = request.args.get("limit-by", None)
     if not due_by is None: due_by = parse_datetime(due_by)
+    assignee_id = request.args.get("assignee", None)
+    if not assignee_id is None: assignee_idf = int(assignee_id)
 
     # perform query
-    event_ids = query_events(pending, author_id, due_by, skip, limit)
+    event_ids = query_events(pending, author_id, due_by, skip, limit, assignee_id)
     return jsonify(event_ids)
 
 # api - read, create, update, delete events

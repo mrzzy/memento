@@ -19,7 +19,9 @@ from ..api.error import NotFoundError
 # due_by - show only tasks that are due before given due_by
 # skip - skip the first skip tasks
 # limit - output ids limit to the first limit tasks
-def query_tasks(pending=None, author_id=None, due_by=None, skip=0, limit=None):
+# assignee_id - show only tasks assigned to the user with the given user id
+def query_tasks(pending=None, author_id=None, due_by=None, skip=0, limit=None,
+                assignee_id=None):
     task_ids = Task.query.with_entities(Task.id)
     # apply filters
     if not pending is None:
@@ -28,6 +30,10 @@ def query_tasks(pending=None, author_id=None, due_by=None, skip=0, limit=None):
     if not author_id is None: task_id = task_ids.filter_by(author_id=author_id)
     if not due_by is None:
         task_ids = task_ids.filter(Task.deadline <= due_by)
+    if not assignee_id is None:
+        task_ids = task_ids.join(Assignment, (Task.id == Assignment.item_id)
+                                 & (Assignment.kind == Assignment.Kind.Task))
+        task_ids = task_ids.filter(Assignment.assignee_id == assignee_id)
 
     # apply skip & limit
     task_ids = [ i[0] for  i in task_ids ]
@@ -103,7 +109,9 @@ def delete_task(task_id):
 # due_by - show only events that have to be attended before and at due_by
 # skip - skip the first skip events
 # limit - output ids limit to the first limip events
-def query_events(pending=None, author_id=None, due_by=None, skip=0, limit=None):
+# assignee_id - show only events that are assigned to the user with user id
+def query_events(pending=None, author_id=None, due_by=None, skip=0, limit=None,
+                 assignee_id=None):
     # apply filters
     event_ids = Event.query.with_entities(Event.id)
     if not pending is None:
@@ -115,6 +123,10 @@ def query_events(pending=None, author_id=None, due_by=None, skip=0, limit=None):
     if not author_id is None: event_id = event_ids.filter_by(author_id=author_id)
     if not due_by is None:
         event_ids = event_ids.filter(Event.start_time <= due_by)
+    if not assignee_id is None:
+        event_ids = event_ids.join(Assignment, (Event.id == Assignment.item_id)
+                                   & (Assignment.kind == Assignment.Kind.Event))
+        event_ids = event_ids.filter(Assignment.assignee_id == assignee_id)
 
     # apply skip & limit
     event_ids = [ i[0] for  i in event_ids ]
@@ -182,7 +194,7 @@ def delete_event(event_id):
 # query ids of assignments
 # kind - show only assignments of the given kind
 # item_id - show only assigns for given assignment type
-# assigner_id - show only assignments assigned by user with assigner_idj
+# assigner_id - show only assignments assigned by user with assigner_id
 # assignee_id - show only assignments assigned to user with assignee_id
 # pending - show only assignments with items that are pending
 # due_by - show only assignments with items that relevant before due_by

@@ -42,12 +42,17 @@ class TestAssigmentOps(TestCase):
                               deadline= task_deadline,
                               duration=60,
                               author_id=manager_id)
+        assign_id = create_assign(Assignment.Kind.Task,
+                                  task_id,
+                                  worker_id,
+                                  manager_id)
 
         task = get_task(task_id)
         self.assertEqual(task["name"], "fish")
         self.assertEqual(query_tasks(), [task_id])
         self.assertEqual(query_tasks(pending=False), [])
         self.assertEqual(query_tasks(due_by=task_deadline), [task_id])
+        self.assertEqual(query_tasks(assignee_id=worker_id), [task_id])
 
         update_task(task_id, name="cook")
         task = get_task(task_id)
@@ -73,12 +78,17 @@ class TestAssigmentOps(TestCase):
                               start_time=event_start_time,
                               duration=60,
                               author_id=manager_id)
+        assign_id = create_assign(Assignment.Kind.Event,
+                                  event_id,
+                                  worker_id,
+                                  manager_id)
 
         event = get_event(event_id)
         self.assertEqual(event["name"], "fishing trip")
         self.assertEqual(query_events(), [event_id])
         self.assertEqual(query_events(pending=False), [event_id])
         self.assertEqual(query_events(due_by=event_start_time), [event_id])
+        self.assertEqual(query_events(assignee_id=worker_id), [event_id])
 
         update_event(event_id, name="cooking competition")
         event = get_event(event_id)

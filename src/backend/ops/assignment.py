@@ -16,7 +16,7 @@ from ..api.error import NotFoundError
 # query ids of tasks
 # pending - show only tasks that are currently incomplete 
 # author_id - show only tasks created by author with given user id 
-# due_by -show  only tasks that are due before given due_by
+# due_by - show only tasks that are due before given due_by
 # skip - skip the first skip tasks
 # limit - output ids limit to the first limit tasks
 def query_tasks(pending=None, author_id=None, due_by=None, skip=0, limit=None):
@@ -192,14 +192,19 @@ def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None,
                   pending=None, due_by=None, skip=0, limit=None):
     assign_ids = Assignment.query.with_entities(Assignment.id)
     # apply filters
-    if not kind is None: assign_ids.filter_by(kind=kind)
-    if not item_id is None: assign_ids.filter_by(item_id=item_id)
-    if not assigner_id is None: assign_ids.filter_by(assigner_id=assigner_id)
-    if not assignee_id is None: assign_ids.filter_by(assignee_id=assignee_id)
+    if not kind is None: assign_ids = assign_ids.filter_by(kind=kind)
+    if not item_id is None: assign_ids = assign_ids.filter_by(item_id=item_id)
+    if not assigner_id is None: assign_ids = assign_ids.filter_by(assigner_id=assigner_id)
+    if not assignee_id is None: assign_ids = assign_ids.filter_by(assignee_id=assignee_id)
 
     if not pending is None or not due_by is None:
-        assign_ids = assign_ids.join(Task, Assignment.item_id == Task.id)
-        assign_ids = assign_ids.join(Event, Assignment.item_id == Event.id)
+        # join with all assigned items
+        task_assign_ids = assign_ids.join(Task, (Assignment.item_id == Task.id)
+                                     & (Assignment.kind == Assignment.Kind.Task))
+        event_assign_ids = assign_ids.join(Event, (Assignment.item_id == Event.id)
+                                     & (Assignment.kind == Assignment.Kind.Event))
+        assign_ids = task_assign_ids.union(event_assign_ids)
+
         if not pending is None:
             # task assignments
             completed = not pending

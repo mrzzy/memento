@@ -16,18 +16,18 @@ from ..api.error import NotFoundError
 # query ids of tasks
 # pending - show only tasks that are currently incomplete 
 # author_id - show only tasks created by author with given user id 
-# limit_by -show  only tasks that are due before given limit_by
+# due_by -show  only tasks that are due before given due_by
 # skip - skip the first skip tasks
 # limit - output ids limit to the first limit tasks
-def query_tasks(pending=None, author_id=None, limit_by=None, skip=0, limit=None):
+def query_tasks(pending=None, author_id=None, due_by=None, skip=0, limit=None):
     task_ids = Task.query.with_entities(Task.id)
     # apply filters
     if not pending is None:
         completed = not pending
         task_ids = task_ids.filter_by(completed=completed)
     if not author_id is None: task_id = task_ids.filter_by(author_id=author_id)
-    if not limit_by is None:
-        task_ids = task_ids.filter(Task.deadline <= limit_by)
+    if not due_by is None:
+        task_ids = task_ids.filter(Task.deadline <= due_by)
 
     # apply skip & limit
     task_ids = [ i[0] for  i in task_ids ]
@@ -100,10 +100,10 @@ def delete_task(task_id):
 # query ids of events
 # pending - show only pending events
 # author_id - show only events created by author with given user id
-# limit_by - show only events that have to be attended before and at limit_by
+# due_by - show only events that have to be attended before and at due_by
 # skip - skip the first skip events
 # limit - output ids limit to the first limip events
-def query_events(pending=None, author_id=None, limit_by=None, skip=0, limit=None):
+def query_events(pending=None, author_id=None, due_by=None, skip=0, limit=None):
     # apply filters
     event_ids = Event.query.with_entities(Event.id)
     if not pending is None:
@@ -113,8 +113,8 @@ def query_events(pending=None, author_id=None, limit_by=None, skip=0, limit=None
         else:
             event_ids = event_ids.filter(Event.start_time < now)
     if not author_id is None: event_id = event_ids.filter_by(author_id=author_id)
-    if not limit_by is None:
-        event_ids = event_ids.filter(Event.start_time <= limit_by)
+    if not due_by is None:
+        event_ids = event_ids.filter(Event.start_time <= due_by)
 
     # apply skip & limit
     event_ids = [ i[0] for  i in event_ids ]
@@ -185,11 +185,11 @@ def delete_event(event_id):
 # assigner_id - show only assignments assigned by user with assigner_idj
 # assignee_id - show only assignments assigned to user with assignee_id
 # pending - show only assignments with items that are pending
-# limit_by - show only assignments with items that relevant before limit_by
+# due_by - show only assignments with items that relevant before due_by
 # skip - skip the first skip assignments
 # limit - output ids limit to the first limit assignments
-def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None, 
-                  pending=None, limit_by=None, skip=0, limit=None):
+def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None,
+                  pending=None, due_by=None, skip=0, limit=None):
     assign_ids = Assignment.query.with_entities(Assignment.id)
     # apply filters
     if not kind is None: assign_ids.filter_by(kind=kind)
@@ -197,7 +197,7 @@ def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None,
     if not assigner_id is None: assign_ids.filter_by(assigner_id=assigner_id)
     if not assignee_id is None: assign_ids.filter_by(assignee_id=assignee_id)
 
-    if not pending is None or not limit_by is None: 
+    if not pending is None or not due_by is None:
         assign_ids = assign_ids.join(Task, Assignment.item_id == Task.id)
         assign_ids = assign_ids.join(Event, Assignment.item_id == Event.id)
         if not pending is None:
@@ -207,12 +207,12 @@ def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None,
             # event assignments
             now = datetime.utcnow()
             assign_ids = assign_ids.filter(Event.start_time >= now)
-        if not limit_by is None:
+        if not due_by is None:
             now = datetime.utcnow()
             # tasks assignments
-            assign_ids = assign_ids.filter(Task.deadline <= limit_by)
+            assign_ids = assign_ids.filter(Task.deadline <= due_by)
             # event assignments
-            assign_ids = assign_ids.filter(Event.start_time <= limit_by)
+            assign_ids = assign_ids.filter(Event.start_time <= due_by)
 
     # apply skip & limit
     assign_ids = [ i[0] for i in assign_ids ]

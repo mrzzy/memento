@@ -47,7 +47,7 @@ class TestAssigmentOps(TestCase):
         self.assertEqual(task["name"], "fish")
         self.assertEqual(query_tasks(), [task_id])
         self.assertEqual(query_tasks(pending=False), [])
-        self.assertEqual(query_tasks(limit_by=task_deadline), [task_id])
+        self.assertEqual(query_tasks(due_by=task_deadline), [task_id])
 
         update_task(task_id, name="cook")
         task = get_task(task_id)
@@ -78,7 +78,7 @@ class TestAssigmentOps(TestCase):
         self.assertEqual(event["name"], "fishing trip")
         self.assertEqual(query_events(), [event_id])
         self.assertEqual(query_events(pending=False), [event_id])
-        self.assertEqual(query_events(limit_by=event_start_time), [event_id])
+        self.assertEqual(query_events(due_by=event_start_time), [event_id])
 
         update_event(event_id, name="cooking competition")
         event = get_event(event_id)
@@ -101,7 +101,7 @@ class TestAssigmentOps(TestCase):
         org_id, manager_id, worker_id = self.create_test_data()
         task_deadline = datetime.utcnow()
         task_id = create_task("fish",
-                              deadline= task_deadline,
+                              deadline=task_deadline,
                               duration=60,
                               author_id=manager_id)
         assign_id = create_assign(Assignment.Kind.Task,
@@ -113,7 +113,7 @@ class TestAssigmentOps(TestCase):
         self.assertEqual(assign["assigneeId"], worker_id)
         self.assertEqual(query_assigns(), [assign_id])
         self.assertEqual(query_assigns(pending=False,
-                                       limit_by=datetime.utcnow()), [])
+                                       due_by=datetime.utcnow()), [])
 
         # swap worker and manager in assignment as a proof of concept
         update_assign(assign_id, assigner_id=worker_id, assignee_id=manager_id)

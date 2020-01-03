@@ -38,3 +38,7 @@ role_mapping = [
     ("scope_target", "scopeTarget")
 ]
 
+role_binding_mapping = [
+    ("user_id", "userId"),
+    ("role_id", "roleId")
+]

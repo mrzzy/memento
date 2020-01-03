@@ -36,12 +36,15 @@ class TestIdentityModels(TestCase):
         db.session.add(self.worker)
         db.session.commit()
 
-        self.supervisor_role = Role(id=f"user/{self.worker.id}:supervisor",
-                                    organisation=self.organisation)
+        self.supervisor_role = Role(scope_kind=Role.ScopeKind.User,
+                                    scope_target=self.worker.id,
+                                    kind=Role.Kind.Admin)
+        self.supervisor_role.id = str(self.supervisor_role)
         db.session.add(self.supervisor_role)
         db.session.commit()
-        self.supervisor_role_binding = RoleBinding(role=self.supervisor_role,
-                                                   user=self.supervisor)
+
+        self.supervisor_role_binding = RoleBinding(role_id=self.supervisor_role.id,
+                                                   user_id=self.supervisor.id)
         db.session.add(self.supervisor_role_binding)
         db.session.commit()
 

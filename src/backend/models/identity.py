@@ -17,7 +17,6 @@ class Organisation(db.Model):
     # relationships 
     teams = db.relationship("Team", backref=db.backref("organisation"), lazy=True)
     members = db.relationship("User", backref=db.backref("organisation"), lazy=True)
-    roles = db.relationship("Role", backref=db.backref("organisation"), lazy=True)
 
     @validates('name')
     def validate_name(self, key, name):
@@ -89,11 +88,32 @@ class Management(db.Model):
 
 # defines a role that can be assigned to users
 class Role(db.Model):
+    # kinds of scope in which a role can be scoped
+    class ScopeKind:
+        Global = "global"
+        Organisation = "org" # scope of role limited to specific organisation
+        User = "user" # scope of role limited to specific user
+    # kinds of roles that can be assigned to users
+    class Kind:
+        Admin = "admin" # allows CRUD access to resource & changing ACL
+        Editor = "editor" # allows R/W access to resource
+        Viewer = "viewer" # allows R/O access to the resource
     # model fields
     id = db.Column(db.String(512), primary_key=True)
-    org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"), nullable=True)
+    kind = db.Column(db.String(64), nullable=False)
+    scope_kind = db.Column(db.String(64), default=ScopeKind.User, nullable=False)
+    scope_target = db.Column(db.Integer, default=0)
+
     # relationships
     bindings = db.relationship("RoleBinding", backref=db.backref("role"), lazy=True)
+
+    # generates a unique str representation of the role based on model fields
+    # this string should be used as the model's id on creation
+    # returns a string representation of the role
+    def __str__(self):
+        scope_part = self.scope_kind + \
+            f"/{self.scope_target}" if not self.scope_target is None else ""
+        return f"{scope_part}:{self.kind}"
 
 # define a binding between a role and user
 class RoleBinding(db.Model):

@@ -169,3 +169,42 @@ class TestIdentityOps(TestCase):
         delete_role(role_id)
         self.assertEqual(query_roles(), [])
         delete_org(org_id)
+
+    def test_role_binding_ops(self):
+        self.assertEqual(query_role_bindings(), [])
+
+        got_lookup_error = False
+        try:
+            get_role_binding(2)
+        except NotFoundError:
+            got_lookup_error = True
+        self.assertTrue(got_lookup_error)
+
+        # create test data
+        org_id = create_org("kompany", "http://logo.jpg")
+        team_id = create_team(org_id, "designer")
+        manager_id = create_user("John",
+                                 "P@$$w0rd",
+                                 "john@jmail.com",
+                                 org_id, team_id)
+        worker_id = create_user("Joel",
+                                "P@$$w0rd",
+                                "joel@jmail.com",
+                                org_id, team_id)
+        role_id = create_role(Role.Kind.Admin,
+                              Role.ScopeKind.User,
+                              worker_id)
+        role_binding_id = create_role_binding(role_id=role_id,
+                                              user_id=worker_id)
+
+        role_binding = get_role_binding(role_binding_id)
+        self.assertEqual(role_binding["userId"], worker_id)
+        self.assertEqual(query_role_bindings(user_id=worker_id), [role_binding_id])
+        self.assertEqual(query_role_bindings(user_id=-1), [])
+        self.assertEqual(query_role_bindings(role_id=role_id), [role_binding_id])
+        self.assertEqual(query_role_bindings(role_id=""), [])
+
+        delete_role_binding(role_binding_id)
+        self.assertEqual(query_role_bindings(), [])
+        delete_org(org_id)
+

@@ -307,7 +307,6 @@ def query_roles(org_id=None, user_id=None, bound_to=None, skip=None, limit=None)
     if not bound_to is None:
         role_ids = role_ids.join(RoleBinding, RoleBinding.role_id == Role.id)
         role_ids = role_ids.filter(RoleBinding.user_id == bound_to)
-
     # apply skip & limit
     role_ids = [ i[0] for i in role_ids ]
     role_ids = apply_bound(role_ids, skip, limit)
@@ -333,13 +332,57 @@ def create_role(kind, scope_kind, scope_target=None):
     role.id = str(role)
     db.session.add(role)
     db.session.commit()
-    return role.id
-
+    return role.id 
 # delete role for the given role_id
-# cascade delete relate objects
+# cascade deletes relate objects
 # throws NotFoundError if no role with role_id is found
 def delete_role(role_id):
     role = Role.query.get(role_id)
     if role is None: raise NotFoundError
+    # casacade delete role bindings
+    binding_ids = query_role_bindings(role_id=role_id)
+    for binding_id in binding_ids: delete_role_binding(binding_id)
     db.session.delete(role)
+    db.session.commit()
 
+## Role Binding Ops
+# query id of role bindings based on params:
+# role_id - filter role bindings by role
+# user_id  - filter role bindings by user
+# skip - skip the first skip organisations
+# limit - output ids limit to the first limit organisations
+def query_role_bindings(role_id=None, user_id=None, skip=None, limit=None):
+    binding_ids = RoleBinding.query.with_entities(RoleBinding.id)
+    # apply filters
+    if not role_id is None: binding_ids = binding_ids.filter_by(role_id=role_id)
+    if not user_id is None: binding_ids = binding_ids.filter_by(user_id=user_id)
+    # apply skip & limit
+    binding_ids = [ i[0] for i in binding_ids ]
+    binding_ids = apply_bound(binding_ids, skip, limit)
+    return binding_ids
+
+# get the role binding for the given role binding id
+# returns a dictionary representation of the role binding
+# throws NotFoundError if no manage with manage_id is found
+def get_role_binding(binding_id):
+    binding = RoleBinding.query.get(binding_id)
+    if binding is None: raise NotFoundError
+    # map model fields to dict
+    return map_dict(binding, role_binding_mapping)
+
+# create a role binding
+# role_id - id of the role to bind to
+# user_id - id of the user to bind to
+# returns the id of the new role binding
+def create_role_binding(role_id, user_id):
+    binding = RoleBinding(role_id=role_id, user_id=user_id)
+    db.session.add(binding)
+    db.session.commit()
+    return binding.id
+
+# delete the role binding for the given role binding id
+# throws NotFoundError if no manage with manage_id is found
+def delete_role_binding(binding_id):
+    binding = RoleBinding.query.get(binding_id)
+    db.session.delete(binding)
+    db.session.commit()

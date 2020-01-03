@@ -25,8 +25,16 @@ user_mapping = [
     ("team_id", "teamId")
 ]
 
-# defines the mapping from user model fields to json api representation
+# defines the mapping from management model fields to json api representation
 manage_mapping = [
     ("managee_id", "manageeId"),
     ("manager_id",  "managerId")
 ]
+
+# defines the mapping from role  model fields to json api representation
+role_mapping = [
+    ("kind", "orgId"),
+    ("scope_kind", "scopeKind"),
+    ("scope_target", "scopeTarget")
+]
+

@@ -65,11 +65,15 @@ def delete_org(org_id):
     org = Organisation.query.get(org_id)
     if org is None: raise NotFoundError
 
-    # cascade delete dependent teams and users
+    # cascade delete users
     user_ids = query_users(org_id=org_id)
     for user_id in user_ids: delete_user(user_id)
+    # cascade delete teams
     team_ids = query_teams(org_id=org_id)
     for team_id in team_ids: delete_team(team_id)
+    # cascade delete scopped roles
+    role_ids = query_roles(org_id=org_id)
+    for role_id in role_ids: delete_role(role_id)
 
     db.session.delete(org)
     db.session.commit()
@@ -214,6 +218,9 @@ def delete_user(user_id):
     # cascde delete channel
     channel_ids = query_channels(user_id=user_id)
     for channel_id in channel_ids: delete_channel(channel_id)
+    # cascade delete scopped roles
+    role_ids = query_roles(user_id=user_id)
+    for role_id in role_ids: delete_role(role_id)
 
     db.session.delete(user)
     db.session.commit()
@@ -280,3 +287,59 @@ def delete_manage(manage_id):
     if manage is None: raise NotFoundError
     db.session.delete(manage)
     db.session.commit()
+
+## Role Ops
+# query id of roles based on params:
+# org_id - show only managements that are scoped to the given organisation
+# user_id - show only roles that are scoped to the given user
+# bound_to - show only role that are bound to the given user
+# skip - skip the first skip organisations
+# limit - output ids limit to the first limit organisations
+def query_roles(org_id=None, user_id=None, bound_to=None, skip=None, limit=None):
+    role_ids = Role.query.with_entities(Role.id)
+    # apply filters
+    if not org_id is None:
+        role_ids = role_ids.filter_by(scope_kind=Role.ScopeKind.Organisation,
+                                      scope_target=org_id)
+    if not user_id is None:
+        role_ids = role_ids.filter_by(scope_kind=Role.ScopeKind.User,
+                                      scope_target=user_id)
+    if not bound_to is None:
+        role_ids = role_ids.join(RoleBinding, RoleBinding.role_id == Role.id)
+        role_ids = role_ids.filter(RoleBinding.user_id == bound_to)
+
+    # apply skip & limit
+    role_ids = [ i[0] for i in role_ids ]
+    role_ids = apply_bound(role_ids, skip, limit)
+
+    return role_ids
+
+# get role for given role_id
+# returns role as a dict
+# throws NotFoundError if no role with role_id is found
+def get_role(role_id):
+    role = Role.query.get(role_id)
+    if role is None: raise NotFoundError
+    # map model fields to dict
+    return map_dict(role, role_mapping)
+
+# create a new role
+# kind - kind of role to create
+# scope_kind - kind of scope to place the role in
+# scope_target - target id of the object of the scope to place the role in
+# returns the id of the new  role
+def create_role(kind, scope_kind, scope_target=None):
+    role = Role(kind=kind, scope_kind=scope_kind, scope_target=scope_target)
+    role.id = str(role)
+    db.session.add(role)
+    db.session.commit()
+    return role.id
+
+# delete role for the given role_id
+# cascade delete relate objects
+# throws NotFoundError if no role with role_id is found
+def delete_role(role_id):
+    role = Role.query.get(role_id)
+    if role is None: raise NotFoundError
+    db.session.delete(role)
+

@@ -36,6 +36,15 @@ class TestIdentityModels(TestCase):
         db.session.add(self.worker)
         db.session.commit()
 
+        self.supervisor_role = Role(id=f"user/{self.worker.id}:supervisor",
+                                    organisation=self.organisation)
+        db.session.add(self.supervisor_role)
+        db.session.commit()
+        self.supervisor_role_binding = RoleBinding(role=self.supervisor_role,
+                                                   user=self.supervisor)
+        db.session.add(self.supervisor_role_binding)
+        db.session.commit()
+
         self.management = Management(managee_id=self.worker.id,
                                      manager=self.supervisor)
 
@@ -44,6 +53,10 @@ class TestIdentityModels(TestCase):
 
     def delete_test_data(self):
         db.session.delete(self.management)
+        db.session.commit()
+        db.session.delete(self.supervisor_role_binding)
+        db.session.commit()
+        db.session.delete(self.supervisor_role)
         db.session.commit()
         db.session.delete(self.worker)
         db.session.commit()

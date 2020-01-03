@@ -17,6 +17,7 @@ class Organisation(db.Model):
     # relationships 
     teams = db.relationship("Team", backref=db.backref("organisation"), lazy=True)
     members = db.relationship("User", backref=db.backref("organisation"), lazy=True)
+    roles = db.relationship("Role", backref=db.backref("organisation"), lazy=True)
 
     @validates('name')
     def validate_name(self, key, name):
@@ -37,7 +38,6 @@ class Team(db.Model):
                        nullable=False)
     members = db.relationship("User", backref=db.backref("team"), lazy=True)
 
-
 # defines a user in the organisation.
 class User(db.Model):
     # model fields
@@ -48,6 +48,7 @@ class User(db.Model):
     # relationships 
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"), nullable=False)
     team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=True)
+    role_bindings = db.relationship("RoleBinding", backref=db.backref("user"), lazy=True)
 
     @validates('name')
     def validate_name(self, key, name):
@@ -76,11 +77,28 @@ class User(db.Model):
         else:
          return password
 
-# defines an assignment of management (supervisors) to workers and teams
+# defines an managment binding (ie supervisors to workers) and teams
 class Management(db.Model):
     # model fields
     id = db.Column(db.Integer, primary_key=True)
     # relationships
+    #TODO add foreign key constraint to managee_id
     managee_id = db.Column(db.Integer, nullable=False)
     manager_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     manager = db.relationship("User", lazy=True)
+
+# defines a role that can be assigned to users
+class Role(db.Model):
+    # model fields
+    id = db.Column(db.String(512), primary_key=True)
+    org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"), nullable=True)
+    # relationships
+    bindings = db.relationship("RoleBinding", backref=db.backref("role"), lazy=True)
+
+# define a binding between a role and user
+class RoleBinding(db.Model):
+    # model fields
+    id = db.Column(db.Integer, primary_key=True)
+    # relationships
+    role_id = db.Column(db.String(512), db.ForeignKey("role.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)

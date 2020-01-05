@@ -33,7 +33,7 @@ manage_mapping = [
 
 # defines the mapping from role  model fields to json api representation
 role_mapping = [
-    ("kind", "orgId"),
+    ("kind", "kind"),
     ("scope_kind", "scopeKind"),
     ("scope_target", "scopeTarget")
 ]

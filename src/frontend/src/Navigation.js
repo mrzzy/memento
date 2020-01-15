@@ -1,5 +1,7 @@
 import React from 'react';
 import './App.css';
+import { Route, Link, BrowserRouter as Router } from 'react-router-dom'
+
 
 function NavigationEmployee() {
     return (
@@ -12,4 +14,16 @@ function NavigationEmployee() {
         </ul>
     );
 }
-export default NavigationEmployee;
+
+function NavigationVisitor() {
+    return (
+        <ul className="navigationBar">
+            <li className="headerLogo"><a href="#"><Link to="/">M</Link></a></li>
+            <li><a href="#"><Link to="/">Home</Link></a></li>
+            <li><a href="#"><Link to="/employee">Employee</Link></a></li>
+            <li><a href="#"><Link to="/about">About</Link></a></li>
+            <li><a href="#"><Link to="/login">Login</Link></a></li>
+        </ul>
+    );
+}
+export { NavigationVisitor, NavigationEmployee };

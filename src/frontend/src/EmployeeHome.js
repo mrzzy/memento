@@ -1,7 +1,7 @@
 import React from 'react';
 import { GETTaskFromUserId, UpdateTasks, CreateChannel, CreateNotification } from './iamAPI';
 import './App.css';
-import NavigationEmployee from './Navigation';
+import { NavigationEmployee } from './Navigation';
 
 /* ----------------DUMMY DATA.---------------- */
 // Used for testing when the server is down
@@ -66,7 +66,7 @@ class EmployeeHome extends React.Component {
         this.taskListElement = React.createRef();
         /* To use for testing when the server is down
          * uncomment to see website with tasks */
-        // this.state = { taskList: dummyTaskList }
+        this.state = { taskList: dummyTaskList }
     }
 
     componentDidMount() {

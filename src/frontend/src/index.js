@@ -3,10 +3,10 @@ import { render } from 'react-dom';
 import './index.css';
 import EmployeeHome from './EmployeeHome';
 import VisitorHome from './VisitorHome';
-import Login from './login';
+import Login from './Login';
 import CreateData from './CreateData';
 import * as serviceWorker from './serviceWorker';
-import { Route, Link, BrowserRouter as Router } from 'react-router-dom'
+import { Route, BrowserRouter as Router } from 'react-router-dom'
 
 const routing = (
     <Router>

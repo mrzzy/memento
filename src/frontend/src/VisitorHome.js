@@ -10,6 +10,7 @@ class VisitorHome extends React.Component {
 
         return (
             <div>
+                <NavigationVisitor />
                 <img src="./visitorhomebg.png" alt="Home Page" style={{height: "70vh", margin: "auto", display: "block"}} />
             </div>
         );

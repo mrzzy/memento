@@ -84,6 +84,7 @@ class EmployeeHome extends React.Component {
             return <Redirect to='/' />
         return (
             <div>
+                <NavigationEmployee />
                 <h1 className="pagetitle">HOME</h1>
                 <Calendar />
                 <TaskList allTasksList={this.state.taskList} ref={this.taskListElement} />

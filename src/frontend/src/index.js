@@ -16,7 +16,6 @@ if (localStorage.getItem("loggedIn") === null) {
 
 const routing = (
     <Router>
-        {(localStorage.getItem("loggedIn") === "true")? <NavigationEmployee /> : <NavigationVisitor />}
         <Route exact path="/" component={VisitorHome} />
         <Route path="/about" component={VisitorHome} />
         <Route path="/employee" component={EmployeeHome} />

@@ -20,6 +20,7 @@ class Login extends React.Component {
             return <Redirect to='/employee' />
         return (
             <div>
+                <NavigationVisitor />
                 <div>
                     <button onClick={this.switchToLogin}>Login</button>
                     <button onClick={this.switchToSignup}>Sign up</button>

@@ -2,6 +2,7 @@ import React from 'react';
 import { GETTaskFromUserId, UpdateTasks, CreateChannel, CreateNotification } from './iamAPI';
 import './App.css';
 import { NavigationEmployee } from './Navigation';
+import { Redirect } from 'react-router-dom';
 
 /* ----------------DUMMY DATA.---------------- */
 // Used for testing when the server is down
@@ -79,9 +80,10 @@ class EmployeeHome extends React.Component {
     }
 
     render() {
+        if (localStorage.getItem("loggedIn") !== "true")
+            return <Redirect to='/' />
         return (
             <div>
-                <NavigationEmployee />
                 <h1 className="pagetitle">HOME</h1>
                 <Calendar />
                 <TaskList allTasksList={this.state.taskList} ref={this.taskListElement} />

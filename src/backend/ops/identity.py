@@ -230,10 +230,10 @@ def delete_user(user_id):
 # managers are given the admin role in user scope for the target user
 
 # constructs the id of the role/rolebind that is used to track the management relationship 
-# manager_id - the id of the user that acts as the manager in the relationship
 # managee_id - the id of the user that acts as the managed in the relationship
+# manager_id - the id of the user that acts as the manager in the relationship
 # returns role_id of the role, rolebind_id of the rolebindig
-def get_manage_ids(manager_id, managee_id):
+def get_manage_ids(managee_id, manager_id):
     role_id  = str(Role(kind=Role.Kind.Admin, scope_kind=Role.ScopeKind.User,
                         scope_target=managee_id))
     rolebind_id = str(RoleBinding(role_id=role_id,

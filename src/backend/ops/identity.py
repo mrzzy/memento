@@ -226,10 +226,21 @@ def delete_user(user_id):
     db.session.commit()
 
 ## Management Ops
-# management is implemented using roles/rolebindings: 
+# management is implemented using roles/rolebinds: 
 # managers are given the admin role in user scope for the target user
 
-# query managment rolebindings
+# constructs the id of the role/rolebind that is used to track the management relationship 
+# manager_id - the id of the user that acts as the manager in the relationship
+# managee_id - the id of the user that acts as the managed in the relationship
+# returns role_id of the role, rolebind_id of the rolebindig
+def get_manage_ids(manager_id, managee_id):
+    role_id  = str(Role(kind=Role.Kind.Admin, scope_kind=Role.ScopeKind.User,
+                        scope_target=managee_id))
+    rolebind_id = str(RoleBinding(role_id=role_id,
+                                  user_id=manager_id))
+    return role_id, rolebind_id
+
+# query managment rolebinds
 # org_id - show only managements that belong to the given organisation
 # mangee_id - show managements that manage the given user.
 # manager_id - show only mangements with manager with given id
@@ -237,63 +248,87 @@ def delete_user(user_id):
 # limit - output ids limit to the first limit organisations
 def query_manage(org_id=None, managee_id=None,
                  manager_id=None, skip=0, limit=None):
-    # find role/role binding for the managment relationship
-    role_id  = str(Role(kind=Role.Kind.Admin, scope_kind=Role.ScopeKind.User,
-                        scope_target=managee_id))
-    # TODO: continue switch to role/role binding based api
+    # filter rolebinds to those that like a management relationship
+    rolebind_ids = RoleBinding.query.with_entities(RoleBinding.id)
+    rolebind_ids.join(Role, Role.id == RoleBinding.role_id)
+    rolebind_ids = rolebind_ids.filter(Role.kind == Role.Kind.Admin,
+                                       Role.scope_kind == Role.ScopeKind.User)
 
     # apply filters
-    if not managee_id is None: manage_ids = manage_ids.filter_by(managee_id=managee_id)
-    if not manager_id is None: manage_ids = manage_ids.filter_by(manager_id=manager_id)
+    if not managee_id is None:
+        rolebind_ids = rolebind_ids.filter(Role.scope_target == managee_id)
+    if not manager_id is None:
+        rolebind_ids = rolebind_ids.filter_by(user_id=manager_id)
     if not org_id is None:
-        manage_ids = manage_ids.join(User, User.id == Management.manager_id)
-        manage_ids = manage_ids.filter(User.org_id == org_id)
+        rolebind_ids = rolebind_ids.join(User, User.id == RoleBinding.user_id)
+        rolebind_ids = rolebind_ids.filter(User.org_id == org_id)
 
     # apply skip & limit
-    manage_ids = [ i[0] for i in manage_ids ]
-    manage_ids = apply_bound(manage_ids, skip, limit)
+    rolebind_ids = [ i[0] for i in rolebind_ids ]
+    rolebind_ids = apply_bound(rolebind_ids, skip, limit)
 
-    return manage_ids
+    return rolebind_ids
 
 # get management for id
 # returns managements as a dict
 # throws NotFoundError if no manage with manage_id is found
-def get_manage(manage_id):
-    manage = Management.query.get(manage_id)
-    if manage is None: raise NotFoundError
+def get_manage(rolebind_id):
+    rolebind = RoleBinding.query.get(rolebind_id)
+    if rolebind is None: raise NotFoundError
     # map fields to dict
-    return map_dict(manage, manage_mapping)
+    manage_dict = {
+        "manageeId": rolebind.role.scope_target,
+        "managerId": rolebind.user_id
+    }
+    return manage_dict
 
-# create a management
+# create a management by creating the corresponding role and rolebind
 # managee_id - id of the worker/team that is being managed
 # manager_id - id of the user that is assigned to manage target
-# returns the id of the management
+# returns the id of the rolebind that represents the managment relationship
 def create_manage(managee_id, manager_id):
-    manage = Management(managee_id=managee_id, manager_id=manager_id)
-    db.session.add(manage)
+    role_id, rolebind_id = get_manage_ids(managee_id, manager_id)
+    # create role if does already exist
+    if Role.query.get(role_id) is None:
+        role = Role.from_id(role_id)
+        db.session.add(role)
+        db.session.commit()
+
+    # create rolebind that represents the management relationship
+    rolebind = RoleBinding.from_id(rolebind_id)
+    db.session.add(rolebind)
     db.session.commit()
 
-    return manage.id
+    return rolebind_id
 
-# update management for given manage_id
+# update management for given rolebind_id
 # managee_id - id of the worker/team that is being managed
 # manager_id - id of the user that is assigned to manage target
-# throws NotFoundError if no manage with manage_id is found
-def update_manage(manage_id, managee_id=None, manager_id=None):
-    manage = Management.query.get(manage_id)
-    if manage is None: raise NotFoundError
-    # update management fields
-    if not managee_id is None: manage.managee_id = managee_id
-    if not manager_id is None: manage.manager_id = manager_id
-    db.session.commit()
+# throws NotFoundError if no management relationship with rolebind_id is found
+def update_manage(rolebind_id, managee_id=None, manager_id=None):
+    manage = get_manage(rolebind_id)
+    if managee_id is None: managee_id = manage["manageeId"]
+    if manager_id is None: manager_id = manage["managerId"]
 
-# delete the managment for the given manage id
-# throws NotFoundError if no manage with manage_id is found
-def delete_manage(manage_id):
-    manage = Management.query.get(manage_id)
-    if manage is None: raise NotFoundError
-    db.session.delete(manage)
-    db.session.commit()
+    try:
+        delete_manage(rolebind_id)
+        create_manage(managee_id, manager_id)
+    except Exception as e:
+        print(e)
+
+# delete management for given rolebind_id
+# throws NotFoundError if no management relationship with rolebind_id is found
+# cascade deletes role if no other role bound to it
+def delete_manage(rolebind_id):
+    # delete rolebinding
+    rolebind = RoleBinding.query.get(rolebind_id)
+    role_id = rolebind.role.id
+    delete_role_binding(rolebind_id)
+
+    # check if role has any rolebindings, if so delete role too
+    rolebind_ids = RoleBinding.query.filter_by(role_id=role_id)
+    if rolebind_ids.count() < 1:
+        delete_role(role_id)
 
 ## Role Ops
 # query id of roles based on params:
@@ -377,7 +412,6 @@ def get_role_binding(binding_id):
     if binding is None: raise NotFoundError
     # map model fields to dict
     return map_dict(binding, role_binding_mapping)
-
 
 # create a role binding
 # role_id - id of the role to bind to

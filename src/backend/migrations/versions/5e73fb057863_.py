@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 059bbbfadd14
+Revision ID: 5e73fb057863
 Revises: 
-Create Date: 2020-01-20 03:38:24.301539
+Create Date: 2020-01-20 06:57:02.678778
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '059bbbfadd14'
+revision = '5e73fb057863'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -78,13 +78,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['author_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('management',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('managee_id', sa.Integer(), nullable=False),
-    sa.Column('manager_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['manager_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('role_binding',
     sa.Column('id', sa.String(length=640), nullable=False),
     sa.Column('role_id', sa.String(length=512), nullable=False),
@@ -121,7 +114,6 @@ def downgrade():
     op.drop_table('notification')
     op.drop_table('task')
     op.drop_table('role_binding')
-    op.drop_table('management')
     op.drop_table('event')
     op.drop_table('channel')
     op.drop_table('assignment')

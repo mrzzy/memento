@@ -76,16 +76,6 @@ class User(db.Model):
         else:
          return password
 
-# defines an managment binding (ie supervisors to workers) and teams
-class Management(db.Model):
-    # model fields
-    id = db.Column(db.Integer, primary_key=True)
-    # relationships
-    #TODO add foreign key constraint to managee_id
-    managee_id = db.Column(db.Integer, nullable=False)
-    manager_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    manager = db.relationship("User", lazy=True)
-
 # defines a role that can be assigned to users
 class Role(db.Model):
     # kinds of scope in which a role can be scoped

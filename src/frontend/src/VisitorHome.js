@@ -5,8 +5,11 @@ import { Redirect } from 'react-router-dom';
 
 class VisitorHome extends React.Component {
     render() {
-        if (localStorage.getItem("loggedIn") === "true")
+        if (localStorage.getItem("role") === "employee")
             return <Redirect to='/employee' />
+
+        else if (localStorage.getItem("role") === "employer")
+            return <Redirect to='/employer' />
 
         return (
             <div>

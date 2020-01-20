@@ -96,7 +96,7 @@ class TestIdentityOps(TestCase):
 
         got_lookup_error = False
         try:
-            get_manage(2)
+            get_manage("")
         except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
@@ -111,8 +111,7 @@ class TestIdentityOps(TestCase):
                                 "P@$$w0rd",
                                 "joel@jmail.com",
                                 org_id, team_id)
-        manage_id = create_manage(worker_id,
-                                  manager_id)
+        manage_id = create_manage(worker_id, manager_id)
 
         manage = get_manage(manage_id)
         self.assertEqual(manage["manageeId"], worker_id)
@@ -171,7 +170,7 @@ class TestIdentityOps(TestCase):
 
         got_lookup_error = False
         try:
-            get_role_binding(2)
+            get_role_binding("")
         except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)

@@ -45,6 +45,7 @@ class TestIdentityModels(TestCase):
 
         self.supervisor_role_binding = RoleBinding(role_id=self.supervisor_role.id,
                                                    user_id=self.supervisor.id)
+        self.supervisor_role_binding.id = str(self.supervisor_role_binding)
         db.session.add(self.supervisor_role_binding)
         db.session.commit()
 

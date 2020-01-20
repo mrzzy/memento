@@ -539,6 +539,80 @@
 					"response": []
 				},
 				{
+					"name": "create supervisor",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save org_id for later tests",
+									"    pm.globals.set(\"supervisor_id\",  response.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/user",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "query users ids",
 					"event": [
 						{
@@ -752,7 +826,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"managerId\": {{user_id}},\n\t\"manageeId\": {{user_id}}\n}",
+							"raw": "{\n\t\"manageeId\": {{user_id}},\n\t\"managerId\": {{supervisor_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -799,7 +873,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v1/identity/manages?org=1&manager=1",
+							"raw": "http://{{api_host}}/api/v1/identity/manages?org={{org_id}}&manager={{supervisor_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -813,11 +887,11 @@
 							"query": [
 								{
 									"key": "org",
-									"value": "1"
+									"value": "{{org_id}}"
 								},
 								{
 									"key": "manager",
-									"value": "1"
+									"value": "{{supervisor_id}}"
 								}
 							]
 						}
@@ -844,7 +918,7 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const manage = pm.response.json();",
-									"    assert(manage.managerId === pm.globals.get(\"user_id\"));",
+									"    assert(manage.managerId === pm.globals.get(\"supervisor_id\"));",
 									"    assert(manage.manageeId === pm.globals.get(\"user_id\"));",
 									"});",
 									""
@@ -874,12 +948,22 @@
 					"response": []
 				},
 				{
-					"name": "update managment",
+					"name": "create new role",
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
-								"id": "460b02f0-32fe-46e9-94e0-a2348cd1dfeb",
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
 								"exec": [
 									"const assert = require(\"assert\");",
 									"",
@@ -893,28 +977,28 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"success\"));",
-									"    assert(response.success);",
-									"});",
-									""
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save manage_id for later tests",
+									"    pm.globals.set(\"role_id\",  response.id);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
-						"method": "PATCH",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
+								"value": "application/json",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"managerId\": {{user_id}},\n\t\"targetId\": {{team_id}}\n}",
+							"raw": "{\n\t\"scopeKind\": \"global\",\n\t\"scopeTarget\": null,\n\t\"kind\": \"admin\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -922,7 +1006,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v1/identity/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/role",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -931,8 +1015,257 @@
 								"api",
 								"v1",
 								"identity",
-								"manage",
-								"{{manage_id}}"
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "query role ids",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1950e2a9-10ed-47cd-89c5-5575b4df6e0b",
+								"exec": [
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/roles",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8595dca9-5426-42d1-a98b-45deef262782",
+								"exec": [
+									"const assert = require(\"assert\")",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const role = pm.response.json()",
+									"    assert(role.kind === \"admin\")",
+									"    assert(role.scopeKind === \"global\")",
+									"    assert(role.scopeTarget === 0)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/role/{{role_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"role",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new rolebinding",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2088b16b-28df-4432-8a35-58803c9c90ac",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save manage_id for later tests",
+									"    pm.globals.set(\"rolebind_id\",  response.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8a315a7a-4c06-4664-81e5-76011ebaab3e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"roleId\": \"{{role_id}}\",\n\t\"userId\": {{user_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/rolebind",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"rolebind"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "query role binding ids",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1950e2a9-10ed-47cd-89c5-5575b4df6e0b",
+								"exec": [
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/rolebinds",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"rolebinds"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get role binding",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8595dca9-5426-42d1-a98b-45deef262782",
+								"exec": [
+									"const assert = require(\"assert\")",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const rolebind = pm.response.json();",
+									"",
+									"    assert(rolebind.roleId === pm.globals.get(\"role_id\"))",
+									"    assert(rolebind.userId === pm.globals.get(\"user_id\"))",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/rolebind/{{rolebind_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"rolebind",
+								"{{rolebind_id}}"
 							]
 						}
 					},
@@ -989,6 +1322,118 @@
 								"identity",
 								"manage",
 								"{{manage_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete role binding",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1e4bb5fe-a230-4ad9-bb53-26cac58f0d94",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/rolebind/{{rolebind_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"rolebind",
+								"{{rolebind_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1e4bb5fe-a230-4ad9-bb53-26cac58f0d94",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/role/{{role_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"role",
+								"{{role_id}}"
 							]
 						}
 					},
@@ -2023,7 +2468,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v1/assignment/assigns?pending=1",
+							"raw": "http://{{api_host}}/api/v1/assignment/assigns?pending=1&kind=task",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2038,6 +2483,10 @@
 								{
 									"key": "pending",
 									"value": "1"
+								},
+								{
+									"key": "kind",
+									"value": "task"
 								}
 							]
 						}

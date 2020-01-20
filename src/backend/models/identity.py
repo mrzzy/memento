@@ -112,8 +112,16 @@ class Role(db.Model):
     # returns a string representation of the role
     def __str__(self):
         scope_part = self.scope_kind + \
-            f"{self.scope_kind}/{self.scope_target}" if not self.scope_target is None else ""
-        return f"{scope_part}:{self.kind}"
+            f"__{self.scope_target}" if not self.scope_target is None else ""
+        return f"{scope_part}..{self.kind}"
+
+    # loads model fields with infomation decoded from the given role id
+    @classmethod
+    def from_id(cls, id):
+        scope_part, kind = id.split("..")
+        scope_kind, scope_target = scope_part.split("__")
+        return cls(id=id,kind=kind, scope_kind=scope_kind,
+                   scope_target=int(scope_target))
 
 # define a binding between a role and user
 class RoleBinding(db.Model):
@@ -127,4 +135,10 @@ class RoleBinding(db.Model):
     # this string should be used as the model's id on creation
     # returns a string representation of the role
     def __str__(self):
-        return f"{self.role_id}=>{self.user_id}"
+        return f"{self.role_id}~~{self.user_id}"
+
+    # loads model fields with infomation decoded from the given role binding id
+    @classmethod
+    def from_id(cls, id):
+        role_id, user_id = id.split("~~")
+        return cls(id=id, role_id=role_id, user_id=int(user_id))

@@ -310,11 +310,8 @@ def update_manage(rolebind_id, managee_id=None, manager_id=None):
     if managee_id is None: managee_id = manage["manageeId"]
     if manager_id is None: manager_id = manage["managerId"]
 
-    try:
-        delete_manage(rolebind_id)
-        create_manage(managee_id, manager_id)
-    except Exception as e:
-        print(e)
+    delete_manage(rolebind_id)
+    create_manage(managee_id, manager_id)
 
 # delete management for given rolebind_id
 # throws NotFoundError if no management relationship with rolebind_id is found
@@ -322,6 +319,7 @@ def update_manage(rolebind_id, managee_id=None, manager_id=None):
 def delete_manage(rolebind_id):
     # delete rolebinding
     rolebind = RoleBinding.query.get(rolebind_id)
+    if rolebind is None: raise NotFoundError
     role_id = rolebind.role.id
     delete_role_binding(rolebind_id)
 
@@ -429,5 +427,6 @@ def create_role_binding(role_id, user_id):
 # throws NotFoundError if no manage with manage_id is found
 def delete_role_binding(binding_id):
     binding = RoleBinding.query.get(binding_id)
+    if binding is None: raise NotFoundError
     db.session.delete(binding)
     db.session.commit()

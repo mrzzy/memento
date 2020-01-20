@@ -122,10 +122,6 @@ class TestIdentityOps(TestCase):
         self.assertEqual(query_manage(org_id=org_id), [manage_id])
         self.assertEqual(query_manage(org_id=-1), [])
 
-        update_manage(manage_id, team_id)
-        manage = get_manage(manage_id)
-        self.assertEqual(manage["manageeId"], team_id)
-
         delete_manage(manage_id)
         self.assertEqual(query_manage(), [])
         delete_org(org_id)

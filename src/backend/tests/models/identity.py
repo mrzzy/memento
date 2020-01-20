@@ -48,15 +48,7 @@ class TestIdentityModels(TestCase):
         db.session.add(self.supervisor_role_binding)
         db.session.commit()
 
-        self.management = Management(managee_id=self.worker.id,
-                                     manager=self.supervisor)
-
-        db.session.add(self.management)
-        db.session.commit()
-
     def delete_test_data(self):
-        db.session.delete(self.management)
-        db.session.commit()
         db.session.delete(self.supervisor_role_binding)
         db.session.commit()
         db.session.delete(self.supervisor_role)

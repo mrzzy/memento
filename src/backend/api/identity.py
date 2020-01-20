@@ -206,7 +206,6 @@ def route_roles():
 def route_role(role_id=None):
     if request.method == "GET":
         # get role for id
-        print(role_id)
         role = get_role(role_id)
         return jsonify(role)
     elif request.method == "POST" and request.is_json:

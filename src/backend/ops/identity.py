@@ -226,15 +226,22 @@ def delete_user(user_id):
     db.session.commit()
 
 ## Management Ops
-# query id of managements
-# managee_id - show only mangements for target with given id
+# management is implemented using roles/rolebindings: 
+# managers are given the admin role in user scope for the target user
+
+# query managment rolebindings
 # org_id - show only managements that belong to the given organisation
+# mangee_id - show managements that manage the given user.
 # manager_id - show only mangements with manager with given id
 # skip - skip the first skip organisations
 # limit - output ids limit to the first limit organisations
 def query_manage(org_id=None, managee_id=None,
                  manager_id=None, skip=0, limit=None):
-    manage_ids = Management.query.with_entities(Management.id)
+    # find role/role binding for the managment relationship
+    role_id  = str(Role(kind=Role.Kind.Admin, scope_kind=Role.ScopeKind.User,
+                        scope_target=managee_id))
+    # TODO: continue switch to role/role binding based api
+
     # apply filters
     if not managee_id is None: manage_ids = manage_ids.filter_by(managee_id=managee_id)
     if not manager_id is None: manage_ids = manage_ids.filter_by(manager_id=manager_id)
@@ -332,7 +339,8 @@ def create_role(kind, scope_kind, scope_target=None):
     role.id = str(role)
     db.session.add(role)
     db.session.commit()
-    return role.id 
+    return role.id
+
 # delete role for the given role_id
 # cascade deletes relate objects
 # throws NotFoundError if no role with role_id is found
@@ -370,12 +378,15 @@ def get_role_binding(binding_id):
     # map model fields to dict
     return map_dict(binding, role_binding_mapping)
 
+
 # create a role binding
 # role_id - id of the role to bind to
 # user_id - id of the user to bind to
 # returns the id of the new role binding
 def create_role_binding(role_id, user_id):
     binding = RoleBinding(role_id=role_id, user_id=user_id)
+    binding.id = str(binding)
+
     db.session.add(binding)
     db.session.commit()
     return binding.id

@@ -112,13 +112,19 @@ class Role(db.Model):
     # returns a string representation of the role
     def __str__(self):
         scope_part = self.scope_kind + \
-            f"/{self.scope_target}" if not self.scope_target is None else ""
+            f"{self.scope_kind}/{self.scope_target}" if not self.scope_target is None else ""
         return f"{scope_part}:{self.kind}"
 
 # define a binding between a role and user
 class RoleBinding(db.Model):
     # model fields
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(640), primary_key=True)
     # relationships
     role_id = db.Column(db.String(512), db.ForeignKey("role.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    # generates a unique str representation of the role based on model fields
+    # this string should be used as the model's id on creation
+    # returns a string representation of the role
+    def __str__(self):
+        return f"{self.role_id}=>{self.user_id}"

@@ -38,6 +38,7 @@ role_mapping = [
     ("scope_target", "scopeTarget")
 ]
 
+# defines the mapping from rolebinding  model fields to json api representation
 role_binding_mapping = [
     ("user_id", "userId"),
     ("role_id", "roleId")

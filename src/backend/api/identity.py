@@ -180,3 +180,82 @@ def route_manage(manage_id=None):
         return jsonify({"success": True })
     else:
         raise NotImplementedError
+
+## role api
+# api - query roles with url params
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/roles", methods=["GET"])
+def route_roles():
+    # parse query url params
+    skip = int(request.args.get("skip", 0))
+    limit = request.args.get("limit", None)
+    if not limit is None: limit = int(limit)
+    org_id = request.args.get("org", None)
+    if not org_id is None: org_id = int(org_id)
+    user_id = request.args.get("user", None)
+    if not user_id is None: user_id = int(user_id)
+    bound_user_id =  request.args.get("bound-to", None)
+    if not bound_user_id is None: bound_user_id = int(bound_user_id)
+    role_ids = query_roles(org_id=org_id, user_id=user_id, bound_to=bound_user_id,
+                           skip=skip, limit=limit)
+
+    return jsonify(role_ids)
+
+# api - create and delete roles
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/role", methods=["POST"])
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/role/<role_id>", methods=["GET","DELETE"])
+def route_role(role_id=None):
+    if request.method == "GET":
+        # get role for id
+        print(role_id)
+        role = get_role(role_id)
+        return jsonify(role)
+    elif request.method == "POST" and request.is_json:
+        # create role with params in json
+        params = parse_params(request, role_mapping)
+        role_id = create_role(**params)
+        return jsonify({ "id": role_id })
+    elif request.method == "DELETE" and role_id:
+        # delete role with params in json
+        delete_role(role_id)
+        return jsonify({"success": True })
+    else:
+        raise NotImplementedError
+
+
+## rolebind api
+# api - query role bindings with url params
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/rolebinds", methods=["GET"])
+def route_rolebinds():
+    # parse query url params
+    skip = int(request.args.get("skip", 0))
+    limit = request.args.get("limit", None)
+    if not limit is None: limit = int(limit)
+    role_id = request.args.get("role", None)
+    if not role_id is None: role_id = int(role_id)
+    user_id = request.args.get("user", None)
+    if not user_id is None: user_id = int(user_id)
+    binding_ids = query_role_bindings(user_id=user_id, role_id=role_id,
+                                      skip=skip, limit=limit)
+
+    return jsonify(binding_ids)
+
+# api - create and delete role bindings
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/rolebind", methods=["POST"])
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/rolebind/<binding_id>", methods=["GET","DELETE"])
+def route_rolebind(binding_id=None):
+    if request.method == "GET":
+        # get rolebind for id
+        rolebind = get_role_binding(binding_id)
+        return jsonify(rolebind)
+    elif request.method == "POST" and request.is_json:
+        # create role binding with params in json
+        params = parse_params(request, role_binding_mapping)
+        binding_id = create_role_binding(**params)
+        return jsonify({ "id": binding_id })
+    elif request.method == "DELETE" and binding_id:
+        # delete role binding with params in json
+        delete_role_binding(binding_id)
+        return jsonify({"success": True })
+    else:
+        raise NotImplementedError
+

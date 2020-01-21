@@ -9,8 +9,8 @@ import jwt
 from base64 import b64encode, b64decode
 from datetime import datetime, timedelta
 
-from utils import *
-from config import API_JWT_KEY
+from ..utils import *
+from ..config import API_JWT_KEY
 
 
 # represents a token that is use to authenticate
@@ -67,10 +67,11 @@ class Token:
     ## properties
     @property
     def kind(self):
-        _, _, kind, _, _ = self.subject.split("/")
+        _, _, kind, _ = self.subject.split("/")
         return kind
 
     @property
     def user_id(self):
-        _, _, _, _, user_id = self.subject.split("/")
+        print(self.subject)
+        _, _, _, user_id = self.subject.split("/")
         return user_id

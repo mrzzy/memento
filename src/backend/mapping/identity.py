@@ -27,7 +27,6 @@ user_mapping = [
     ("password", "password"),
     ("email", "email"),
     ("org_id", "orgId"),
-    ("team_id", "teamId")
 ]
 
 # defines the mapping from management model fields to json api representation

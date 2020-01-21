@@ -35,7 +35,6 @@ class Team(db.Model):
     # relationships 
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"),
                        nullable=False)
-    members = db.relationship("User", backref=db.backref("team"), lazy=True)
 
 # defines a user in the organisation.
 class User(db.Model):
@@ -46,7 +45,6 @@ class User(db.Model):
     email = db.Column(db.String(512), unique=True, nullable=False)
     # relationships 
     org_id = db.Column(db.Integer, db.ForeignKey("organisation.id"), nullable=False)
-    team_id = db.Column(db.Integer, db.ForeignKey("team.id"), nullable=True)
     role_bindings = db.relationship("RoleBinding", backref=db.backref("user"), lazy=True)
 
     @validates('name')

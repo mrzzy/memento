@@ -29,7 +29,6 @@ class TestIdentityModels(TestCase):
         db.session.commit()
 
         self.worker = User(organisation=self.organisation,
-                           team=self.team,
                            name="James",
                            password="Pa$$w0rd",
                            email="james@email.com")

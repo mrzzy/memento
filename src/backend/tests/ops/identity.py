@@ -59,7 +59,7 @@ class TestIdentityOps(TestCase):
         user_id = create_user("Joel",
                               "P@$$w0rd",
                               "joel@jmail.com",
-                              org_id, team_id)
+                              org_id)
         role_binding_id = assign_team(team_id, user_id)
         self.assertEqual(query_users(team_id=team_id), [user_id])
         unassign_team(role_binding_id)
@@ -84,7 +84,7 @@ class TestIdentityOps(TestCase):
         user_id = create_user("Joel",
                               "P@$$w0rd",
                               "joel@jmail.com",
-                              org_id, team_id)
+                              org_id)
 
         user = get_user(user_id)
         self.assertEqual(user["name"], "Joel")
@@ -118,11 +118,11 @@ class TestIdentityOps(TestCase):
         manager_id = create_user("John",
                                  "P@$$w0rd",
                                  "john@jmail.com",
-                                 org_id, team_id)
+                                 org_id)
         worker_id = create_user("Joel",
                                 "P@$$w0rd",
                                 "joel@jmail.com",
-                                org_id, team_id)
+                                org_id)
         manage_id = create_manage(worker_id, manager_id)
 
         manage = get_manage(manage_id)
@@ -153,11 +153,11 @@ class TestIdentityOps(TestCase):
         manager_id = create_user("John",
                                  "P@$$w0rd",
                                  "john@jmail.com",
-                                 org_id, team_id)
+                                 org_id)
         worker_id = create_user("Joel",
                                 "P@$$w0rd",
                                 "joel@jmail.com",
-                                org_id, team_id)
+                                org_id)
         role_id = create_role(Role.Kind.Admin,
                               Role.ScopeKind.User,
                               worker_id)
@@ -193,11 +193,11 @@ class TestIdentityOps(TestCase):
         manager_id = create_user("John",
                                  "P@$$w0rd",
                                  "john@jmail.com",
-                                 org_id, team_id)
+                                 org_id)
         worker_id = create_user("Joel",
                                 "P@$$w0rd",
                                 "joel@jmail.com",
-                                org_id, team_id)
+                                org_id)
         role_id = create_role(Role.Kind.Admin,
                               Role.ScopeKind.User,
                               worker_id)

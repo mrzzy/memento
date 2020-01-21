@@ -11,6 +11,7 @@ from .utils import parse_params
 from ..config import API_VERSION
 from ..mapping.identity import *
 from ..ops.identity import *
+from ..ops.auth import authenticate
 
 identity = Blueprint("identity", __name__)
 
@@ -18,6 +19,7 @@ identity = Blueprint("identity", __name__)
 # api - query organisations 
 # returns organisation ids using
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/orgs", methods=["GET"])
+@authenticate(kind="access")
 def route_orgs():
     # parse query args
     skip = int(request.args.get("skip", 0))
@@ -27,19 +29,25 @@ def route_orgs():
     org_ids = query_orgs(skip, limit)
     return jsonify(org_ids)
 
-# api - read, create, update, delete organisations
+# api - create organisation
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/org", methods=["POST"])
+def route_create_org():
+    if request.method == "POST" and request.is_json:
+        # create org with params in json
+        params = parse_params(request, org_mapping)
+        org_id = create_org(**params)
+        return jsonify({ "id": org_id })
+    else:
+        raise NotImplementedError
+
+# api - read, update, delete organisations
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/org/<org_id>", methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_org(org_id=None):
     if request.method == "GET" and org_id:
         # get org for id
         org = get_org(org_id)
         return jsonify(org)
-    elif request.method == "POST" and request.is_json:
-        # create org with params in json
-        params = parse_params(request, org_mapping)
-        org_id = create_org(**params)
-        return jsonify({ "id": org_id })
     elif request.method == "PATCH" and org_id and request.is_json:
         # parse params in json
         params = parse_params(request, org_mapping)
@@ -56,6 +64,7 @@ def route_org(org_id=None):
 ## Team API
 # api - query teams with url params
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/teams", methods=["GET"])
+@authenticate(kind="access")
 def route_teams():
     # parse query args
     skip = int(request.args.get("skip", 0))
@@ -70,6 +79,7 @@ def route_teams():
 # api - read, create, update, delete teams
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/team", methods=["POST"])
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/team/<int:team_id>", methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_team(team_id=None):
     if request.method == "GET" and team_id:
         # get team for id
@@ -94,6 +104,7 @@ def route_team(team_id=None):
         raise NotImplementedError
 
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/team/assign", methods=["POST", "DELETE"])
+@authenticate(kind="access")
 def route_team_assign():
     if request.method == "POST" and request.is_json:
         # assign user to team using params in json
@@ -111,6 +122,7 @@ def route_team_assign():
 
 ## User API
 # api - query users with url params
+@authenticate(kind="access")
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/users", methods=["GET"])
 def route_users():
     # parse query url params
@@ -126,19 +138,26 @@ def route_users():
     user_ids = query_users(org_id, team_id, skip, limit)
     return jsonify(user_ids)
 
-# api - read, create, update, delete users
+# api - create users
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/user", methods=["POST"])
-@identity.route(f"/api/v{API_VERSION}/{identity.name}/user/<user_id>", methods=["GET", "PATCH", "DELETE"])
+def route_create_user(user_id=None):   
+    if request.method == "POST" and request.is_json:
+        # create user with params in json
+        params = parse_params(request, user_mapping)
+        user_id = create_user(**params)
+        return jsonify({ "id": user_id })
+    else:
+        raise NotImplementedError
+
+# api - read, update, delete users
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/user/<user_id>",
+                methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_user(user_id=None):
     if request.method == "GET" and user_id:
         # get user for id
         user = get_user(user_id)
         return jsonify(user)
-    elif request.method == "POST" and request.is_json:
-        # create user with params in json
-        params = parse_params(request, user_mapping)
-        user_id = create_user(**params)
-        return jsonify({ "id": user_id })
     elif request.method == "PATCH" and user_id and request.is_json:
         # parse params in json
         params = parse_params(request, user_mapping)
@@ -155,6 +174,7 @@ def route_user(user_id=None):
 ## manage api
 # api - query manages with url params
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/manages", methods=["GET"])
+@authenticate(kind="access")
 def route_manages():
     # parse query url params
     skip = int(request.args.get("skip", 0))
@@ -174,6 +194,7 @@ def route_manages():
 # api - read, create, update, delete managements
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/manage", methods=["POST"])
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/manage/<manage_id>", methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_manage(manage_id=None):
     if request.method == "GET" and manage_id:
         # get manage for id
@@ -200,6 +221,7 @@ def route_manage(manage_id=None):
 ## role api
 # api - query roles with url params
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/roles", methods=["GET"])
+@authenticate(kind="access")
 def route_roles():
     # parse query url params
     skip = int(request.args.get("skip", 0))
@@ -219,6 +241,7 @@ def route_roles():
 # api - create and delete roles
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/role", methods=["POST"])
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/role/<role_id>", methods=["GET","DELETE"])
+@authenticate(kind="access")
 def route_role(role_id=None):
     if request.method == "GET":
         # get role for id
@@ -240,6 +263,7 @@ def route_role(role_id=None):
 ## rolebind api
 # api - query role bindings with url params
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/rolebinds", methods=["GET"])
+@authenticate(kind="access")
 def route_rolebinds():
     # parse query url params
     skip = int(request.args.get("skip", 0))
@@ -257,6 +281,7 @@ def route_rolebinds():
 # api - create and delete role bindings
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/rolebind", methods=["POST"])
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/rolebind/<binding_id>", methods=["GET","DELETE"])
+@authenticate(kind="access")
 def route_rolebind(binding_id=None):
     if request.method == "GET":
         # get rolebind for id
@@ -273,4 +298,3 @@ def route_rolebind(binding_id=None):
         return jsonify({"success": True })
     else:
         raise NotImplementedError
-

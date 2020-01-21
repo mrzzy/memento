@@ -72,6 +72,5 @@ class Token:
 
     @property
     def user_id(self):
-        print(self.subject)
         _, _, _, user_id = self.subject.split("/")
         return user_id

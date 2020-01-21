@@ -7,16 +7,17 @@
 import os
 import jwt
 from functools import wraps
-from utils import map_obj, map_dict, reverse_mapping
 from datetime import datetime, timedelta
 from base64 import b64encode, b64decode
 from flask import abort, request, Blueprint, jsonify
 
+from ..utils import map_obj, map_dict, reverse_mapping
 from ..config import API_VERSION
 from ..models import *
 from ..ops.auth import *
 
 auth = Blueprint("auth", __name__)
+
 ## routes
 # api route to perform login with login credentials
 # POST - perform login with login credentials

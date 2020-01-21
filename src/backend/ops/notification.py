@@ -15,6 +15,7 @@ from ..mapping.notification import *
 from ..utils import apply_bound, map_dict
 from ..api.error import NotFoundError
 from ..messaging.broker import LocalBroker
+from ..ops.auth import authenticate
 
 # notification message broker
 message_broker = LocalBroker()

@@ -515,7 +515,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -589,7 +589,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -607,6 +607,81 @@
 								"v1",
 								"identity",
 								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "assign user to team",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"teamId\": {{team_id}},\n\t\"userId\": {{user_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/team/assign",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"team",
+								"assign"
 							]
 						}
 					},
@@ -1440,6 +1515,81 @@
 					"response": []
 				},
 				{
+					"name": "unassign user from team",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"teamId\": {{team_id}},\n\t\"userId\": {{user_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/team/assign",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"team",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "delete user",
 					"event": [
 						{
@@ -1506,6 +1656,33 @@
 				},
 				{
 					"name": "delete team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "734f3299-a9b8-4d66-b081-b0921e1eb3c6",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -1672,80 +1849,6 @@
 					"response": []
 				},
 				{
-					"name": "create team",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "8f719416-0efb-4104-a268-8181e1808675",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"id\"));",
-									"    // save org_id for later tests",
-									"    pm.globals.set(\"team_id\",  response.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"name\": \"designers\",\n\t\"orgId\": {{org_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://{{api_host}}/api/v1/identity/team",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"identity",
-								"team"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "create  supervisor",
 					"event": [
 						{
@@ -1796,7 +1899,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1870,7 +1973,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2907,80 +3010,6 @@
 					"response": []
 				},
 				{
-					"name": "create team",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "8f719416-0efb-4104-a268-8181e1808675",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"id\"));",
-									"    // save org_id for later tests",
-									"    pm.globals.set(\"team_id\",  response.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"name\": \"designers\",\n\t\"orgId\": {{org_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://{{api_host}}/api/v1/identity/team",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"identity",
-								"team"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "create user",
 					"event": [
 						{
@@ -3031,7 +3060,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"

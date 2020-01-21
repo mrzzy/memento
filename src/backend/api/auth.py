@@ -29,8 +29,7 @@ def route_login():
     if credentials is None: abort(400)
 
     # perform login & generate refresh token
-    uid = perform_login(credentials["username"], credentials["password"])
-    jwt_token = Token("refresh", uid).to_jwt()
+    jwt_token = perform_login(credentials["username"], credentials["password"])
 
     return jsonify({"refreshToken": jwt_token })
 
@@ -52,7 +51,7 @@ def route_refresh():
 
 # api route to verify if token is valid
 @auth.route(f"/api/v{API_VERSION}/auth/check", methods=["GET"])
-@authenticate(kind="any")
+@authenticate(kind="refresh")
 def route_check():
     return jsonify({"success": True})
 

@@ -23,13 +23,17 @@ class Token:
         ("subject", "sub"),
         ("issue_on", "iat"),
         ("expires", "exp"),
+        ("user_secret", "usersec")
     }
 
     # create a token of the given kind
+    # kind - kind of token to create "access, "refresh" or "any"
     # user_id - unique identifier of the user that created the token
-    def __init__(self, kind=None, user_id=None):
+    # user_secret - user secret used to validate refresh toknes
+    def __init__(self, kind=None, user_id=None, user_secret=None):
         self.issue_on = datetime.utcnow()
         self.subject = f"k8s-cms/token/{kind}/{user_id}"
+        self.user_secret = user_secret
 
         if kind == "access":
             self.expires = self.issue_on + timedelta(minutes=5)
@@ -39,7 +43,6 @@ class Token:
             self.expires = None
         else:
             raise ValueError(f"Unsupported token kind: {kind}")
-
 
     # convert this object as a JWT token
     # returns this object in JWT token representation

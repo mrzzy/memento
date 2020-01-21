@@ -45,4 +45,4 @@ API_VERSION = os.environ.get("API_VERSION", "0")
 # jwt settings
 keyspace = string.digits + string.ascii_letters
 default_jwt_key = "".join(random.choices(keyspace, k=32))
-API_JWT_KEY = os.environ.get("KCMS_MASTER_JWT_KEY", default_jwt_key)
+API_JWT_KEY = os.environ.get("JWT_KEY", default_jwt_key)

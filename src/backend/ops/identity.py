@@ -126,10 +126,17 @@ def update_team(team_id, org_id=None, name=None):
 
 
 # delete team for id 
+# cascade delete team assignments to users
 # throws NotFoundError if no team with team_id is found
 def delete_team(team_id):
     team = Team.query.get(team_id)
     if team is None: raise NotFoundError
+
+    # cascade delete assignments 
+    user_ids = query_users(team_id=team_id)
+    for user_id in user_ids:
+        _ , rolebind_id = get_team_member_ids(team_id, user_id)
+        unassign_team(rolebind_id)
 
     db.session.delete(team)
     db.session.commit()

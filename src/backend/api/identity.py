@@ -69,7 +69,7 @@ def route_teams():
 
 # api - read, create, update, delete teams
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/team", methods=["POST"])
-@identity.route(f"/api/v{API_VERSION}/{identity.name}/team/<team_id>", methods=["GET", "PATCH", "DELETE"])
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/team/<int:team_id>", methods=["GET", "PATCH", "DELETE"])
 def route_team(team_id=None):
     if request.method == "GET" and team_id:
         # get team for id
@@ -89,6 +89,22 @@ def route_team(team_id=None):
     elif request.method == "DELETE" and team_id:
         # delete team with params in json
         delete_team(team_id)
+        return jsonify({"success": True })
+    else:
+        raise NotImplementedError
+
+@identity.route(f"/api/v{API_VERSION}/{identity.name}/team/assign", methods=["POST", "DELETE"])
+def route_team_assign():
+    if request.method == "POST" and request.is_json:
+        # assign user to team using params in json
+        params = parse_params(request, team_assign_mapping)
+        assign_team(**params)
+        return jsonify({"success": True })
+    elif request.method == "DELETE" and request.is_json:
+        # unassign user to team using params in json
+        params = parse_params(request, team_assign_mapping)
+        _, rolebind_id = get_team_member_ids(params["team_id"], params["user_id"])
+        unassign_team(rolebind_id)
         return jsonify({"success": True })
     else:
         raise NotImplementedError

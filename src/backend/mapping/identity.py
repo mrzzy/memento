@@ -16,6 +16,11 @@ team_mapping = [
     ("org_id", "orgId")
 ]
 
+team_assign_mapping = [
+    ("team_id", "teamId"),
+    ("user_id", "userId")
+]
+
 # defines the mapping from user model fields to json api representation
 user_mapping = [
     ("name", "name"),

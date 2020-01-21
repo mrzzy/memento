@@ -82,6 +82,7 @@ class Role(db.Model):
     class ScopeKind:
         Global = "global"
         Organisation = "org" # scope of role limited to specific organisation
+        Team = "team" # scope of role limited to specific team
         User = "user" # scope of role limited to specific user
     # kinds of roles that can be assigned to users
     class Kind:

@@ -134,6 +134,32 @@ def delete_team(team_id):
     db.session.delete(team)
     db.session.commit()
 
+## Team membership
+# teams membership using roles/rolebinds
+# teams members are given the editor role with team scope by default
+
+# constructs the id of the role/rolebind that is used to track the the team membership
+# team_id - id specifying the team in the team membership relationship
+# user_id - id specifying the user in the team membership relationship
+# returns role_id of the role, rolebind_id of the rolebindig
+def get_team_member_ids(team_id, user_id):
+    role_id  = str(Role(kind=Role.Kind.Editor, scope_kind=Role.ScopeKind.Team,
+                        scope_target=team_id))
+    rolebind_id = str(RoleBinding(role_id=role_id, user_id=user_id))
+    return role_id, rolebind_id
+
+# assign a user to the given team
+# team_id - id of the target team being in assigned to 
+# user_id - id of the user being assigned to the team
+def assign_team(team_id, user_id):
+    role_id, rolebind_id = get_team_member_ids(team_id, user_id)
+    return create_role_relation(role_id, rolebind_id)
+
+# reverse an assignment of the given user to the team
+# rolebind_id - id of the rolebinding that tracks the team membership
+def unassign_team(rolebind_id):
+    delete_role_relation(rolebind_id)
+
 ## User Ops
 # query ids of users
 # org_id - show only users that belong to organisation given by org_id
@@ -144,8 +170,12 @@ def query_users(org_id=None, team_id=None, skip=0, limit=None):
     user_ids = User.query.with_entities(User.id)
     # apply filters
     if not org_id is None: user_ids = user_ids.filter_by(org_id=org_id)
-    if not team_id is None: user_ids = user_ids.filter_by(team_id=team_id)
-
+    if not team_id is None:
+        user_ids = user_ids.join(RoleBinding, RoleBinding.user_id == User.id)
+        user_ids = user_ids.join(Role, Role.id == RoleBinding.role_id)
+        user_ids = user_ids.filter(Role.scope_kind == Role.ScopeKind.Team,
+                                     Role.scope_target == team_id,
+                                     Role.kind == Role.Kind.Editor)
     # apply skip & limit
     user_ids = [ i[0] for i in user_ids ]
     user_ids = apply_bound(user_ids, skip, limit)
@@ -221,6 +251,9 @@ def delete_user(user_id):
     # cascade delete scopped roles
     role_ids = query_roles(user_id=user_id)
     for role_id in role_ids: delete_role(role_id)
+    # cascade delete bound rolebindings
+    rolebind_ids = query_role_bindings(user_id=user_id)
+    for rolebind_id in rolebind_ids: delete_role_binding(rolebind_id)
 
     db.session.delete(user)
     db.session.commit()
@@ -288,18 +321,7 @@ def get_manage(rolebind_id):
 # returns the id of the rolebind that represents the managment relationship
 def create_manage(managee_id, manager_id):
     role_id, rolebind_id = get_manage_ids(managee_id, manager_id)
-    # create role if does already exist
-    if Role.query.get(role_id) is None:
-        role = Role.from_id(role_id)
-        db.session.add(role)
-        db.session.commit()
-
-    # create rolebind that represents the management relationship
-    rolebind = RoleBinding.from_id(rolebind_id)
-    db.session.add(rolebind)
-    db.session.commit()
-
-    return rolebind_id
+    return create_role_relation(role_id, rolebind_id)
 
 # update management for given rolebind_id
 # managee_id - id of the worker/team that is being managed
@@ -317,16 +339,7 @@ def update_manage(rolebind_id, managee_id=None, manager_id=None):
 # throws NotFoundError if no management relationship with rolebind_id is found
 # cascade deletes role if no other role bound to it
 def delete_manage(rolebind_id):
-    # delete rolebinding
-    rolebind = RoleBinding.query.get(rolebind_id)
-    if rolebind is None: raise NotFoundError
-    role_id = rolebind.role.id
-    delete_role_binding(rolebind_id)
-
-    # check if role has any rolebindings, if so delete role too
-    rolebind_ids = RoleBinding.query.filter_by(role_id=role_id)
-    if rolebind_ids.count() < 1:
-        delete_role(role_id)
+    delete_role_relation(rolebind_id)
 
 ## Role Ops
 # query id of roles based on params:
@@ -430,3 +443,41 @@ def delete_role_binding(binding_id):
     if binding is None: raise NotFoundError
     db.session.delete(binding)
     db.session.commit()
+
+## Role Relation ops
+# role relations are relationships represented as roles and rolebindings
+
+# create role & rolebinding used to represent an relationship
+# only tries to create role if does not already exist
+# role_id - the id of the role used to represent the relationship
+# rolebind_id - the id of the rolebind used to represent the relationship
+def create_role_relation(role_id, rolebind_id):
+    # create role if does already exist
+    if Role.query.get(role_id) is None:
+        role = Role.from_id(role_id)
+        db.session.add(role)
+        db.session.commit()
+
+    # create rolebind that represents the management relationship
+    rolebind = RoleBinding.from_id(rolebind_id)
+    db.session.add(rolebind)
+    db.session.commit()
+
+    return rolebind_id
+
+# delete role & rolebinding  used to represent the relationshipa
+# only tries to casacade delete role if not used by other rolebindings
+# rolebind_id - the id of the rolebind used to represent the relationship
+def delete_role_relation(rolebind_id):
+    # delete rolebinding
+    rolebind = RoleBinding.query.get(rolebind_id)
+    if rolebind is None: raise NotFoundError
+    role_id = rolebind.role.id
+    delete_role_binding(rolebind_id)
+
+    # check if role has any rolebindings, if so delete role too
+    rolebind_ids = RoleBinding.query.filter_by(role_id=role_id)
+    if rolebind_ids.count() < 1:
+        delete_role(role_id)
+
+

@@ -55,6 +55,16 @@ class TestIdentityOps(TestCase):
         team = get_team(team_id)
         self.assertEqual(team["name"], "ui/ux")
 
+        # team assign/unassign 
+        user_id = create_user("Joel",
+                              "P@$$w0rd",
+                              "joel@jmail.com",
+                              org_id, team_id)
+        role_binding_id = assign_team(team_id, user_id)
+        self.assertEqual(query_users(team_id=team_id), [user_id])
+        unassign_team(role_binding_id)
+        self.assertEqual(query_users(team_id=team_id), [])
+
         delete_team(team_id)
         self.assertEqual(query_teams(), [])
         delete_org(org_id)
@@ -79,6 +89,8 @@ class TestIdentityOps(TestCase):
         user = get_user(user_id)
         self.assertEqual(user["name"], "Joel")
         self.assertEqual(query_users(), [user_id])
+        self.assertEqual(query_users(team_id=team_id), [])
+        assign_team(team_id, user_id)
         self.assertEqual(query_users(team_id=team_id), [user_id])
         self.assertEqual(query_users(team_id=-1), [])
 

@@ -31,13 +31,15 @@ def route_tasks():
     if not author_id is None: author_id = int(author_id)
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
+    started = request.args.get("started", None)
+    if not started is None: started = parse_bool(started)
     due_by = request.args.get("due-by", None)
     if not due_by is None: due_by = parse_datetime(due_by)
     assignee_id = request.args.get("assignee", None)
     if not assignee_id is None: assignee_idf = int(assignee_id)
 
     # perform query
-    task_ids = query_tasks(pending, author_id, due_by, skip, limit, assignee_id)
+    task_ids = query_tasks(pending, started, author_id, due_by, skip, limit, assignee_id)
     return jsonify(task_ids)
 
 # api - read, create, update, delete tasks

@@ -15,18 +15,21 @@ from ..api.error import NotFoundError
 ## Task Ops
 # query ids of tasks
 # pending - show only tasks that are currently incomplete 
+# started - show only tasks that are currently started 
 # author_id - show only tasks created by author with given user id 
 # due_by - show only tasks that are due before given due_by
 # skip - skip the first skip tasks
 # limit - output ids limit to the first limit tasks
 # assignee_id - show only tasks assigned to the user with the given user id
-def query_tasks(pending=None, author_id=None, due_by=None, skip=0, limit=None,
-                assignee_id=None):
+def query_tasks(pending=None, started=None, author_id=None, due_by=None, skip=0,
+                limit=None, assignee_id=None):
     task_ids = Task.query.with_entities(Task.id)
     # apply filters
     if not pending is None:
         completed = not pending
         task_ids = task_ids.filter_by(completed=completed)
+    if not started is None:
+        task_ids = task_ids.filter_by(started=started)
     if not author_id is None: task_id = task_ids.filter_by(author_id=author_id)
     if not due_by is None:
         task_ids = task_ids.filter(Task.deadline <= due_by)
@@ -56,12 +59,14 @@ def get_task(task_id):
 # deadline - completion deadline of the task 
 # duration - duration of task of task in seconds
 # completed - whether the task is completed
+# started - whether the task is completed
 # author_id - user id of the author of the task
 # returns the id of the new task
 def create_task(name, deadline, duration, author_id,
-                description="", completed=False):
+                description="", started=False, completed=False):
     task = Task(name=name, deadline=deadline, description=description,
-                duration= duration, author_id=author_id, completed=completed)
+                duration= duration, author_id=author_id, started=started,
+                completed=completed)
     db.session.add(task)
     db.session.commit()
 
@@ -73,10 +78,11 @@ def create_task(name, deadline, duration, author_id,
 # deadline - completion deadline of the task 
 # duration - duration of task of task in seconds
 # completed - whether the task is completed
+# started - whether the task is started 
 # author_id - user id of the author of the task
 # throws NotFoundError if no task with task_id is found
 def update_task(task_id, name=None, deadline=None, duration=None,
-                author_id=None, description=None, completed=None):
+                author_id=None, description=None, completed=None, started=None):
     task = Task.query.get(task_id)
     if task is None: raise NotFoundError
     # update task fields
@@ -86,6 +92,8 @@ def update_task(task_id, name=None, deadline=None, duration=None,
     if not author_id is None: task.author_id = author_id
     if not description is None: task.description = description
     if not completed is None: task.completed = completed
+    if not started is None: task.started = started
+
     db.session.commit()
 
 # delete the task for the given task id

@@ -11,6 +11,7 @@ task_mapping = [
     ("duration", "duration"),
     ("deadline", "deadline"),
     ("completed", "completed"),
+    ("started", "started"),
     ("author_id", "authorId")
 ]
 

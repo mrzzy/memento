@@ -62,7 +62,9 @@ spec:
           volumeMounts:
             - name: database-data
               mountPath: "/var/lib/postgresql/data"
-              subPath: memento-database-data
+              {{ if .Values.deployment.database.subPath -}}
+              subPath: "{{ .Values.deployment.database.subPath }}"
+              {{- end }}
       volumes:
         - name: database-data
           persistentVolumeClaim:

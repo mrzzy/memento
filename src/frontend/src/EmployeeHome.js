@@ -80,8 +80,12 @@ class EmployeeHome extends React.Component {
     }
 
     render() {
-        if (localStorage.getItem("loggedIn") !== "true")
+        if (sessionStorage.getItem("role") === "employer")
+            return <Redirect to='/employer' />
+
+        if (sessionStorage.getItem("role") === "")
             return <Redirect to='/' />
+
         return (
             <div>
                 <NavigationEmployee />

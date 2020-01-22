@@ -12,6 +12,9 @@ from sqlalchemy.exc import IntegrityError
 class NotFoundError(Exception):
     pass
 
+# raise on authentication/authorisation errors
+class AuthError(Exception):
+    pass
 ## error handlers
 err = Blueprint("err", __name__)
 
@@ -42,6 +45,14 @@ def route_bad_request(error):
         "message": "Submitted a malformed request."
     }), 400
 
+@err.app_errorhandler(401)
+@err.app_errorhandler(AuthError)
+def route_unauthorized(error):
+    return jsonify({
+        "error": "unauthorised",
+        "message": "Not authorised to perform request."
+    }), 401
+
 # error handler for method not allowed/implmented (NotImplementedError)
 @err.app_errorhandler(405)
 @err.app_errorhandler(NotImplementedError)
@@ -67,3 +78,4 @@ def route_validation(error):
         "error": "intenal-server-error",
         "message": "Backend server encounted an unexpected error."
     })
+

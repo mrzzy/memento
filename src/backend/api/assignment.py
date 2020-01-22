@@ -14,12 +14,14 @@ from .utils import parse_params
 from ..config import API_VERSION
 from ..mapping.assignment import *
 from ..ops.assignment import *
+from ..ops.auth import authenticate
 
 assign = Blueprint("assignment", __name__)
 
 ## Task API
 # api - query tasks
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/tasks")
+@authenticate(kind="access")
 def route_tasks():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -31,15 +33,18 @@ def route_tasks():
     if not pending is None: pending = parse_bool(pending)
     due_by = request.args.get("due-by", None)
     if not due_by is None: due_by = parse_datetime(due_by)
+    assignee_id = request.args.get("assignee", None)
+    if not assignee_id is None: assignee_idf = int(assignee_id)
 
     # perform query
-    task_ids = query_tasks(pending, author_id, due_by, skip, limit)
+    task_ids = query_tasks(pending, author_id, due_by, skip, limit, assignee_id)
     return jsonify(task_ids)
 
 # api - read, create, update, delete tasks
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/task", methods=["POST"])
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/task/<task_id>",
               methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_task(task_id=None):
     if request.method == "GET" and task_id:
         # get task for id
@@ -74,6 +79,7 @@ def route_task(task_id=None):
 ## Event API
 # api - query events
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/events")
+@authenticate(kind="access")
 def route_events():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -85,15 +91,18 @@ def route_events():
     if not pending is None: pending = parse_bool(pending)
     due_by = request.args.get("limit-by", None)
     if not due_by is None: due_by = parse_datetime(due_by)
+    assignee_id = request.args.get("assignee", None)
+    if not assignee_id is None: assignee_idf = int(assignee_id)
 
     # perform query
-    event_ids = query_events(pending, author_id, due_by, skip, limit)
+    event_ids = query_events(pending, author_id, due_by, skip, limit, assignee_id)
     return jsonify(event_ids)
 
 # api - read, create, update, delete events
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/event", methods=["POST"])
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/event/<event_id>",
               methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_event(event_id=None):
     if request.method == "GET" and event_id:
         # get event for id
@@ -127,6 +136,7 @@ def route_event(event_id=None):
 ## Assignment API
 # api - query assignments
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/assigns")
+@authenticate(kind="access")
 def route_assigns():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -153,6 +163,7 @@ def route_assigns():
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/assign", methods=["POST"])
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/assign/<assign_id>",
               methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_assign(assign_id=None):
     if request.method == "GET" and assign_id:
         # get assign for id

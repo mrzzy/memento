@@ -3,7 +3,7 @@ import './App.css';
 import { NavigationVisitor } from './Navigation';
 import { Redirect } from 'react-router-dom';
 
-class VisitorHome extends React.Component {
+class About extends React.Component {
     render() {
         if (sessionStorage.getItem("role") === "employee")
             return <Redirect to='/employee' />
@@ -14,11 +14,11 @@ class VisitorHome extends React.Component {
         return (
             <div>
                 <NavigationVisitor />
-                <img src="./visitorhomebg.png" alt="Home Page" style={{height: "70vh", margin: "auto", display: "block"}} />
+                <p>From About.js</p>
             </div>
         );
     }
 }
 
-export default VisitorHome;
+export default About;
 

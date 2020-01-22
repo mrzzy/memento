@@ -29,21 +29,29 @@ class TestIdentityModels(TestCase):
         db.session.commit()
 
         self.worker = User(organisation=self.organisation,
-                           team=self.team,
                            name="James",
                            password="Pa$$w0rd",
                            email="james@email.com")
         db.session.add(self.worker)
         db.session.commit()
 
-        self.management = Management(managee_id=self.worker.id,
-                                     manager=self.supervisor)
+        self.supervisor_role = Role(scope_kind=Role.ScopeKind.User,
+                                    scope_target=self.worker.id,
+                                    kind=Role.Kind.Admin)
+        self.supervisor_role.id = str(self.supervisor_role)
+        db.session.add(self.supervisor_role)
+        db.session.commit()
 
-        db.session.add(self.management)
+        self.supervisor_role_binding = RoleBinding(role_id=self.supervisor_role.id,
+                                                   user_id=self.supervisor.id)
+        self.supervisor_role_binding.id = str(self.supervisor_role_binding)
+        db.session.add(self.supervisor_role_binding)
         db.session.commit()
 
     def delete_test_data(self):
-        db.session.delete(self.management)
+        db.session.delete(self.supervisor_role_binding)
+        db.session.commit()
+        db.session.delete(self.supervisor_role)
         db.session.commit()
         db.session.delete(self.worker)
         db.session.commit()

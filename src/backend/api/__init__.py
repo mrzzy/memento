@@ -9,6 +9,7 @@ from .identity import identity
 from .assignment import assign
 from .notification import notify, notify_ws
 from .status import status
+from .auth import auth
 
 # register api components with given flask app/sockets
 def register_api(app, sockets):
@@ -18,5 +19,6 @@ def register_api(app, sockets):
     app.register_blueprint(identity)
     app.register_blueprint(assign)
     app.register_blueprint(notify)
+    app.register_blueprint(auth)
     # websockets api
     sockets.register_blueprint(notify_ws)

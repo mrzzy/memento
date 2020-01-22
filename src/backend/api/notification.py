@@ -22,6 +22,7 @@ notify_ws = Blueprint("notification", __name__)
 ## Channel API
 # api - query channels
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/channels")
+@authenticate(kind="access")
 def route_channels():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -40,6 +41,7 @@ def route_channels():
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/channel", methods=["POST"])
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/channel/<channel_id>",
               methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_channel(channel_id=None):
     if request.method == "GET" and channel_id:
         # get channel for id
@@ -66,6 +68,7 @@ def route_channel(channel_id=None):
 ## Notify API
 # api - query notifications
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/notifys")
+@authenticate(kind="access")
 def route_notifys():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -84,6 +87,7 @@ def route_notifys():
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/notify", methods=["POST"])
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/notify/<notify_id>",
               methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_notify(notify_id=None):
     if request.method == "GET" and notify_id:
         # get notify for id

@@ -6,7 +6,8 @@ import { Redirect, NavLink } from 'react-router-dom'
 class NavigationEmployee extends React.Component {
 
     signOut = () => {
-        localStorage.setItem("loggedIn", "false");
+        sessionStorage.setItem("loggedIn", "false");
+        sessionStorage.setItem("role", "");
         return <Redirect to="/" />
     }
 
@@ -14,6 +15,26 @@ class NavigationEmployee extends React.Component {
         return (
             <ul className="navigationBar">
                 <li className="headerLogo"><NavLink to="/employee">M</NavLink></li>
+                <li><a href="" onClick={this.signOut}><img className="signout" src="./signout.svg" alt="Sign out button" /></a></li>
+            </ul>
+        );
+    }
+}
+
+class NavigationEmployer extends React.Component {
+
+    signOut = () => {
+        sessionStorage.setItem("loggedIn", "false");
+        sessionStorage.setItem("role", "");
+        return <Redirect to="/" />
+    }
+
+    render() {
+        return (
+            <ul className="navigationBar">
+                <li className="headerLogo"><NavLink to="/employee">M</NavLink></li>
+                <li><NavLink to="/employer">Home</NavLink></li>
+                <li><NavLink to="/my-employees">My Employees</NavLink></li>
                 <li><a href="" onClick={this.signOut}><img className="signout" src="./signout.svg" alt="Sign out button" /></a></li>
             </ul>
         );
@@ -31,4 +52,4 @@ function NavigationVisitor() {
     );
 }
 
-export { NavigationVisitor, NavigationEmployee };
+export { NavigationVisitor, NavigationEmployee, NavigationEmployer };

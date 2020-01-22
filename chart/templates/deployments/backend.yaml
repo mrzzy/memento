@@ -47,7 +47,7 @@ spec:
             - configMapRef:
                 name: {{ include "memento.fullname" . }}-config-env
             - secretRef:
-                name: {{ include "memento.fullname" . }}-database
+                name: {{ include "memento.fullname" . }}-secrets
           livenessProbe:
             httpGet:
               path: /healthz

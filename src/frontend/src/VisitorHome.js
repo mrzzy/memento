@@ -5,10 +5,10 @@ import { Redirect } from 'react-router-dom';
 
 class VisitorHome extends React.Component {
     render() {
-        if (localStorage.getItem("role") === "employee")
+        if (sessionStorage.getItem("role") === "employee")
             return <Redirect to='/employee' />
 
-        else if (localStorage.getItem("role") === "employer")
+        else if (sessionStorage.getItem("role") === "employer")
             return <Redirect to='/employer' />
 
         return (

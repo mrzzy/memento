@@ -80,10 +80,10 @@ class EmployeeHome extends React.Component {
     }
 
     render() {
-        if (localStorage.getItem("role") === "employer")
+        if (sessionStorage.getItem("role") === "employer")
             return <Redirect to='/employer' />
 
-        if (localStorage.getItem("role") === "")
+        if (sessionStorage.getItem("role") === "")
             return <Redirect to='/' />
 
         return (

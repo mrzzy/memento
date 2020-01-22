@@ -16,8 +16,8 @@ class Login extends React.Component {
 
         if (this.state.username == employee[0]) {
             if (this.state.password == employee[1]) {
-                localStorage.setItem("loggedIn", "true");
-                localStorage.setItem("role", "employee");
+                sessionStorage.setItem("loggedIn", "true");
+                sessionStorage.setItem("role", "employee");
                 return <Redirect to="/employee" />
             }
 
@@ -27,8 +27,8 @@ class Login extends React.Component {
 
         else if (this.state.username == employer[0]) {
             if (this.state.password == employer[1]) {
-                localStorage.setItem("loggedIn", "true");
-                localStorage.setItem("role", "employer");
+                sessionStorage.setItem("loggedIn", "true");
+                sessionStorage.setItem("role", "employer");
                 return <Redirect to="/employer" />
             }
 
@@ -47,10 +47,10 @@ class Login extends React.Component {
     handleUsernameChange = (e) => this.setState({ "username": e.target.value });
 
     render() {
-        if (localStorage.getItem("role") === "employee")
+        if (sessionStorage.getItem("role") === "employee")
             return <Redirect to='/employee' />
 
-        if (localStorage.getItem("role") === "employer")
+        if (sessionStorage.getItem("role") === "employer")
             return <Redirect to='/employer' />
 
         return (
@@ -64,7 +64,7 @@ class Login extends React.Component {
                         handleLogin={this.handleLogin}
                         handlePasswordChange={this.handlePasswordChange}
                         handleUsernameChange={this.handleUsernameChange} /> : <SignupSection />)}
-                    {(localStorage.getItem("loggedIn") === "true"? <p>Logged in</p>:<p>Not Logged in</p>)}
+                    {(sessionStorage.getItem("loggedIn") === "true"? <p>Logged in</p>:<p>Not Logged in</p>)}
                 </div>
 
                 <p>{this.state.message}</p>

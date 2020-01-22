@@ -6,8 +6,8 @@ import { Redirect, NavLink } from 'react-router-dom'
 class NavigationEmployee extends React.Component {
 
     signOut = () => {
-        localStorage.setItem("loggedIn", "false");
-        localStorage.setItem("role", "");
+        sessionStorage.setItem("loggedIn", "false");
+        sessionStorage.setItem("role", "");
         return <Redirect to="/" />
     }
 
@@ -24,8 +24,8 @@ class NavigationEmployee extends React.Component {
 class NavigationEmployer extends React.Component {
 
     signOut = () => {
-        localStorage.setItem("loggedIn", "false");
-        localStorage.setItem("role", "");
+        sessionStorage.setItem("loggedIn", "false");
+        sessionStorage.setItem("role", "");
         return <Redirect to="/" />
     }
 

@@ -4,24 +4,25 @@ import './index.css';
 import EmployeeHome from './EmployeeHome';
 import EmployerHome from './EmployerHome';
 import VisitorHome from './VisitorHome';
+import About from './About';
 import Login from './Login';
 import CreateData from './CreateData';
 import * as serviceWorker from './serviceWorker';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
 
-if (localStorage.getItem("loggedIn") === null) {
-    localStorage.setItem("loggedIn", "false");
+if (sessionStorage.getItem("loggedIn") === null) {
+    sessionStorage.setItem("loggedIn", "false");
 }
 
-if (localStorage.getItem("role") === null) {
-    localStorage.setItem("role", "");
+if (sessionStorage.getItem("role") === null) {
+    sessionStorage.setItem("role", "");
 }
 
 
 const routing = (
     <Router>
         <Route exact path="/" component={VisitorHome} />
-        <Route path="/about" component={VisitorHome} />
+        <Route path="/about" component={About} />
         <Route path="/employee" component={EmployeeHome} />
         <Route path="/employer" component={EmployerHome} />
         <Route path="/login" component={Login} />

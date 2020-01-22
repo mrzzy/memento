@@ -3,13 +3,30 @@ import './App.css';
 import { NavigationEmployer } from './Navigation';
 import { Redirect } from 'react-router-dom';
 
+// Dummy data.
+
+// Task object
+/*
+{
+    "authorId": {{supervisor_id}},
+    "completed": true,
+    "deadline": "2099-11-11T11:51:53.334Z",
+    "description": "Complete the fishing quota by going fishing",
+    "duration": 3600,
+    "name": "fishing"
+}
+ * */
+
+var employees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }]
+
+
 class EmployerHome extends React.Component {
 
     render() {
-        if (localStorage.getItem("role") === "employee")
+        if (sessionStorage.getItem("role") === "employee")
             return <Redirect to="/employee" />
 
-        else if (localStorage.getItem("role") === "")
+        else if (sessionStorage.getItem("role") === "")
             return <Redirect to="/" />
 
         return (
@@ -17,7 +34,7 @@ class EmployerHome extends React.Component {
                 <NavigationEmployer />
                 <h1 className="pagetitle">HOME</h1>
                 <Calendar />
-                <AllEmployeesTask />
+                <AllEmployeesTasks />
             </div>
         );
 	}
@@ -78,7 +95,7 @@ class Calendar extends React.Component {
     }
 }
 
-class AllEmployeesTask extends React.Component {
+class AllEmployeesTasks extends React.Component {
     render() {
         return (
             <div>
@@ -86,6 +103,10 @@ class AllEmployeesTask extends React.Component {
             </div>
         );
     }
+}
+
+class EmployeeTask extends React.Component {
+    
 }
 
 export default EmployerHome;

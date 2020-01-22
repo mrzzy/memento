@@ -17,10 +17,47 @@ import { Redirect } from 'react-router-dom';
 }
  * */
 
-var employees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }]
+/* Employee Object
+ * "userId": {{employee_id}}
+ * "name": Joel
+ */
+
+// date object with new Date(0), setMiliseconds to Date.parse("ISOstring")
+
+var myemployees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }, { userId: 3, name: "Jessie" }, { userId: 4, name: "Guhesh" }];
+var tasks = [
+    { taskId: 2, userId: 1, completed: false, deadline: "2020-01-26T11:55:51.569Z", duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
+    { taskId: 3, userId: 3, completed: false, deadline: "2020-01-22T13:30:00.000Z", duration: 3600, name: "Start next project", description: "This is a test description to test out the front end." },
+    { taskId: 4, userId: 4, completed: false, deadline: "2020-01-22T13:30:00.000Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+    { taskId: 5, userId: 4, completed: false, deadline: "2020-01-22T14:35:00.000Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+    { taskId: 6, userId: 4, completed: false, deadline: "2020-01-22T14:14:18.478Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+];
 
 
 class EmployerHome extends React.Component {
+
+    constructor() {
+        super();
+        let filteredTasks = [];
+        let employees = {}
+        for (let i = 0; i < tasks.length; i++) {
+            let stringDate = tasks[i].deadline;
+            let mili = Date.parse(stringDate);
+            let taskDeadline = new Date(0);
+            taskDeadline.setMilliseconds(mili);
+
+            let today = new Date();
+
+            if (taskDeadline.getDate() == today.getDate())
+                filteredTasks.push(tasks[i])
+        }
+
+        for (let i = 0; i < myemployees.length; i++) {
+            employees[myemployees[i]["userId"]] = myemployees[i]["name"];
+        }
+
+        this.state = { tasks: filteredTasks, employees: employees };
+    }
 
     render() {
         if (sessionStorage.getItem("role") === "employee")
@@ -34,7 +71,7 @@ class EmployerHome extends React.Component {
                 <NavigationEmployer />
                 <h1 className="pagetitle">HOME</h1>
                 <Calendar />
-                <AllEmployeesTasks />
+                <AllEmployeesTasks tasks={this.state.tasks} employees={this.state.employees} />
             </div>
         );
 	}
@@ -96,17 +133,40 @@ class Calendar extends React.Component {
 }
 
 class AllEmployeesTasks extends React.Component {
+    deadline = (dateString) => {
+        let date = new Date(0);
+        let mili = Date.parse(dateString);
+        date.setMilliseconds(mili);
+        let minutes = date.getMinutes().toString();
+        if (minutes.length == 1)
+            minutes = "0" + minutes;
+        let deadline = "" + date.getHours() + ":" + minutes;
+        return deadline;
+    }
+
     render() {
+        const tasks = this.props.tasks.map((task) =>
+                <div className="task" key={task.taskId}>
+                    <div className="profile">
+                        <img src="./anon.png" alt="Employee Picture" />
+                        <span className="userName">{this.props.employees[task.userId]}</span>
+                    </div>
+
+                    <div>
+                        <h3>{task.name}</h3>
+                        <p>{task.description}</p>
+                    </div>
+                    {this.deadline(task.deadline)}
+                </div>
+        );
+
         return (
             <div>
                 <h2>Employees' Tasks</h2>
+                {tasks}
             </div>
         );
     }
-}
-
-class EmployeeTask extends React.Component {
-    
 }
 
 export default EmployerHome;

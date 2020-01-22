@@ -6,7 +6,6 @@ import EmployerHome from './EmployerHome';
 import VisitorHome from './VisitorHome';
 import About from './About';
 import Login from './Login';
-import CreateData from './CreateData';
 import * as serviceWorker from './serviceWorker';
 import { Route, BrowserRouter as Router } from 'react-router-dom';
 

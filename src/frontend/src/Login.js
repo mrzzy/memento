@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import './Login.css';
 import { NavigationVisitor } from './Navigation';
 import { Redirect } from 'react-router-dom';
 
@@ -21,12 +21,10 @@ class Login extends React.Component {
         return (
             <div>
                 <NavigationVisitor />
-                <div>
-                    <button onClick={this.switchToLogin}>Login</button>
-                    <button onClick={this.switchToSignup}>Sign up</button>
-
-                    {(this.state.login ? <LoginSection handleLogin={this.handleLogin} /> : <SignupSection />)}
-                    {(localStorage.getItem("loggedIn") === "true"? <p>Logged in</p>:<p>Not Logged in</p>)}
+                <div class="container">
+                    <button class="content btn" id="loginbtn" onClick={this.switchToLogin}>Login</button>
+                    <button class="content btn" id="signupbtn" onClick={this.switchToSignup}>Sign up</button>
+                    {(this.state.login ? <LoginSection  handleLogin={this.handleLogin} /> : <SignupSection />)}
                 </div>
             </div>
         );
@@ -35,21 +33,21 @@ class Login extends React.Component {
 
 function LoginSection(props) {
     return (
-        <form onSubmit={props.handleLogin}>
-            <input required type="text" placeholder="Username"/>
-            <input required type="password" placeholder="Password" />
-            <input type="submit" value="->" />
+        <form class="content forms" onSubmit={props.handleLogin}>
+            <input  class="inputTxt" required type="text" placeholder="Username"/>
+            <input class="inputTxt" required type="password" placeholder="Password" />
+            <input class="submitbtn"type="submit" value=">" />
         </form>
     );
 }
 
 function SignupSection() {
     return (
-        <form>
-            <input required type="email" placeholder="Email" />
-            <input required type="text" placeholder="Username" />
-            <input required type="password" placeholder="Password" />
-            <input type="submit" value="->" />
+        <form class="content forms">
+            <input class="inputTxt" required type="email" placeholder="Email" />
+            <input class="inputTxt" required type="text" placeholder="Username" />
+            <input class="inputTxt" required type="password" placeholder="Password" />
+            <input class="submitbtn" type="submit" value="->" />
         </form>
     );
 }

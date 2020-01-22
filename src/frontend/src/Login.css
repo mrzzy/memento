@@ -1,0 +1,134 @@
+/*Login CSS*/
+
+/*FONTS */
+
+:root {
+    --main-color: #FFD159;
+    --header-font: 'Montserrat', sans-serif; /*Used as family font*/
+    --regular-font: 'Roboto', sans-serif;
+}
+
+.container{
+	margin: auto;
+	width: 60%;
+	height: 400px;
+	margin-top: 10rem; 
+	background-color: #fafafa;
+	text-align: center;
+	border-radius: 3%;
+	/*display: flex;
+	flex-flow: column wrap;*/
+}
+
+.content {
+
+}
+
+#loginbtn{
+	color: #989898;
+	transition-property: border-bottom;
+	transition-duration: 0.5s;
+
+}
+#loginbtn:hover{
+	color: #000000;
+}
+
+#loginbtn:focus{
+	color: #000000;
+	border-bottom: 3px solid #ffda79;
+	padding-bottom: 10px;
+}
+
+
+#signupbtn{
+	color: #989898;
+	transition-property: border-bottom;
+	transition-duration: 0.5s;
+
+}
+#signupbtn:hover{
+	color: #000000;
+}
+
+#signupbtn:focus{
+	color: #000000;
+	border-bottom: 3px solid #ffda79;
+	padding-bottom: 10px;
+}
+
+/*Buttons*/
+.btn{
+	width: 40%;
+	border: 0;
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+    background-color: inherit;
+    font-family: var(--regular-font);
+    font-size: 27px;
+}
+
+/*the rest of the buttons*/
+.form{
+	
+}
+
+.inputTxt{
+	width: 60%;
+    height: 40px;
+    border-radius: 5%;
+    border: none;
+    margin: 1rem;
+    background-color: #fafafa;
+    border-bottom: 2px solid #ffda79;
+
+}
+.inputTxt::placeholder{
+	font-size: 20px;
+	border: none;
+    
+}
+
+form.forms{
+	display: inline-flex;
+	flex-flow: column wrap;
+	justify-content: center;
+	align-content: center;
+	width: 100%;
+}
+
+
+.forms input[type=submit] {
+	align-self: flex-end;
+	border-radius: 100%;
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    background-color: #ffda79;
+    color: white;
+    font-size: 2rem;
+}
+.forms input[type=submit]:hover{
+	background-color: #ffd159; 
+
+}
+
+
+/*Getting rid of outline */
+
+.btn:focus{
+	outline: none;
+}
+.inputTxt:focus{
+	outline: none;
+}
+.submitbtn:focus{
+	outline: none;
+}
+
+
+/*@media all and (min-width: 800px) {
+  .btn { order: 1; } 
+  .form    { order: 2; }
+  .forms  { order: 3; }
+}*/

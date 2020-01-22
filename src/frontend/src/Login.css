@@ -8,15 +8,16 @@
     --regular-font: 'Roboto', sans-serif;
 }
 
-.container{
-	margin: auto;
-	width: 60%;
-	height: 400px;
-	margin-top: 10rem; 
-	background-color: #fafafa;
-	text-align: center;
-	border-radius: 3%;
-	/*display: flex;
+.container {
+    margin: auto;
+    width: 60%;
+    height: 400px;
+    margin-top: 10rem;
+    background-color: #fafafa;
+    text-align: center;
+    border-radius: 3%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    /*display: flex;
 	flex-flow: column wrap;*/
 }
 
@@ -26,35 +27,69 @@
 
 #loginbtn{
 	color: #989898;
-	transition-property: border-bottom;
-	transition-duration: 0.5s;
+	position: relative;
 
 }
 #loginbtn:hover{
 	color: #000000;
 }
 
-#loginbtn:focus{
-	color: #000000;
-	border-bottom: 3px solid #ffda79;
-	padding-bottom: 10px;
+#loginbtn::after {
+    content: "";
+    height: 3px;
+    top: 125%;
+    left: 0;
+    right: 100%;
+    background-color: #ffda79;
+    color: #000000;
+    transition-property: right;
+    transition-duration: 0.5s;
+    position: absolute;
+}
+
+#loginbtn:focus::after {
+    content: "";
+    height: 3px;
+    top: 125%;
+    left: 0;
+    right: 0;
+    background-color: #ffda79;
+    color: #000000;
+    position: absolute;
 }
 
 
 #signupbtn{
 	color: #989898;
-	transition-property: border-bottom;
-	transition-duration: 0.5s;
+    position: relative;
 
 }
 #signupbtn:hover{
 	color: #000000;
 }
 
-#signupbtn:focus{
+#signupbtn::after{
+    content:"";
+    height: 3px;
+    top: 125%;
+    left: 0;
+    right: 100%;
+    background-color: #ffda79;
 	color: #000000;
-	border-bottom: 3px solid #ffda79;
-	padding-bottom: 10px;
+    transition-property: right;
+	transition-duration: 0.5s;
+    position: absolute;
+}
+
+#signupbtn:focus::after{
+    content:"";
+    height: 3px;
+    top: 125%;
+    left: 0;
+    right: 0;
+    background-color: #ffda79;
+	color: #000000;
+    position: absolute;
 }
 
 /*Buttons*/

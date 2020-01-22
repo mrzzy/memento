@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 import './index.css';
 import EmployeeHome from './EmployeeHome';
 import EmployerHome from './EmployerHome';
+import MyEmployee from './MyEmployees';
 import VisitorHome from './VisitorHome';
 import About from './About';
 import Login from './Login';
@@ -24,6 +25,7 @@ const routing = (
         <Route path="/about" component={About} />
         <Route path="/employee" component={EmployeeHome} />
         <Route path="/employer" component={EmployerHome} />
+        <Route path="/my-employees" component={MyEmployee} />
         <Route path="/login" component={Login} />
     </Router>
 )

@@ -73,10 +73,10 @@ class EmployeeHome extends React.Component {
     componentDidMount() {
         const self = this;
         // Default user id for testing.
-        GETTaskFromUserId(17)
-            .then(tasks => {
-                self.taskListElement.current.updateAllTasksList(tasks);
-            });
+        //GETTaskFromUserId(17)
+        //    .then(tasks => {
+        //        self.taskListElement.current.updateAllTasksList(tasks);
+        //    });
     }
 
     render() {

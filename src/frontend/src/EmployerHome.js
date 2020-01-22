@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import './EmployerHome.css';
 import { NavigationEmployer } from './Navigation';
 import { Redirect } from 'react-router-dom';
 
@@ -27,10 +28,10 @@ import { Redirect } from 'react-router-dom';
 var myemployees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }, { userId: 3, name: "Jessie" }, { userId: 4, name: "Guhesh" }];
 var tasks = [
     { taskId: 2, userId: 1, completed: false, deadline: "2020-01-26T11:55:51.569Z", duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
-    { taskId: 3, userId: 3, completed: false, deadline: "2020-01-22T13:30:00.000Z", duration: 3600, name: "Start next project", description: "This is a test description to test out the front end." },
-    { taskId: 4, userId: 4, completed: false, deadline: "2020-01-22T13:30:00.000Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
-    { taskId: 5, userId: 4, completed: false, deadline: "2020-01-22T14:35:00.000Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
-    { taskId: 6, userId: 4, completed: false, deadline: "2020-01-22T14:14:18.478Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+    { taskId: 3, userId: 3, completed: false, deadline: "2020-01-23T02:20:00.115Z", duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
+    { taskId: 4, userId: 4, completed: false, deadline: "2020-01-23T02:00:00.115Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+    { taskId: 5, userId: 4, completed: false, deadline: "2020-01-23T03:30:00.115Z", duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
+    { taskId: 6, userId: 4, completed: false, deadline: "2020-01-23T04:20:00.115Z", duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
 ];
 
 
@@ -146,23 +147,23 @@ class AllEmployeesTasks extends React.Component {
 
     render() {
         const tasks = this.props.tasks.map((task) =>
-                <div className="task" key={task.taskId}>
+                <div className="employeeTask" key={task.taskId}>
                     <div className="profile">
                         <img src="./anon.png" alt="Employee Picture" />
                         <span className="userName">{this.props.employees[task.userId]}</span>
                     </div>
 
-                    <div>
-                        <h3>{task.name}</h3>
+                    <div className="description">
+                        <span className="taskName">{task.name}</span>
                         <p>{task.description}</p>
                     </div>
-                    {this.deadline(task.deadline)}
+                    <span className="deadline">{this.deadline(task.deadline)}</span>
                 </div>
         );
 
         return (
             <div>
-                <h2>Employees' Tasks</h2>
+                <h2 className="sectionTitle">Employees' Tasks</h2>
                 {tasks}
             </div>
         );

@@ -1,0 +1,71 @@
+.employee {
+    background-color: rgb(246, 247, 248);
+    width: 70vw;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 20px;
+    padding: 30px 60px;
+}
+
+.employeeTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.employee h3 {
+    font-size: 40px;
+}
+
+.numTasks {
+    font-size: 40px;
+}
+
+.numTasks span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #646464;
+}
+
+.taskList {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    max-width: 100%;
+}
+
+.task {
+    background-color: white;
+    width: 70%;
+    padding: 20px;
+}
+
+.details {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.taskTitle {
+    font-size: 40px;;
+}
+
+.popUpName {
+    text-decoration: underline;
+}
+
+.popUp form {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.popUp form input {
+    margin-bottom: 10px;
+}
+
+.popUp form input[type=submit] {
+    align-self: flex-end;
+}

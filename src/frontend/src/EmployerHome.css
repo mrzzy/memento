@@ -1,0 +1,44 @@
+.sectionTitle {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #646464;
+    margin-left: 10vw;
+}
+
+.employeeTask {
+    background-color: rgb(246, 247, 248);
+    width: 70vw;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 20px;
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    padding: 30px 60px;
+}
+
+.profile {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.userName {
+    font-size: 30px;
+}
+
+.taskName {
+    font-size: 40px;
+    letter-spacing: 2px;
+}
+
+.description {
+    width: 50%;
+}
+
+.deadline {
+    font-size: 40px;
+}
+

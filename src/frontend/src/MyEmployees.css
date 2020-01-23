@@ -59,6 +59,7 @@
 .details {
     display: inline-flex;
     flex-direction: column;
+    width: 70%;
 }
 
 .taskTitle {

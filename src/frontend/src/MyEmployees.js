@@ -79,8 +79,7 @@ class MyEmployees extends React.Component {
         this.setState({ activated: employee["userId"] });
     }
 
-    addTask = (employee, e) => {
-        console.log("addTask was called for " + employee["name"]);
+    addTaskPopUp = (employee, e) => {
         this.setState({
             popUp: <AddEmployeeTask employeeId={employee["userId"]} name={employee["name"]} cancelPopUp={this.cancelPopUp} />
         })
@@ -110,7 +109,7 @@ class MyEmployees extends React.Component {
                             name={employee["name"]}
                             employeeId={employee["userId"]}
                             showMore={this.showMore.bind(null, employee)}
-                            addTask={this.addTask.bind(null, employee)}
+                            addTaskPopUp={this.addTaskPopUp.bind(null, employee)}
                             showTasks={(this.state.activated == employee["userId"]) ? true : false} />
                     )}
                 </div>
@@ -195,7 +194,7 @@ class Employee extends React.Component {
 
     render() {
         const tasks = this.props.tasks.map((task) =>
-            <div className="task" key={task.taskId}>
+            <div className="aTask" key={task.taskId}>
                 <div className="details">
                     <span className="taskTitle">{task.name}</span>
                     <span className="taskDesc">{task.description}</span>
@@ -213,8 +212,8 @@ class Employee extends React.Component {
                 </div>
 
                 {(this.props.showTasks) ?
-                    <div className="taskList">
-                        <button onClick={this.props.addTask}>Add Task</button>
+                    <div className="aTaskList">
+                        <button onClick={this.props.addTaskPopUp}>Add Task</button>
                         {tasks}
                     </div> :
                     null}

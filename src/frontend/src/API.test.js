@@ -51,7 +51,7 @@ describe("API", () => {
     
 
     
-    // test crud on auth api
+    // test crud on org api
     describe("#query(type, params)", () => {
         it("should get orgs ids", async () => {
             const orgIds = await api.query("org", {"limit": 1, "skip": 0});

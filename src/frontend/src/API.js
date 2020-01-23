@@ -54,19 +54,19 @@ export default class API {
 
     // returns true if given type is supported, otherwise false
     supports(type)  {
-        for(let types of Object.values(this.apiMap)) {
-            if(types.includes(type)) {
-                return true
+        for(let [service, types] of Object.entries(this.apiMap)) {
+            if(types.includes(type) ) {
+                // don't support calling auth api directly
+                if(service === "auth") return false; 
+                return true;
             }
         }
-        return false
+        return false;
     }
 
     // build object url 
     // type - type of object to build. Must be supported
     objectUrl(type) {
-        // check object type supported
-        assert(this.supports(type));
         // map type to service
         for(let [service, types] of Object.entries(this.apiMap)) {
             if(types.includes(type)) {
@@ -97,11 +97,17 @@ export default class API {
     // password - password of the user
     // returns true if login success, false otherwise
     async login(username, password) {
-        const response =  await this.post("login", {
-            "username": username,
-            "password": password
-        })
-        
+        var response = await fetch(this.objectUrl("login"),{
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ "username": username, "password": password})
+        });
+        response = await response.json();
+
         if(response.refreshToken != null) {
             this.setState({"refreshToken": response.refreshToken});
             return true;
@@ -134,7 +140,7 @@ export default class API {
             this.setState({"accessToken": response.accessToken});
             // auto expire access token
             setTimeout(() => {
-                this.state.accessToken = nullj
+                this.setState({"accessToken": accessToken});
             }, 4 * 60 * 1000);
             return true;
         } else {
@@ -170,6 +176,9 @@ export default class API {
     // type - type of object to query
     // params - query parameters to pass on query
     async query(type, params={}) {
+        // check object type supported
+        assert(this.supports(type));
+
         // build query url
         const queryParams = this.convertUrl(params);
         const queryUrl = `${this.objectUrl(type)}s${queryParams}`;
@@ -183,6 +192,9 @@ export default class API {
     // type - type of object to get
     // id - id of the object to get
     async get(type, id) {
+        // check object type supported
+        assert(this.supports(type));
+
         const objUrl = `${this.objectUrl(type)}/${id}`;
     
         // perform get request
@@ -196,11 +208,14 @@ export default class API {
         return await response.json();
     }
 
-    // post object
+    // create  object
     // type - type of object to create
     // params - params to pass to create object
     // returns api response
     async post(type, params) {
+        // check object type supported
+        assert(this.supports(type));
+
         // perform create request 
         this.refresh();
         const response = await fetch(this.objectUrl(type), this.attachToken({
@@ -222,6 +237,9 @@ export default class API {
     // params - params to pass to update object
     // returns api response
     async update(type, id, params) {
+        // check object type supported
+        assert(this.supports(type));
+
         const objUrl = `${this.objectUrl(type)}/${id}`;
 
         // perform update request 
@@ -244,6 +262,9 @@ export default class API {
     // id - id of the object to delete 
     // returns api response
     async delete(type, id) {
+        // check object type supported
+        assert(this.supports(type));
+
         // perform delete request
         const objUrl = `${this.objectUrl(type)}/${id}`;
         this.refresh();

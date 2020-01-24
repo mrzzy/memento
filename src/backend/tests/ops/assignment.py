@@ -52,6 +52,7 @@ class TestAssigmentOps(TestCase):
         self.assertEqual(query_tasks(), [task_id])
         self.assertEqual(query_tasks(pending=False), [])
         self.assertEqual(query_tasks(due_by=task_deadline), [task_id])
+        self.assertEqual(query_tasks(for_day=datetime.today()), [task_id])
         self.assertEqual(query_tasks(assignee_id=worker_id), [task_id])
 
         update_task(task_id, name="cook")
@@ -88,6 +89,7 @@ class TestAssigmentOps(TestCase):
         self.assertEqual(query_events(), [event_id])
         self.assertEqual(query_events(pending=False), [event_id])
         self.assertEqual(query_events(due_by=event_start_time), [event_id])
+        self.assertEqual(query_events(for_day=datetime.today()), [event_id])
         self.assertEqual(query_events(assignee_id=worker_id), [event_id])
 
         update_event(event_id, name="cooking competition")
@@ -122,6 +124,7 @@ class TestAssigmentOps(TestCase):
         assign = get_assign(assign_id)
         self.assertEqual(assign["assigneeId"], worker_id)
         self.assertEqual(query_assigns(), [assign_id])
+        self.assertEqual(query_assigns(for_day=datetime.today()), [assign_id])
         self.assertEqual(query_assigns(pending=False,
                                        due_by=datetime.utcnow()), [])
 

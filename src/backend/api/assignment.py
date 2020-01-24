@@ -37,9 +37,12 @@ def route_tasks():
     if not due_by is None: due_by = parse_datetime(due_by)
     assignee_id = request.args.get("assignee", None)
     if not assignee_id is None: assignee_idf = int(assignee_id)
+    for_day = request.args.get("for-day", None)
+    if not for_day is None: for_day = parse_datetime(for_day)
 
     # perform query
-    task_ids = query_tasks(pending, started, author_id, due_by, skip, limit, assignee_id)
+    task_ids = query_tasks(pending, started, author_id, due_by, skip, limit,
+                           assignee_id, for_day)
     return jsonify(task_ids)
 
 # api - read, create, update, delete tasks
@@ -93,11 +96,16 @@ def route_events():
     if not pending is None: pending = parse_bool(pending)
     due_by = request.args.get("limit-by", None)
     if not due_by is None: due_by = parse_datetime(due_by)
+    due_by = request.args.get("due-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
     assignee_id = request.args.get("assignee", None)
     if not assignee_id is None: assignee_idf = int(assignee_id)
+    for_day = request.args.get("for-day", None)
+    if not for_day is None: for_day = parse_datetime(for_day)
 
     # perform query
-    event_ids = query_events(pending, author_id, due_by, skip, limit, assignee_id)
+    event_ids = query_events(pending, author_id, due_by, skip, limit, assignee_id,
+                             for_day)
     return jsonify(event_ids)
 
 # api - read, create, update, delete events
@@ -155,10 +163,12 @@ def route_assigns():
     if not pending is None: pending = parse_bool(pending)
     due_by = request.args.get("due-by", None)
     if not due_by is None: due_by = parse_datetime(due_by)
+    due_by = request.args.get("due-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
 
     # perform query
     assign_ids = query_assigns(kind, item_id, assignee_id, assignee_id,
-                               pending, due_by, skip, limit)
+                               pending, due_by, skip, limit, for_day)
     return jsonify(assign_ids)
 
 # api - read, create, update, delete assignments

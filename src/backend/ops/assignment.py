@@ -18,11 +18,12 @@ from ..api.error import NotFoundError
 # started - show only tasks that are currently started 
 # author_id - show only tasks created by author with given user id 
 # due_by - show only tasks that are due before given due_by
+# for_day - show only tasks that are due for the given date
 # skip - skip the first skip tasks
 # limit - output ids limit to the first limit tasks
 # assignee_id - show only tasks assigned to the user with the given user id
 def query_tasks(pending=None, started=None, author_id=None, due_by=None, skip=0,
-                limit=None, assignee_id=None):
+                limit=None, assignee_id=None, for_day=None):
     task_ids = Task.query.with_entities(Task.id)
     # apply filters
     if not pending is None:
@@ -37,7 +38,11 @@ def query_tasks(pending=None, started=None, author_id=None, due_by=None, skip=0,
         task_ids = task_ids.join(Assignment, (Task.id == Assignment.item_id)
                                  & (Assignment.kind == Assignment.Kind.Task))
         task_ids = task_ids.filter(Assignment.assignee_id == assignee_id)
-
+    if not for_day is None:
+        begin_day = for_day.replace(hour=0, minute=0, second=0)
+        end_day = for_day.replace(hour=23, minute=59, second=59)
+        task_ids = task_ids.filter(Task.deadline >= begin_day,
+                                   Task.deadline <= end_day)
     # apply skip & limit
     task_ids = [ i[0] for  i in task_ids ]
     task_ids = apply_bound(task_ids, skip, limit)
@@ -115,11 +120,12 @@ def delete_task(task_id):
 # pending - show only pending events
 # author_id - show only events created by author with given user id
 # due_by - show only events that have to be attended before and at due_by
+# for_day - show only events that are due for the given date
 # skip - skip the first skip events
 # limit - output ids limit to the first limip events
 # assignee_id - show only events that are assigned to the user with user id
 def query_events(pending=None, author_id=None, due_by=None, skip=0, limit=None,
-                 assignee_id=None):
+                 assignee_id=None, for_day=None):
     # apply filters
     event_ids = Event.query.with_entities(Event.id)
     if not pending is None:
@@ -131,6 +137,11 @@ def query_events(pending=None, author_id=None, due_by=None, skip=0, limit=None,
     if not author_id is None: event_id = event_ids.filter_by(author_id=author_id)
     if not due_by is None:
         event_ids = event_ids.filter(Event.start_time <= due_by)
+    if not for_day is None:
+        begin_day = for_day.replace(hour=0, minute=0, second=0)
+        end_day = for_day.replace(hour=23, minute=59, second=59)
+        event_ids = event_ids.filter(Event.start_time >= begin_day,
+                                     Event.start_time <= end_day)
     if not assignee_id is None:
         event_ids = event_ids.join(Assignment, (Event.id == Assignment.item_id)
                                    & (Assignment.kind == Assignment.Kind.Event))
@@ -206,10 +217,11 @@ def delete_event(event_id):
 # assignee_id - show only assignments assigned to user with assignee_id
 # pending - show only assignments with items that are pending
 # due_by - show only assignments with items that relevant before due_by
+# for_day - show only assigns that are due for the given date
 # skip - skip the first skip assignments
 # limit - output ids limit to the first limit assignments
 def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None,
-                  pending=None, due_by=None, skip=0, limit=None):
+                  pending=None, due_by=None, skip=0, limit=None, for_day=None):
     assign_ids = Assignment.query.with_entities(Assignment.id)
     # apply filters
     if not kind is None: assign_ids = assign_ids.filter_by(kind=kind)
@@ -238,7 +250,15 @@ def query_assigns(kind=None, item_id=None, assigner_id=None, assignee_id=None,
             assign_ids = assign_ids.filter(Task.deadline <= due_by)
             # event assignments
             assign_ids = assign_ids.filter(Event.start_time <= due_by)
-
+        if not for_day is None:
+            begin_day = for_day.replace(hour=0, minute=0, second=0)
+            end_day = for_day.replace(hour=23, minute=59, second=59)
+            # tasks assignments
+            assign_ids = assign_ids.filter(Task.deadline >= begin_day,
+                                           Task.deadline <= end_day)
+            # event assignments
+            assign_ids = assign_ids.filter(Event.start_time >= begin_day,
+                                         Event.start_time <= end_day)
     # apply skip & limit
     assign_ids = [ i[0] for i in assign_ids ]
     return apply_bound(assign_ids, skip, limit)

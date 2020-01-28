@@ -140,7 +140,7 @@ export default class API {
             this.setState({"accessToken": response.accessToken});
             // auto expire access token
             setTimeout(() => {
-                this.setState({"accessToken": accessToken});
+                this.setState({"accessToken": null});
             }, 4 * 60 * 1000);
             return true;
         } else {

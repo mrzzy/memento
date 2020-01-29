@@ -40,7 +40,7 @@ def parse_options():
 async def subscribe_channel(api_host, channel_id, is_secure):
     # build subscribe url
     protocol = "wss" if is_secure else "ws"
-    subscribe_url = f"{protocol}://{api_host}/api/v0/notification/subscribe"
+    subscribe_url = f"{protocol}://{api_host}/api/v1/notification/subscribe"
     if not channel_id is None:
         subscribe_url += f"?channel={channel_id}"
 

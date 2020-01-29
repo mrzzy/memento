@@ -8,11 +8,11 @@ import time
 import json
 import asyncio
 import argparse
+import display
 import websockets
 
 from datetime import datetime,timedelta
 from dateutil.parser import parse as parse_datetim
-from display import displaymsg
 
 FAILURE_THRESHOLD = 3
 
@@ -38,7 +38,12 @@ def parse_options():
         "is_secure": args.is_secure
     }
 
-async def subscribe_channel(api_host, channel_id, is_secure):
+# subscribe to get notifications form the specified channel
+# api_host - host hasing the api server
+# channel_id - host hashing the api 
+# is_secure - secure hosting
+# handler - handler function called to handle incomping notifications
+async def subscribe_channel(api_host, channel_id, is_secure, handler):
     # build subscribe url
     protocol = "wss" if is_secure else "ws"
     subscribe_url = f"{protocol}://{api_host}/api/v1/notification/subscribe"
@@ -64,25 +69,32 @@ async def subscribe_channel(api_host, channel_id, is_secure):
                 # read notifications from serve
                 notify_json = await socket.recv()
                 notify = json.loads(notify_json)
-                print(f"recieved notification {notify['title']}")
-                print(f"recieved notification {notify['title']}")
-                displaymsg()
+                # handle notify with handler
+                handle_notify(notify)
 
                 # reset failure counter
                 n_failure = 0
 
         except Exception as e:
+            print(e)
             n_failure += 1
             print(f"failure {n_failure}: could not not connect.")
             time.sleep(1)
 
     if n_failure >= 3: print("could not connect: giving up.")
 
+
+# handler to handle incoming notifications
+def handle_notify(notify):
+    print(f"recieved notification {notify['title']}")
+    display.show(f"{notify['title']}: {notify['description']}")
+
 async def main():
     options = parse_options()
     await subscribe_channel(options["api_host"],
                             options["channel_id"],
-                            options["is_secure"])
+                            options["is_secure"],
+                            handle_notify)
 
 # setup async event loop
 event_loop = asyncio.get_event_loop().run_until_complete(main())

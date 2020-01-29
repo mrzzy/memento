@@ -10,7 +10,7 @@ import assert from "assert";
 
 describe("API", () => {
     const api = new API(); 
-    let orgId;
+    let orgId, userId;
 
     // create required objects for testing
     describe("#post(type, params)", () => {
@@ -30,6 +30,7 @@ describe("API", () => {
                 "orgId": orgId
             })
             assert(response.id);
+            userId = response.id;
         });
     });
 
@@ -42,6 +43,13 @@ describe("API", () => {
         });
     });
     
+    describe("#authCheck()", () => {
+        it("show perform auth token check", async () => {
+            const loggedInUserId = await api.authCheck();
+            assert(loggedInUserId == userId);
+        });
+    });
+    
     describe("#refresh(username, password)", () => {
         it("show perform access token refresh", async () => {
             const hasRefresh = await api.refresh();
@@ -49,7 +57,6 @@ describe("API", () => {
         });
     });
     
-
     
     // test crud on org api
     describe("#query(type, params)", () => {
@@ -81,6 +88,20 @@ describe("API", () => {
             const orgIds = await api.query("org", {"limit": 1, "skip": 0});
             const response = await api.delete("org", orgIds[0]);
             assert(response.success);
+        });
+    });
+    
+    // logout
+    describe("#logout()", () => {
+        it("should failed as unauthorised", async() => {
+            api.logout();
+            var hasError = false;
+            try {
+                await api.get("org", 0);
+            } catch(error) {
+                hasError = true;
+            }
+            assert(hasError);
         });
     });
 });

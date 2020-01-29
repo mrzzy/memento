@@ -39,19 +39,17 @@ def route_login():
 @auth.route(f"/api/v{API_VERSION}/auth/refresh", methods=["GET"])
 @authenticate(kind="refresh")
 def route_refresh():
-    # extract user id from refresh token
-    auth_header = request.headers.get("Authorization", "")
-    _, refresh_jwt_token = auth_header.split()
-    refresh_token = Token.from_jwt(refresh_jwt_token)
-
+    refresh_token = extract_token(request)
     # generate access token
     access_jwt_token = Token("access", refresh_token.user_id).to_jwt()
 
     return jsonify({"accessToken": access_jwt_token })
 
 # api route to verify if token is valid
+# GET - check if the given token is valid
+# responses with user id with user currently authenticated as  if valid
 @auth.route(f"/api/v{API_VERSION}/auth/check", methods=["GET"])
-@authenticate(kind="refresh")
+@authenticate(kind="any")
 def route_check():
-    return jsonify({"success": True})
-
+    token = extract_token(request)
+    return jsonify({"success": True, "userId": token.user_id})

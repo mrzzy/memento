@@ -49,7 +49,6 @@ describe("API", () => {
         });
     });
     
-
     
     // test crud on org api
     describe("#query(type, params)", () => {
@@ -81,6 +80,16 @@ describe("API", () => {
             const orgIds = await api.query("org", {"limit": 1, "skip": 0});
             const response = await api.delete("org", orgIds[0]);
             assert(response.success);
+        });
+    });
+    
+    // logout
+    describe("#logout()", () => {
+        it("should failed as unauthorised", async() => {
+            api.logout();
+            const response = await api.get("org", 0);
+            console.log(response.error);
+            assert(response.error === "unauthorised");
         });
     });
 });

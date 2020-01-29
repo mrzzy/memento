@@ -116,6 +116,14 @@ export default class API {
         }
     }
     
+    // perform logout by removing session tokens (access & refresh)
+    logout() {
+        this.setState({
+            "accessToken": null,
+            "refreshToken": null
+        });
+    }
+    
     // attempts to refresh the access token using the refreshToken
     // only refreshes the access token once it expires
     // if no refreshToken is available does nothing

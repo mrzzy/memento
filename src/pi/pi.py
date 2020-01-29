@@ -12,6 +12,7 @@ import websockets
 
 from datetime import datetime,timedelta
 from dateutil.parser import parse as parse_datetim
+from display import displaymsg
 
 FAILURE_THRESHOLD = 3
 
@@ -64,6 +65,9 @@ async def subscribe_channel(api_host, channel_id, is_secure):
                 notify_json = await socket.recv()
                 notify = json.loads(notify_json)
                 print(f"recieved notification {notify['title']}")
+                print(f"recieved notification {notify['title']}")
+                displaymsg()
+
                 # reset failure counter
                 n_failure = 0
 
@@ -73,7 +77,6 @@ async def subscribe_channel(api_host, channel_id, is_secure):
             time.sleep(1)
 
     if n_failure >= 3: print("could not connect: giving up.")
-
 
 async def main():
     options = parse_options()

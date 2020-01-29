@@ -3,6 +3,7 @@ import './App.css';
 import './EmployerHome.css';
 import { NavigationEmployer } from './Navigation';
 import { Redirect } from 'react-router-dom';
+import API from './API';
 
 // Dummy data.
 
@@ -49,7 +50,7 @@ class EmployerHome extends React.Component {
 
             let today = new Date();
 
-            if (taskDeadline.getDate() == today.getDate())
+            if (taskDeadline.getDate() === today.getDate())
                 filteredTasks.push(tasks[i])
         }
 
@@ -61,11 +62,8 @@ class EmployerHome extends React.Component {
     }
 
     render() {
-        if (sessionStorage.getItem("role") === "employee")
-            return <Redirect to="/employee" />
-
-        else if (sessionStorage.getItem("role") === "")
-            return <Redirect to="/" />
+        if (this.state.api.state.accessToken === null)
+            return <Redirect to='/' />
 
         return (
             <div>
@@ -139,7 +137,7 @@ class AllEmployeesTasks extends React.Component {
         let mili = Date.parse(dateString);
         date.setMilliseconds(mili);
         let minutes = date.getMinutes().toString();
-        if (minutes.length == 1)
+        if (minutes.length === 1)
             minutes = "0" + minutes;
         let deadline = "" + date.getHours() + ":" + minutes;
         return deadline;
@@ -149,7 +147,7 @@ class AllEmployeesTasks extends React.Component {
         const tasks = this.props.tasks.map((task) =>
                 <div className="employeeTask" key={task.taskId}>
                     <div className="profile">
-                        <img src="./anon.png" alt="Employee Picture" />
+                        <img src="./anon.png" alt="Employee Profile Pic" />
                         <span className="userName">{this.props.employees[task.userId]}</span>
                     </div>
 

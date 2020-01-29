@@ -15,9 +15,9 @@ export default class API {
     constructor() {
         // load config from environment 
         dotenv.config();
-        this.apiHost = process.env.BACKEND_API_HOST || "backend:5000";
+        this.apiHost = process.env.BACKEND_API_HOST || "memento.mrzzy.co";
         this.apiVersion = 1
-        this.protocol = process.env.BACKEND_API_PROTOCOL || "http";
+        this.protocol = process.env.BACKEND_API_PROTOCOL || "https";
         // check protocol support
         assert(this.protocol === "http" || this.protocol === "https");
         // build api root url from configuration

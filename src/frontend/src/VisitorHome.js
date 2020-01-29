@@ -2,14 +2,18 @@ import React from 'react';
 import './App.css';
 import { NavigationVisitor } from './Navigation';
 import { Redirect } from 'react-router-dom';
+import API from './API';
 
 class VisitorHome extends React.Component {
-    render() {
-        if (sessionStorage.getItem("role") === "employee")
-            return <Redirect to='/employee' />
+    constructor() {
+        super();
+        const api = new API();
+        this.state = { api: api };
+    }
 
-        else if (sessionStorage.getItem("role") === "employer")
-            return <Redirect to='/employer' />
+    render() {
+        if (this.state.api.state.accessToken !== null)
+            return <Redirect to='/employee' />
 
         return (
             <div>

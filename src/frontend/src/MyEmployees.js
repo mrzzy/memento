@@ -3,27 +3,10 @@ import './App.css';
 import './MyEmployees.css';
 import { NavigationEmployer } from './Navigation';
 import { Redirect } from 'react-router-dom';
+import API from './API';
 
 // Dummy data.
-
-// Task object
-/*
-{
-    "authorId": {{supervisor_id}},
-    "completed": true,
-    "deadline": "2099-11-11T11:51:53.334Z",
-    "description": "Complete the fishing quota by going fishing",
-    "duration": 3600,
-    "name": "fishing"
-}
- * */
-
-/* Employee Object
- * "userId": {{employee_id}}
- * "name": Joel
- */
-
-// date object with new Date(0), setMiliseconds to Date.parse("ISOstring")
+// Converting from ISOString to date object. new Date(0), setMiliseconds to Date.parse("ISOstring")
 
 var myemployees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }, { userId: 3, name: "Jessie" }, { userId: 4, name: "Guhesh" }];
 var tasks = [
@@ -67,7 +50,7 @@ class MyEmployees extends React.Component {
 
             let today = new Date();
 
-            if (taskDeadline.getDate() == today.getDate()) {
+            if (taskDeadline.getDate() === today.getDate()) {
                 filteredTasks.push(tasks[i]);
                 if (employeeToTask[tasks[i].userId] === undefined) {
                     employeeToTask[tasks[i].userId] = [tasks[i]]
@@ -149,11 +132,8 @@ class MyEmployees extends React.Component {
     }
 
     render() {
-        if (sessionStorage.getItem("role") === "employee")
-            return <Redirect to="/employee" />
-
-        else if (sessionStorage.getItem("role") === "")
-            return <Redirect to="/" />
+        if (this.state.api.state.accessToken === null)
+            return <Redirect to='/' />
 
         return (
             <div>
@@ -169,7 +149,7 @@ class MyEmployees extends React.Component {
                             employeeId={employee["userId"]}
                             showMore={this.showMore.bind(null, employee)}
                             addTaskPopUp={this.addTaskPopUp.bind(null, employee)}
-                            showTasks={(this.state.activated == employee["userId"]) ? true : false} />
+                            showTasks={(this.state.activated === employee["userId"]) ? true : false} />
                     )}
                 </div>
                 {this.state.popUp}
@@ -241,7 +221,7 @@ class Employee extends React.Component {
         let mili = Date.parse(dateString);
         date.setMilliseconds(mili);
         let minutes = date.getMinutes().toString();
-        if (minutes.length == 1)
+        if (minutes.length === 1)
             minutes = "0" + minutes;
         let deadline = "" + date.getHours() + ":" + minutes;
         return deadline;
@@ -265,7 +245,7 @@ class Employee extends React.Component {
         return (
             <div onClick={this.props.showMore} className="employee">
                 <div className="employeeTop">
-                    <img src="./anon.png" alt="Employee Picture" />
+                    <img src="./anon.png" alt="Employee Profile Pic" />
                     <h3>{this.props.name}</h3>
                     <span className="numTasks">{this.props.tasks.length} Task(s) <span>left</span></span>
                 </div>

@@ -4,6 +4,9 @@ import './App.css';
 import { NavigationEmployee } from './Navigation';
 import { Redirect } from 'react-router-dom';
 
+import API from './API';
+import APIHelpers from './APIHelpers';
+
 /* ----------------DUMMY DATA.---------------- */
 // Used for testing when the server is down
 const dummyTaskList = [
@@ -65,9 +68,10 @@ class EmployeeHome extends React.Component {
         super();
         this.state = { taskList: [] }
         this.taskListElement = React.createRef();
+        const api = new API();
         /* To use for testing when the server is down
          * uncomment to see website with tasks */
-        this.state = { taskList: dummyTaskList }
+        this.state = { taskList: dummyTaskList, api: api, apiHelpers: new APIHelpers(api) };
     }
 
     componentDidMount() {
@@ -80,10 +84,7 @@ class EmployeeHome extends React.Component {
     }
 
     render() {
-        if (sessionStorage.getItem("role") === "employer")
-            return <Redirect to='/employer' />
-
-        if (sessionStorage.getItem("role") === "")
+        if (this.state.api.state.accessToken === null)
             return <Redirect to='/' />
 
         return (

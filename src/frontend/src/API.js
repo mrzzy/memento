@@ -117,11 +117,29 @@ export default class API {
     }
     
     // perform logout by removing session tokens (access & refresh)
+    // does nothing if not already logged in
     logout() {
         this.setState({
             "accessToken": null,
             "refreshToken": null
         });
+    }
+
+    // check if api is currently authenticated with the api server.
+    // Returns the user id of the user that we are logged in as 
+    // or null if not logged in.
+    async authCheck() {
+        var response = await fetch(this.objectUrl("check"),{
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+                "Authorization": `Bearer ${this.state.refreshToken}`
+            }
+        });
+        response = await response.json();
+        
+        return (response.success === true) ? response.userId: null;
     }
     
     // attempts to refresh the access token using the refreshToken

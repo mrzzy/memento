@@ -10,7 +10,7 @@ import assert from "assert";
 
 describe("API", () => {
     const api = new API(); 
-    let orgId;
+    let orgId, userId;
 
     // create required objects for testing
     describe("#post(type, params)", () => {
@@ -30,6 +30,7 @@ describe("API", () => {
                 "orgId": orgId
             })
             assert(response.id);
+            userId = response.id;
         });
     });
 
@@ -39,6 +40,13 @@ describe("API", () => {
             const hasLogin = await api.login("joel@gmail.com", "P@$$w0rd");
             assert(hasLogin);
             assert(api.state.refreshToken);
+        });
+    });
+    
+    describe("#authCheck()", () => {
+        it("show perform auth token check", async () => {
+            const loggedInUserId = await api.authCheck();
+            assert(loggedInUserId == userId);
         });
     });
     

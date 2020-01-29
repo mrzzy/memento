@@ -95,9 +95,13 @@ describe("API", () => {
     describe("#logout()", () => {
         it("should failed as unauthorised", async() => {
             api.logout();
-            const response = await api.get("org", 0);
-            console.log(response.error);
-            assert(response.error === "unauthorised");
+            var hasError = false;
+            try {
+                await api.get("org", 0);
+            } catch(error) {
+                hasError = true;
+            }
+            assert(hasError);
         });
     });
 });

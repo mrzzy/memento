@@ -89,6 +89,15 @@ export default class API {
         // store object state for 14 days
         Cookie.set(this.stateCookieName, this.state, { "expires": 14 });
     }
+    
+    // checks the given response for errors
+    // if detected, throws and exception detailing the error
+    async checkResponse(response) {
+        if(response.status != 200) {
+            const body = await response.text();
+            throw `FATAL: API call failed with status code: ${response.status}, response: ${body}`;
+        }
+    }
 
     /* authentication */
     // perform authentication with the given user credentials
@@ -106,6 +115,7 @@ export default class API {
             },
             body: JSON.stringify({ "username": username, "password": password})
         });
+        await this.checkResponse(response);
         response = await response.json();
 
         if(response.refreshToken != null) {
@@ -137,6 +147,7 @@ export default class API {
                 "Authorization": `Bearer ${this.state.refreshToken}`
             }
         });
+        await this.checkResponse(response);
         response = await response.json();
         
         return (response.success === true) ? response.userId: null;
@@ -160,6 +171,7 @@ export default class API {
                 "Authorization": `Bearer ${this.state.refreshToken}`
             }
         });
+        await this.checkResponse(response);
         response = await response.json();
         
         if(response.accessToken != null) {
@@ -211,6 +223,8 @@ export default class API {
         // perform query request
         this.refresh();
         const response = await fetch(queryUrl, this.attachToken({}));
+        await this.checkResponse(response);
+
         return await response.json();
     }
 
@@ -230,6 +244,7 @@ export default class API {
             mode: "cors",
             cache: "no-cache"
         }));
+        await this.checkResponse(response);
 
         return await response.json();
     }
@@ -253,6 +268,7 @@ export default class API {
             },
             body: JSON.stringify(params)
         }));
+        await this.checkResponse(response);
         
         return await response.json();
     }
@@ -279,6 +295,7 @@ export default class API {
             },
             body: JSON.stringify(params)
         }));
+        await this.checkResponse(response);
         
         return await response.json();
     }
@@ -299,6 +316,7 @@ export default class API {
             mode: "cors",
             cache: "no-cache"
         }));
+        await this.checkResponse(response);
         
         return await response.json();
     }

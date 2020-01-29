@@ -6,6 +6,7 @@
 import re
 import time
 import argparse
+import threading
 import luma.core
 import luma.led_matrix
 import gpiozero
@@ -29,5 +30,9 @@ led_display = max7219(led_serial, cascaded=4, block_orientation=-90)
 
 # show the given message on the led display
 # msg - message to show  on the display
-def show(msg):
-    show_message(led_display, msg, fill="white", font=proportional(LCD_FONT),scroll_delay=0.025)
+# speed - speed to show the message
+def show(msg, speed=20):
+    show_fn = (lambda : show_message(led_display, msg, fill="white",
+                                     font=proportional(LCD_FONT),
+                                     scroll_delay=1/speed))
+    threading.Thread(target=show_fn).start()

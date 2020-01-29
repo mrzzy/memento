@@ -8,7 +8,9 @@ import time
 import json
 import asyncio
 import argparse
+import threading
 import display
+import buzzer
 import websockets
 
 from datetime import datetime,timedelta
@@ -88,6 +90,7 @@ async def subscribe_channel(api_host, channel_id, is_secure, handler):
 def handle_notify(notify):
     print(f"recieved notification {notify['title']}")
     display.show(f"{notify['title']}: {notify['description']}")
+    buzzer.play()
 
 async def main():
     options = parse_options()

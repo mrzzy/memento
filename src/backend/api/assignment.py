@@ -163,8 +163,8 @@ def route_assigns():
     if not pending is None: pending = parse_bool(pending)
     due_by = request.args.get("due-by", None)
     if not due_by is None: due_by = parse_datetime(due_by)
-    due_by = request.args.get("due-by", None)
-    if not due_by is None: due_by = parse_datetime(due_by)
+    for_day = request.args.get("for-day", None)
+    if not for_day is None: for_day = parse_datetime(for_day)
 
     # perform query
     assign_ids = query_assigns(kind, item_id, assignee_id, assignee_id,

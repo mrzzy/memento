@@ -13,42 +13,33 @@ from ..app import db
 
 # defines a channel where notifications are sent
 class Channel(db.Model):
-    # kinds/types
-    class Kind:
-        Task = "task"
-        Event = "event"
-        Notice = "notice"
-
     # model fields
-    id = db.Column(db.Integer, primary_key=True)
-    kind = db.Column(db.String(64), nullable=False)
+    id = db.Column(db.String, primary_key=True)
     # relationships
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    # enforce that only one channel be created for each user
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False)
     notifications = db.relationship("Notification", backref=db.backref("channel"),
                                     lazy=True)
 
-    @validates('kind')
-    def validate_kind(self, key, kind):
-        kind_list = [Channel.Kind.Task,
-                     Channel.Kind.Event,
-                     Channel.Kind.Notice]
-        if not kind:
-            raise AssertionError("kind must not be empty")
-        elif kind not in kind_list:
-            raise AssertionError('Enter either Event , Task or Notice')
-        else:
-            return kind
+    # generates a unique str representation of the channel based on model fields
+    # this string should be used as the model's id on creation
+    # returns a string representation of the channel
+    def __str__(self):
+        return f"user..{self.user_id}"
 
 # defines a notification that is send to a channel
 class Notification(db.Model):
     # model fields
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256), nullable=False)
+    # TODO: add kind field
     description = db.Column(db.String(1024), nullable=True)
     firing_time = db.Column(db.DateTime, nullable=False) # utc timezone
 
+    # TODO: change id type to string and derive id from kind and user_id
+
     # relationships
-    channel_id = db.Column(db.Integer, db.ForeignKey("channel.id"), nullable=True)
+    channel_id = db.Column(db.String, db.ForeignKey("channel.id"), nullable=False)
 
     @validates('title')
     def validate_title (self, key, title):

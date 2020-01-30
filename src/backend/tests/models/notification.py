@@ -17,8 +17,8 @@ from .identity import TestIdentityModels
 class TestNotificationModels(TestCase):
     def create_test_data(self):
         TestIdentityModels.create_test_data(self)
-        self.channel = Channel(kind=Channel.Kind.Notice,
-                               user_id=self.worker.id)
+        self.channel = Channel(user_id=self.worker.id)
+        self.channel.id = str(self.channel)
 
         db.session.add(self.channel)
         db.session.commit()

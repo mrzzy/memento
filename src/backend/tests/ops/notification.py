@@ -27,22 +27,18 @@ class TestsNotficationOps(TestCase):
 
         got_lookup_error = False
         try:
-            get_channel(2)
+            get_channel("")
         except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
         org_id, user_id = self.create_test_data()
-        channel_id = create_channel(Channel.Kind.Notice, user_id)
+        channel_id = create_channel(user_id)
 
         channel = get_channel(channel_id)
         self.assertEqual(channel["userId"], user_id)
         self.assertEqual(query_channels(), [channel_id])
         self.assertEqual(query_channels(pending=True), [])
-
-        update_channel(channel_id, kind=Channel.Kind.Task)
-        channel = get_channel(channel_id)
-        self.assertEqual(channel["kind"], Channel.Kind.Task)
 
         delete_channel(channel_id)
         self.assertEqual(query_tasks(), [])
@@ -59,7 +55,7 @@ class TestsNotficationOps(TestCase):
         self.assertTrue(got_lookup_error)
 
         org_id, user_id = self.create_test_data()
-        channel_id = create_channel(Channel.Kind.Notice, user_id)
+        channel_id = create_channel(user_id)
         notify_id = create_notify("fish", channel_id)
 
         notify = get_notify(notify_id)
@@ -77,7 +73,7 @@ class TestsNotficationOps(TestCase):
 
     def test_subscription(self):
         org_id, user_id = self.create_test_data()
-        channel_id = create_channel(Channel.Kind.Notice, user_id)
+        channel_id = create_channel(user_id)
 
         # define a test handler to run on notificaion
         run_lock = Semaphore()

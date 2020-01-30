@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: df3bda4c82b2
+Revision ID: facbb2862771
 Revises: 
-Create Date: 2020-01-21 04:35:48.082144
+Create Date: 2020-01-30 04:29:29.168961
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'df3bda4c82b2'
+revision = 'facbb2862771'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -60,11 +60,11 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('channel',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('kind', sa.String(length=64), nullable=False),
+    sa.Column('id', sa.String(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id')
     )
     op.create_table('event',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -90,6 +90,7 @@ def upgrade():
     sa.Column('description', sa.String(length=2048), nullable=False),
     sa.Column('deadline', sa.DateTime(), nullable=False),
     sa.Column('duration', sa.BigInteger(), nullable=False),
+    sa.Column('started', sa.Boolean(), nullable=False),
     sa.Column('completed', sa.Boolean(), nullable=False),
     sa.Column('author_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['author_id'], ['user.id'], ),
@@ -100,7 +101,7 @@ def upgrade():
     sa.Column('title', sa.String(length=256), nullable=False),
     sa.Column('description', sa.String(length=1024), nullable=True),
     sa.Column('firing_time', sa.DateTime(), nullable=False),
-    sa.Column('channel_id', sa.Integer(), nullable=True),
+    sa.Column('channel_id', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['channel_id'], ['channel.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

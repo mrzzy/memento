@@ -6,7 +6,6 @@
 
 # defines the mapping from channel model fields to json api representation
 channel_mapping = [
-    ("kind", "kind"),
     ("user_id", "userId")
 ]
 

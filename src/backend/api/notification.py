@@ -38,10 +38,10 @@ def route_channels():
     channel_ids = query_channels(user_id, pending, skip, limit)
     return jsonify(channel_ids)
 
-# api - read, create, update, delete channels
+# api - read, create, delete channels
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/channel", methods=["POST"])
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/channel/<channel_id>",
-              methods=["GET", "PATCH", "DELETE"])
+              methods=["GET", "DELETE"])
 @authenticate(kind="access")
 def route_channel(channel_id=None):
     if request.method == "GET" and channel_id:
@@ -53,12 +53,6 @@ def route_channel(channel_id=None):
         params = parse_params(request, channel_mapping)
         channel_id = create_channel(**params)
         return jsonify({ "id": channel_id })
-    elif request.method == "PATCH" and channel_id and request.is_json:
-        # parse params in json
-        params = parse_params(request, channel_mapping)
-        # update channel with params in json
-        update_channel(channel_id, **params)
-        return jsonify({"success": True })
     elif request.method == "DELETE" and channel_id:
         # delete channel with params in json
         delete_channel(channel_id)
@@ -78,7 +72,7 @@ def route_notifys():
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
     channel_id = request.args.get("channel", None)
-    if not channel_id is None: channel_id = int(channel_id)
+    if not channel_id is None: channel_id = str(channel_id)
 
     # perform query
     notify_ids = query_notifys(pending, channel_id, skip, limit)
@@ -127,7 +121,7 @@ def route_subscribe(socket):
     # parse request args
     channel_id = request.args.get("channel", None)
     if not channel_id is None:
-        channel_ids = [ int(channel_id) ]
+        channel_ids = [ str(channel_id) ]
     else:
         # channel id is not specified, assume all channels
         channel_ids = query_channels()

@@ -48,27 +48,15 @@ def get_channel(channel_id):
     # map fields to dict
     return map_dict(channel, channel_mapping)
 
-# create a channel
-# kind - kind of channel (task/event/notice)
+# create a channel for  user
 # user_id - id of user using this channel
 # returns id the new channel
-def create_channel(kind, user_id):
-    channel = Channel(kind=kind, user_id=user_id)
+def create_channel(user_id):
+    channel = Channel(user_id=user_id)
+    channel.id = str(channel)
     db.session.add(channel)
     db.session.commit()
     return channel.id
-
-# update channel with channel_id
-# kind - kind of channel (task/event/notice)
-# user_id - id of user using this channel
-# throws NotFoundError if no channel with channel_id is found
-def update_channel(channel_id, kind=None, user_id=None):
-    channel = Channel.query.get(channel_id)
-    if channel is None: raise NotFoundError
-    # update channel fields
-    if not kind is None: channel.kind = kind
-    if not user_id is None: channel.user_id = user_id
-    db.session.commit()
 
 # delete the channel with the given channel id
 # also cascade deletes any dependent objects

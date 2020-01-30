@@ -2450,7 +2450,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v1/assignment/tasks?author={{supervisor_id}}&pending=1",
+							"raw": "http://{{api_host}}/api/v1/assignment/tasks?author={{supervisor_id}}&started=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -2467,7 +2467,7 @@
 									"value": "{{supervisor_id}}"
 								},
 								{
-									"key": "pending",
+									"key": "started",
 									"value": "1"
 								}
 							]
@@ -2567,7 +2567,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"authorId\": {{supervisor_id}},\n    \"completed\": true,\n    \"deadline\": \"2099-11-11T11:51:53.334Z\",\n    \"description\": \"Complete the fishing quota by going fishing\",\n    \"duration\": 3600,\n    \"name\": \"fishing\"\n}",
+							"raw": "{\n    \"authorId\": {{supervisor_id}},\n    \"completed\": true,\n    \"started\": true,\n    \"deadline\": \"2099-11-11T11:51:53.334Z\",\n    \"description\": \"Complete the fishing quota by going fishing\",\n    \"duration\": 3600,\n    \"name\": \"fishing\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3490,7 +3490,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"task\",\n\t\"userId\": {{user_id}}\n}",
+							"raw": "{\n\t\"userId\": {{user_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3572,7 +3572,6 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const channel = pm.response.json();",
-									"    assert(channel.kind === \"task\");",
 									"    assert(channel.userId === pm.globals.get(\"user_id\"));",
 									"});",
 									""
@@ -3584,71 +3583,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "http://{{api_host}}/api/v1/notification/channel/{{channel_id}}",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notification",
-								"channel",
-								"{{channel_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update channel",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "460b02f0-32fe-46e9-94e0-a2348cd1dfeb",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"success\"));",
-									"    assert(response.success);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"kind\": \"event\",\n    \"userId\": {{user_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "http://{{api_host}}/api/v1/notification/channel/{{channel_id}}",
 							"protocol": "http",
@@ -3717,7 +3651,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": \"2019-11-15T11:51:23.270Z\",\n\t\"channelId\": {{channel_id}}\n}",
+							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": \"2019-11-15T11:51:23.270Z\",\n\t\"channelId\": \"{{channel_id}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3791,7 +3725,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": null,\n\t\"channelId\": {{channel_id}}\n}",
+							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": null,\n\t\"channelId\": \"{{channel_id}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3838,7 +3772,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v1/notification/notifys?pending=1&channel={{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notifys?channel={{channel_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -3850,10 +3784,6 @@
 								"notifys"
 							],
 							"query": [
-								{
-									"key": "pending",
-									"value": "1"
-								},
 								{
 									"key": "channel",
 									"value": "{{channel_id}}"
@@ -3952,7 +3882,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"cooking task\",\n\t\"description\": \"You have been assigned a cooking task\",\n\t\"firingTime\": \"2099-11-11T11:51:53.334Z\",\n\t\"channelId\": {{channel_id}}\n}",
+							"raw": "{\n\t\"title\": \"cooking task\",\n\t\"description\": \"You have been assigned a cooking task\",\n\t\"firingTime\": \"2099-11-11T11:51:53.334Z\",\n\t\"channelId\": \"{{channel_id}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"

@@ -9,7 +9,7 @@ from ..models.identity import *
 from ..mapping.identity import *
 from .assignment import *
 from ..utils import map_dict, apply_bound
-from .notification import query_channels, delete_channel
+from .notification import create_channel, query_channels, delete_channel
 from ..api.error import NotFoundError
 
 ## Organisation Ops
@@ -209,6 +209,9 @@ def create_user(name, password, email, org_id):
                 email=email, org_id=org_id)
     db.session.add(user)
     db.session.commit()
+
+    # create notification channel for user
+    create_channel(user.id)
 
     return user.id
 

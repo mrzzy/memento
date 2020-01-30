@@ -326,11 +326,11 @@ class AddEmployeeTask extends React.Component {
                 <button onClick={this.props.cancelPopUp}>X</button>
                 <h2>Task For <span className="popUpName">{this.props.name}</span></h2>
                 <form onSubmit={this.props.createTask}>
-                    <input onChange={this.props.onChange} id="taskTitle" type="text" name="taskTitle" placeholder="TITLE" required />
-                    <input onChange={this.props.onChange} id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
-                    <input onChange={this.props.onChange} type="date" name="deadlineDate" required />
-                    <input onChange={this.props.onChange} type="time" id="deadlineTime" name="deadlineTime" min="09:00" max="18:00" required />
-                    <input onChange={this.props.onChange} type="number" name="duration" min="1" max="240" />
+                    <input onChange={this.props.onChange} className="forminput" id="taskTitle" type="text" name="taskTitle" placeholder="TITLE" required />
+                    <input onChange={this.props.onChange} className="forminput" id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
+                    <input onChange={this.props.onChange} className="forminput" type="date" name="deadlineDate" required />
+                    <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" min="09:00" max="18:00" required />
+                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="240" />
                     <input type="submit" value=">" />
                 </form>
             </div>

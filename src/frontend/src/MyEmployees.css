@@ -1,3 +1,10 @@
+
+:root {
+    --main-color: #FFD159;
+    --header-font: 'Montserrat', sans-serif; /*Used as family font*/
+    --regular-font: 'Roboto', sans-serif;
+}
+
 .employee {
     background-color: rgb(246, 247, 248);
     width: 70vw;
@@ -43,6 +50,18 @@
     align-items: flex-end;
     max-width: 100%;
 }
+.taskList button {
+    background-color: #ffda79;
+    border-radius: 10pc;
+    width: 10rem;
+    height: 2rem;
+    border: none;
+    font-weight: 900;
+
+}
+.taskList button:hover{
+    background-color: var(--main-color);
+}
 
 .aTask {
     margin: 0 0 30px 0;
@@ -69,17 +88,52 @@
 .popUpName {
     text-decoration: underline;
 }
-
+.popUp{
+    display: inline-flex;
+    flex-flow: column wrap;
+    justify-content: center;
+}
+.popUp button {
+    align-self: flex-end;
+    border: none;
+    margin-right: 1rem;
+}
 .popUp form {
     display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
 }
+.forminput{
+    border: none;
+    border-bottom: 2px solid #ffda79;
+    margin-left: 2.5rem;
+    width: 80%;
+}
 
 .popUp form input {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .popUp form input[type=submit] {
     align-self: flex-end;
+    border-radius: 100%;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+    border: none;
+    background-color: #ffda79;
+    color: white;
+    margin-right: 1rem;
+}
+
+
+/*outline*/
+.taskList button:focus{
+    outline: none;
+}
+.forminput:focus{
+    outline: none;
+}
+.popUp button:focus {
+    outline: none;
 }

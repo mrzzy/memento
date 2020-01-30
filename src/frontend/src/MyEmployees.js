@@ -4,17 +4,19 @@ import './MyEmployees.css';
 import { NavigationEmployer } from './Navigation';
 import { Redirect } from 'react-router-dom';
 import API from './API';
+import APIHelpers from './APIHelpers';
+import { type } from 'os';
 
 // Dummy data.
 // Converting from ISOString to date object. new Date(0), setMiliseconds to Date.parse("ISOstring")
 
 var myemployees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }, { userId: 3, name: "Jessie" }, { userId: 4, name: "Guhesh" }];
 var tasks = [
-    { taskId: 2, userId: 1, completed: false, deadline: "2020-01-26T11:55:51.569Z", duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
-    { taskId: 3, userId: 3, completed: false, deadline: "2020-01-23T02:20:00.115Z", duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
-    { taskId: 4, userId: 4, completed: false, deadline: "2020-01-23T02:00:00.115Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
-    { taskId: 5, userId: 4, completed: false, deadline: "2020-01-23T03:30:00.115Z", duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
-    { taskId: 6, userId: 4, completed: false, deadline: "2020-01-23T04:20:00.115Z", duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
+    { taskId: 2, userId: 1, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
+    { taskId: 3, userId: 3, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
+    { taskId: 4, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+    { taskId: 5, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
+    { taskId: 6, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
 ];
 
 class MyEmployees extends React.Component {
@@ -23,24 +25,75 @@ class MyEmployees extends React.Component {
         super();
 
         // [filteredTasks, employees, employeeToTask]
-        let details = this.settingUp();
+        //let details = this.settingUp();
+        let details = [[],[],[], []];
+        const api = new API();
+        const apiHelper = new APIHelpers(api);
+        this.createTask = this.createTask.bind(this);
 
         this.state = {
             tasks: details[0],
             employees: details[1],
             employeeToTask: details[2],
-            myemployees: myemployees,
+            myEmployees: details[3],
             activated: -1,
             popUp: null,
-            newTask: {}
+            newTask: {},
+            api: api,
+            apiHelper: apiHelper
         };
     }
 
+    async componentDidMount() {
+        try {
+            const loggedIn = await this.state.api.authCheck();
+
+            this.settingUp(loggedIn)
+                .then(details => {
+                    this.setState({
+                        tasks: details[0],
+                        employees: details[1],
+                        employeeToTask: details[2],
+                        myEmployees: details[3],
+                        userId: loggedIn
+                    });
+                })
+
+        } catch (e) {
+            if (this.state.userId !== null)
+                this.setState({ userId: null });
+        }
+    }
+
     // Obtaining data and sorting it out again
-    settingUp() {
+    async settingUp(loggedIn) {
         let filteredTasks = []; // array of tasks
         let employees = {}; // id: name
         let employeeToTask = {}; // id: task
+
+        const manages = await this.state.api.query("manage", { "manager": loggedIn });
+        const employeeIds = await manages.map((manage) => manage.match(/[0-9]+/)[0]); // returns list of employeeIds
+        let myEmployees = [];
+        for (const id of employeeIds) {
+            let user = await this.state.api.get("user", id)
+            myEmployees.push({ userId: parseInt(id), name: user.name });
+            console.log(myEmployees);
+        }
+
+        let tasks = [];
+        
+        for (const employee of myEmployees) {
+            let taskIds = await this.state.apiHelper.getTasks(employee.userId);
+
+            for (const taskId of taskIds) {
+                let task = await this.state.api.get("task", taskId);
+                task.id = taskId;
+                task.userId = employee.userId;
+                tasks.push(task);
+            }
+
+            console.log(tasks);
+        }
 
         for (let i = 0; i < tasks.length; i++) {
             let stringDate = tasks[i].deadline;
@@ -61,11 +114,11 @@ class MyEmployees extends React.Component {
             }
         }
 
-        for (let i = 0; i < myemployees.length; i++) {
-            employees[myemployees[i]["userId"]] = myemployees[i]["name"];
+        for (let i = 0; i < myEmployees.length; i++) {
+            employees[myEmployees[i].userId] = myEmployees[i].name;
         }
 
-        return [filteredTasks, employees, employeeToTask];
+        return [filteredTasks, employees, employeeToTask, myEmployees];
     }
 
     // change "30-12-2020" to date object
@@ -89,21 +142,24 @@ class MyEmployees extends React.Component {
         this.setState({ newTask: newTask });
     }
 
-    createTask = (employee, e) => {
+    async createTask(employee, e) {
         //{ taskId: 2, userId: 1, completed: false, deadline: ISOString, duration: 3600, name: "", description: "" },
+        // employee.userId
+        e.preventDefault();
         let newTask = {};
-        newTask["completed"] = false;
-        newTask["taskId"] = Math.floor(Math.random() * 100); // testing purposes only
-        newTask["userId"] = employee.userId;
+        //newTask["completed"] = false;
+        //newTask["userId"] = employee.userId;
+        newTask["authorId"] = this.state.userId;
         newTask["deadline"] = this.parseDate(this.state.newTask["deadlineDate"], this.state.newTask["deadlineTime"]).toISOString();
         newTask["duration"] = this.state.newTask["duration"];
         newTask["name"] = this.state.newTask["taskTitle"];
         newTask["description"] = this.state.newTask["taskDesc"];
 
-        tasks.push(newTask);
-        let details = this.settingUp();
+        const responseTask = await this.state.api.post("task", newTask);
+        const newAssign = { kind: "task", itemId: responseTask.id, assigneeId: employee.userId, assignerId: this.state.userId };
+        await this.state.api.post("assign", newAssign);
 
-        e.preventDefault();
+        let details = await this.settingUp(this.state.userId);
 
         this.setState({
             popUp: false,
@@ -132,7 +188,7 @@ class MyEmployees extends React.Component {
     }
 
     render() {
-        if (this.state.api.state.accessToken === null)
+        if (this.state.api.authCheck() === null)
             return <Redirect to='/' />
 
         return (
@@ -141,7 +197,7 @@ class MyEmployees extends React.Component {
                 <h1 className="pagetitle">MY EMPLOYEES</h1>
                 <Calendar />
                 <div>
-                    {this.state.myemployees.map((employee) =>
+                    {this.state.myEmployees.map((employee) =>
                         <Employee
                             key={employee["userId"]}
                             tasks={(this.state.employeeToTask[employee["userId"]] === undefined) ? [] : this.state.employeeToTask[employee["userId"]]}
@@ -233,7 +289,7 @@ class Employee extends React.Component {
 
     render() {
         const tasks = this.props.tasks.map((task) =>
-            <div className="aTask" key={task.taskId}>
+            <div className="aTask" key={task.id}>
                 <div className="details">
                     <span className="taskTitle">{task.name}</span>
                     <span className="taskDesc">{task.description}</span>

@@ -28,11 +28,11 @@ import API from './API';
 
 var myemployees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }, { userId: 3, name: "Jessie" }, { userId: 4, name: "Guhesh" }];
 var tasks = [
-    { taskId: 2, userId: 1, completed: false, deadline: "2020-01-26T11:55:51.569Z", duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
-    { taskId: 3, userId: 3, completed: false, deadline: "2020-01-23T02:20:00.115Z", duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
-    { taskId: 4, userId: 4, completed: false, deadline: "2020-01-23T02:00:00.115Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
-    { taskId: 5, userId: 4, completed: false, deadline: "2020-01-23T03:30:00.115Z", duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
-    { taskId: 6, userId: 4, completed: false, deadline: "2020-01-23T04:20:00.115Z", duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
+    { taskId: 2, userId: 1, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
+    { taskId: 3, userId: 3, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
+    { taskId: 4, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+    { taskId: 5, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
+    { taskId: 6, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
 ];
 
 
@@ -58,11 +58,13 @@ class EmployerHome extends React.Component {
             employees[myemployees[i]["userId"]] = myemployees[i]["name"];
         }
 
-        this.state = { tasks: filteredTasks, employees: employees };
+        const api = new API();
+
+        this.state = { api: api, tasks: filteredTasks, employees: employees };
     }
 
     render() {
-        if (this.state.api.state.accessToken === null)
+        if (this.state.api.authCheck() === null)
             return <Redirect to='/' />
 
         return (

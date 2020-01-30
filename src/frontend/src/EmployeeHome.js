@@ -71,20 +71,53 @@ class EmployeeHome extends React.Component {
         const api = new API();
         /* To use for testing when the server is down
          * uncomment to see website with tasks */
-        this.state = { taskList: dummyTaskList, api: api, apiHelpers: new APIHelpers(api) };
+        // set state: taskList: dummyTaskList, 
+
+        this.state = { taskList: [], api: api, apiHelpers: new APIHelpers(api) };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const self = this;
-        // Default user id for testing.
-        //GETTaskFromUserId(17)
-        //    .then(tasks => {
-        //        self.taskListElement.current.updateAllTasksList(tasks);
-        //    });
+
+        try {
+            let loggedIn = await this.state.api.authCheck();
+            this.setState({ userId: loggedIn });
+        } catch (e) {
+            if (this.state.userId !== null)
+                this.setState({ userId: null });
+        }
+
+        this.setState({ userId: await this.state.api.authCheck() });
+
+        let taskList = await this.getTaskList();
+
+        this.taskListElement.current.updateAllTasksList(taskList);
+    }
+
+    async componentDidUpdate() {
+        // authcheck requires authorisation
+        try {
+            let loggedIn = await this.state.api.authCheck();
+        } catch (e) {
+            if (this.state.userId !== null)
+                this.setState({ userId: null });
+        }
+    }
+
+    async getTaskList() {
+        let taskIds = await this.state.apiHelpers.getTasks(this.state.userId);
+        let taskList = [];
+        for (let i = 0; i < taskIds.length; i++) {
+            let task = await this.state.api.get("task", taskIds[i]);
+            task.id = taskIds[i];
+            taskList.push(task);
+        }
+
+        return taskList
     }
 
     render() {
-        if (this.state.api.state.accessToken === null)
+        if (this.state.userId === null)
             return <Redirect to='/' />
 
         return (
@@ -92,7 +125,7 @@ class EmployeeHome extends React.Component {
                 <NavigationEmployee />
                 <h1 className="pagetitle">HOME</h1>
                 <Calendar />
-                <TaskList allTasksList={this.state.taskList} ref={this.taskListElement} />
+                <TaskList api={this.state.api} allTasksList={this.state.taskList} ref={this.taskListElement} />
             </div>
         );
     }
@@ -147,6 +180,7 @@ class TaskList extends React.Component {
                     allTasksList={this.props.allTasksList}
                     updateCurrentTaskElement={this.updateCurrentTaskElement}
                     secondsToHMS={this.secondsToHMS}
+                    api={this.props.api}
                     ref={this.toDoListElement} />
                 <CurrentTask
                     ref={this.currentTaskElement}
@@ -248,7 +282,12 @@ class ToDoList extends React.Component {
                 this.setState({ allTasksList: tempTaskList, currentTaskNull: true });
 
                 // update the task in the database
-                UpdateTasks(tempTaskList[i]);
+                //UpdateTasks(tempTaskList[i]);
+                let update = tempTaskList[i];
+                delete update.id;
+                delete update.started;
+                update.completed = true;
+                this.props.api.update("task", id, update);
                 break;
             }
         }

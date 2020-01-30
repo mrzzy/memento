@@ -39,5 +39,10 @@ export default class APIHelpers {
         const taskIds = this.api.query("task", {"assignee": userId, "for-day": date});
         return taskIds
     }
-    
+
+    // check if the user specified by the given userId is an employer
+    isEmployer(userId) {
+        const manageIds = this.api.query("manage", {"manager": userId});
+        return manageIds.length > 0;
+    }
 }

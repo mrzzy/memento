@@ -41,8 +41,23 @@ export default class APIHelpers {
     }
 
     // check if the user specified by the given userId is an employer
+    // userId - id of the user to check
     async isEmployer(userId) {
         const manageIds = await this.api.query("manage", {"manager": userId});
         return manageIds.length > 0;
+    }
+
+    // get notification channel for user 
+    // userId - id of the user to check
+    // returns channelId of channel 
+    getChannel(userId) {
+        return `user..${userId}`;
+    }
+    
+    // subscribe to the notification channel for the given user
+    // userId - id of the user, of whose channel to subscribe
+    // handler(notify) - callback called on when on recieve notification
+    subscribeChannel(userId, handler) {
+        this.api.subscribe(this.getChannel(userId), handler);
     }
 }

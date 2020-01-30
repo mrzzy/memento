@@ -8,6 +8,7 @@ import assert from "assert";
 import fetch from "cross-fetch";
 import dotenv from "dotenv";
 import Cookie from "js-cookie";
+import WebSocket from "isomorphic-ws";
 
 // defines an api client to interface with the backend api
 export default class API {
@@ -17,11 +18,18 @@ export default class API {
         dotenv.config();
         this.apiHost = process.env.REACT_APP_BACKEND_API_HOST || "memento.mrzzy.co";
         this.apiVersion = 1
-        this.protocol = process.env.REACT_APP_BACKEND_API_PROTOCOL || "https";
-        // check protocol support
-        assert(this.protocol === "http" || this.protocol === "https");
+        
+        if(process.env.REACT_APP_BACKEND_API_PROTOCOL_SECURE) {
+            this.protocol = "https"
+            this.socketProtocol = "wss";
+        } else {
+            this.protocol = "http";
+            this.socketProtocol = "ws";
+        }
+    
         // build api root url from configuration
         this.apiRoot = `${this.protocol}://${this.apiHost}/api/v${this.apiVersion}`
+        this.socketRoot = `${this.socketProtocol}://${this.apiHost}/api/v${this.apiVersion}`
 
         // object state
         this.stateCookieName = "memento-api-obj-state";
@@ -40,7 +48,7 @@ export default class API {
             "identity": 
             [ "org", "user", "team", "team/assign", "manage", "role", "rolebind"],
             "assignment": ["task", "event", "assign"],
-            "notify": ["notify", "channel"],
+            "notification": ["notify", "channel"],
         };
     }
 
@@ -318,4 +326,32 @@ export default class API {
         return await response.json();
     }
     
+    /* notifications */
+    // subscribe to notifications on the given channel using the given callback
+    // as handler to handle incoming notifications
+    // channelId- id of the channel to subscribe to
+    // handler(notify) - callback called on when on recieve notification
+    subscribe(channelId, handler) {
+        // build websocket url to listen for notifications
+        const listenParams = this.convertUrl({ "channel": channelId });
+        const listenUrl = `${this.socketRoot}/notification/subscribe${listenParams}`;
+        
+        // open websocket to listen for notifications
+        const socket = new WebSocket(listenUrl);
+        socket.onopen = () => {
+            console.log(`API: Listening for notifications on channel: ${channelId}`);
+        };
+    
+        socket.onclose = () => {
+            console.log(`API: Stopped: Listening for notifications on channel: ${channelId}`);
+        }
+    
+        socket.onmessage = (packet) => {
+            // parse notification
+            const notifyJson = packet.data;
+            const notify = JSON.parse(notifyJson);
+            
+            handler(notify);
+        }
+    }
 }

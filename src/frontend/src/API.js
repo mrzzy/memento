@@ -115,7 +115,6 @@ export default class API {
             },
             body: JSON.stringify({ "username": username, "password": password})
         });
-        await this.checkResponse(response);
         response = await response.json();
 
         if(response.refreshToken != null) {
@@ -147,7 +146,6 @@ export default class API {
                 "Authorization": `Bearer ${this.state.refreshToken}`
             }
         });
-        await this.checkResponse(response);
         response = await response.json();
         
         return (response.success === true) ? response.userId: null;
@@ -171,7 +169,6 @@ export default class API {
                 "Authorization": `Bearer ${this.state.refreshToken}`
             }
         });
-        await this.checkResponse(response);
         response = await response.json();
         
         if(response.accessToken != null) {

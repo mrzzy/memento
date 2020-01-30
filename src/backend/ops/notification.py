@@ -117,11 +117,6 @@ def get_notify(notify_id):
     # map fields to dict
     notify_dict = map_dict(notify, notify_mapping)
 
-    # return db connection to pool
-    # required to prevent the connection pool from 
-    # running out of connnections and causing timeouts
-    db.session.remove()
-
     return notify_dict
 
 # create an notification

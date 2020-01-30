@@ -9,6 +9,7 @@ from datetime import datetime
 from flask import request, Blueprint, jsonify
 from sqlalchemy.exc import IntegrityError
 from dateutil.parser import parse as parse_datetime
+from geventwebsocket.exceptions import WebSocketError
 
 from ..utils import parse_bool
 from .utils import parse_params
@@ -147,10 +148,19 @@ def route_subscribe(socket):
             # add "Z" to signal utc timezone
             notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
             # send notification to client
-            socket.send(json.dumps(notify))
+            try:
+                socket.send(json.dumps(notify))
+            except WebSocketError:
+                # websocket error: probably socket closed
+                socket.close()
         else:
             # channel has closed: disconnect the client
             socket.close()
+
+        # return db connection to pool
+        # required to prevent the connection pool from 
+        # running out of connnections  and causing timeouts
+        db.session.remove()
 
     # subscribe to channels with callack
     for channel_id in channel_ids:

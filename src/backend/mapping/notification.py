@@ -14,5 +14,8 @@ notify_mapping = [
     ("title", "title"),
     ("description", "description"),
     ("firing_time", "firingTime"),
-    ("channel_id", "channelId")
+    ("channel_id", "channelId"),
+    ("subject", "subject"),
+    ("scope", "scope"),
+    ("scope_target", "scopeTarget")
 ]

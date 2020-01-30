@@ -20,7 +20,12 @@ class TestsNotficationOps(TestCase):
                               "P@$$w0rd",
                               "john@jmail.com",
                               org_id)
-        return org_id, user_id
+        task_deadline = datetime.utcnow()
+        task_id = create_task("fish",
+                              deadline= task_deadline,
+                              duration=60,
+                              author_id=user_id)
+        return org_id, user_id, task_id
 
     def test_channel_ops(self):
         self.assertEqual(query_channels(), [])
@@ -32,8 +37,9 @@ class TestsNotficationOps(TestCase):
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
-        org_id, user_id = self.create_test_data()
-        channel_id = create_channel(user_id)
+        org_id, user_id, task_id = self.create_test_data()
+        # should automatically create channel on create_user()
+        channel_id = query_channels(user_id=user_id)[0]
 
         channel = get_channel(channel_id)
         self.assertEqual(channel["userId"], user_id)
@@ -41,7 +47,6 @@ class TestsNotficationOps(TestCase):
         self.assertEqual(query_channels(pending=True), [])
 
         delete_channel(channel_id)
-        self.assertEqual(query_tasks(), [])
         delete_org(org_id)
 
     def test_notify_ops(self):
@@ -54,14 +59,23 @@ class TestsNotficationOps(TestCase):
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
-        org_id, user_id = self.create_test_data()
-        channel_id = create_channel(user_id)
-        notify_id = create_notify("fish", channel_id)
+        org_id, user_id, task_id = self.create_test_data()
+        # should automatically create channel on create_user()
+        channel_id = query_channels(user_id=user_id)[0]
+        notify_id = create_notify("fish task", channel_id,
+                                  Notification.Subject.Created,
+                                  scope=Notification.Scope.Task,
+                                  scope_target=task_id)
 
         notify = get_notify(notify_id)
-        self.assertEqual(notify["title"], "fish")
+        self.assertEqual(notify["title"], "fish task")
+        self.assertEqual(notify["scope"], Notification.Scope.Task)
+        self.assertEqual(notify["subject"], Notification.Subject.Created)
+        self.assertEqual(notify["scopeTarget"], task_id)
         self.assertEqual(query_notifys(), [notify_id])
         self.assertEqual(query_notifys(pending=True), [])
+        self.assertEqual(query_notifys(scope=Notification.Scope.Task,
+                                       scope_target=task_id), [notify_id])
 
         update_notify(notify_id, title="gym")
         notify = get_notify(notify_id)
@@ -72,8 +86,8 @@ class TestsNotficationOps(TestCase):
         delete_org(org_id)
 
     def test_subscription(self):
-        org_id, user_id = self.create_test_data()
-        channel_id = create_channel(user_id)
+        org_id, user_id, task_id = self.create_test_data()
+        channel_id = query_channels(user_id)[0]
 
         # define a test handler to run on notificaion
         run_lock = Semaphore()

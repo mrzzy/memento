@@ -3440,80 +3440,6 @@
 					"response": []
 				},
 				{
-					"name": "create channel",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "7bebc176-6d45-4299-9dbf-eb1fd885c987",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"id\"));",
-									"    // save channel_id for later tests",
-									"    pm.globals.set(\"channel_id\",  response.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "65bf49c5-8b04-4a81-b0e9-ae920ef1d294",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"userId\": {{user_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://{{api_host}}/api/v1/notification/channel",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"notification",
-								"channel"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "query channel ids",
 					"event": [
 						{
@@ -3527,7 +3453,12 @@
 									"",
 									"pm.test(\"response is parsable json\", ()  => {",
 									"    pm.response.json();",
-									"})"
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", ()=> {",
+									"    const response = pm.response.json();",
+									"    pm.globals.set(\"channel_id\", response[0]);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -3537,7 +3468,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v1/notification/channels",
+							"raw": "http://{{api_host}}/api/v1/notification/channels?user={{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -3547,6 +3478,12 @@
 								"v1",
 								"notification",
 								"channels"
+							],
+							"query": [
+								{
+									"key": "user",
+									"value": "{{user_id}}"
+								}
 							]
 						}
 					},
@@ -3595,6 +3532,80 @@
 								"notification",
 								"channel",
 								"{{channel_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create task",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save task_id for later tests",
+									"    pm.globals.set(\"task_id\",  response.id);",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"fishing\",\n\t\"description\": \"Complete the fishing quota by going fishing\",\n\t\"duration\": 3600,\n\t\"deadline\": \"2099-11-11T11:51:53.334Z\",\n\t\"authorId\": {{user_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/assignment/task",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assignment",
+								"task"
 							]
 						}
 					},
@@ -3651,7 +3662,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": \"2019-11-15T11:51:23.270Z\",\n\t\"channelId\": \"{{channel_id}}\"\n}",
+							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": \"2019-11-15T11:51:23.270Z\",\n\t\"channelId\": \"{{channel_id}}\",\n\t\"scope\": \"task\",\n\t\"scopeTarget\": {{task_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3725,7 +3736,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": null,\n\t\"channelId\": \"{{channel_id}}\"\n}",
+							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": null,\n\t\"channelId\": \"{{channel_id}}\",\n\t\"scope\": \"task\",\n\t\"scopeTarget\": {{task_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3772,7 +3783,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v1/notification/notifys?channel={{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notifys?channel={{channel_id}}&scope=task",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
@@ -3787,6 +3798,10 @@
 								{
 									"key": "channel",
 									"value": "{{channel_id}}"
+								},
+								{
+									"key": "scope",
+									"value": "task"
 								}
 							]
 						}

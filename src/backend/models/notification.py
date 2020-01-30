@@ -18,8 +18,7 @@ class Channel(db.Model):
     # relationships
     # enforce that only one channel be created for each user
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False)
-    notifications = db.relationship("Notification", backref=db.backref("channel"),
-                                    lazy=True)
+    notifications = db.relationship("Notification", backref=db.backref("channel"), lazy=True)
 
     # generates a unique str representation of the channel based on model fields
     # this string should be used as the model's id on creation
@@ -29,14 +28,32 @@ class Channel(db.Model):
 
 # defines a notification that is send to a channel
 class Notification(db.Model):
+    # defines notification types
+    # scope defines the type of object that the notification targets.
+    # or global if the notification does not target a specific object
+    class Scope:
+        Task = "task"
+        Event = "event"
+
+    # subject defines the purpose of which the notification is sent
+    class Subject:
+        Changed = "changed"
+        Created = "created"
+        Started = "started"
+        DueSoon = "soondue"
+        Completed = "completed"
+        Overdue = "overdue"
+
     # model fields
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(256), nullable=False)
-    # TODO: add kind field
-    description = db.Column(db.String(1024), nullable=True)
+    subject = db.Column(db.String(128), nullable=False, default=Subject.Changed)
     firing_time = db.Column(db.DateTime, nullable=False) # utc timezone
-
-    # TODO: change id type to string and derive id from kind and user_id
+    # notification scope - defines which object is referenced by notification if any
+    scope = db.Column(db.String(64), nullable=True)
+    scope_target = db.Column(db.Integer, nullable=True)
+    # human readable title & description
+    title = db.Column(db.String(256), nullable=False)
+    description = db.Column(db.String(1024), nullable=True)
 
     # relationships
     channel_id = db.Column(db.String, db.ForeignKey("channel.id"), nullable=False)

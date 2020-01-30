@@ -29,7 +29,8 @@ message_broker = LocalBroker()
 def query_channels(user_id=None, pending=None, skip=0, limit=None):
     channel_ids = Channel.query.with_entities(Channel.id)
     # apply filters
-    if not user_id is None: channel_ids.filter_by(user_id=user_id)
+    if not user_id is None: 
+        channel_ids = channel_ids.filter_by(user_id=user_id)
     if not pending is None:
         now = datetime.utcnow()
         channel_ids = channel_ids.outerjoin(Notification, Channel.id == Notification.channel_id)
@@ -82,7 +83,10 @@ def delete_channel(channel_id):
 # channel_id - show only notifications sent on channel with channel id
 # skip - skip the first skip channels
 # limit - output ids limit to the first limit channels
-def query_notifys(pending=None, channel_id=None, skip=0, limit=None):
+# scope - show only notifications that are scoped to the given scope 
+# scope_target - show only notifications that are scoped to the given scope target 
+def query_notifys(pending=None, channel_id=None, skip=0, limit=None,
+                  scope=None, scope_target=None):
     notify_ids = Notification.query.with_entities(Notification.id)
     # apply filters
     if not pending is None:
@@ -93,6 +97,10 @@ def query_notifys(pending=None, channel_id=None, skip=0, limit=None):
             notify_ids = notify_ids.filter(Notification.firing_time <= now)
     if not channel_id is None:
         notify_ids = notify_ids.filter_by(channel_id=channel_id)
+    if not scope is None:
+        notify_ids = notify_ids.filter_by(scope=scope)
+    if not scope_target is None:
+        notify_ids = notify_ids.filter_by(scope_target=scope_target)
     # apply skip & limit
     notify_id = [ i[0] for i in notify_ids ]
     return apply_bound(notify_id, skip, limit)
@@ -110,16 +118,22 @@ def get_notify(notify_id):
 # create an notification
 # title - title of the notification
 # channel_id - id of the channel to send the notification
+# subject - subject of the notification
+# scope - defines type of object of which notification is scoped by
+# scope_target - defines the id of the object of which the notification is scoped by
 # firing_time - firing datetime of the notification
 # description - description of the notification
 # returns the id of the new notification
-def create_notify(title, channel_id, firing_time=None, description=""):
+def create_notify(title, channel_id, subject=Notification.Subject.Changed,
+                  scope=None, scope_target=None,
+                  firing_time=None, description=""):
     # check if firing_time is none
     # if so, assume that notification fires now.
     if firing_time is None: firing_time = datetime.utcnow()
 
     # create notification
-    notify = Notification(title=title, firing_time=firing_time,
+    notify = Notification(title=title, firing_time=firing_time, subject=subject,
+                          scope=scope, scope_target=scope_target,
                           channel_id=channel_id, description=description)
     db.session.add(notify)
     db.session.commit()
@@ -131,12 +145,17 @@ def create_notify(title, channel_id, firing_time=None, description=""):
 
 # update notification with the given notification id
 # title - title of the notification
-# firing_time - firing datetime of the notification
 # channel_id - id of the channel to send the notification
+# subject - subject of the notification
+# scope - defines type of object of which notification is scoped by
+# scope_target - defines the id of the object of which the notification is scoped by
+# firing_time - firing datetime of the notification
+# description - description of the notification
 # returns the id of the new notification
 # throws NotFoundError if no notify with notify_id is found
-def update_notify(notify_id, title=None, firing_time=None, channel_id=None,
-                  description=None):
+def update_notify(notify_id, channel_id=None, title=None, subject=None,
+                  scope=None, scope_target=None,
+                  firing_time=None, description=None):
     notify = Notification.query.get(notify_id)
     if notify is None: raise NotFoundError
     # update notification fields
@@ -144,6 +163,9 @@ def update_notify(notify_id, title=None, firing_time=None, channel_id=None,
     if not firing_time is None: notify.firing_time = firing_time
     if not channel_id is None: notify.channel_id = channel_id
     if not description is None: notify.description = description
+    if not scope is None: notify.scope = scope
+    if not scope_target is None: notify.scope_target = scope_target
+    if not subject is None: notify.subject = subject
     db.session.commit()
 
     # notify users of notification change 
@@ -156,6 +178,7 @@ def delete_notify(notify_id):
     if notify is None: raise NotFoundError
     db.session.delete(notify)
     db.session.commit()
+
 # reschedule all pending notifications for firing (ie after backend reboot.)
 def reschedule_all_notifies():
     notify_ids = query_notifys(pending=True)

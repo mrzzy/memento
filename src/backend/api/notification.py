@@ -73,9 +73,13 @@ def route_notifys():
     if not pending is None: pending = parse_bool(pending)
     channel_id = request.args.get("channel", None)
     if not channel_id is None: channel_id = str(channel_id)
+    scope = request.args.get("scope")
+    if not scope is None: scope = str(scope)
+    scope_target = request.args.get("scope_target")
+    if not scope_target is None: scope_target = int(scope_target)
 
     # perform query
-    notify_ids = query_notifys(pending, channel_id, skip, limit)
+    notify_ids = query_notifys(pending, channel_id, skip, limit, scope, scope_target)
     return jsonify(notify_ids)
 
 # api - read, create, update, delete notifys

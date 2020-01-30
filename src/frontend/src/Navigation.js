@@ -1,17 +1,31 @@
 import React from 'react';
 import './App.css';
 import { Redirect, NavLink } from 'react-router-dom'
-
+import API from './API';
 
 class NavigationEmployee extends React.Component {
 
+    constructor() {
+        super();
+        const api = new API();
+        this.state = { api: api, loggedIn: true };
+    }
+
     signOut = () => {
-        sessionStorage.setItem("loggedIn", "false");
-        sessionStorage.setItem("role", "");
-        return <Redirect to="/" />
+
+        // for some reason this.state.api.logout() skips the lines afterwards
+        // so doing manually for now
+        this.state.api.setState({
+            "accessToken": null,
+            "refreshToken": null
+        });
+        this.setState({ loggedIn: false });
     }
 
     render() {
+        if (!this.state.loggedIn)
+            return <Redirect to="/" />;
+
         return (
             <ul className="navigationBar">
                 <li className="headerLogo"><NavLink to="/employee">M</NavLink></li>
@@ -23,13 +37,24 @@ class NavigationEmployee extends React.Component {
 
 class NavigationEmployer extends React.Component {
 
+    constructor() {
+        super();
+        const api = new API();
+        this.state = { api: api, loggedIn: true };
+    }
+
     signOut = () => {
-        sessionStorage.setItem("loggedIn", "false");
-        sessionStorage.setItem("role", "");
-        return <Redirect to="/" />
+        this.state.api.setState({
+            "accessToken": null,
+            "refreshToken": null
+        });
+        this.setState({ loggedIn: false });
     }
 
     render() {
+        if (!this.state.loggedIn)
+            return <Redirect to="/" />;
+
         return (
             <ul className="navigationBar">
                 <li className="headerLogo"><NavLink to="/employee">M</NavLink></li>

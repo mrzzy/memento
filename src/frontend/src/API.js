@@ -159,7 +159,7 @@ export default class API {
     // return true if refresh success, false otherwise
     async refresh() {
         // check if has refreshToken to perfrom refresh 
-        if(this.state.refreshToken == null) return;
+        if(this.state.refreshToken === null) return;
         // check access token has expired
         if(this.state.accessToken != null) return;
         // make refresh request
@@ -221,7 +221,7 @@ export default class API {
         const queryParams = this.convertUrl(params);
         const queryUrl = `${this.objectUrl(type)}s${queryParams}`;
         // perform query request
-        this.refresh();
+        await this.refresh();
         const response = await fetch(queryUrl, this.attachToken({}));
         await this.checkResponse(response);
 
@@ -238,7 +238,7 @@ export default class API {
         const objUrl = `${this.objectUrl(type)}/${id}`;
     
         // perform get request
-        this.refresh();
+        await this.refresh();
         const response = await fetch(objUrl, this.attachToken({
             method: "GET",
             mode: "cors",
@@ -258,7 +258,7 @@ export default class API {
         assert(this.supports(type));
 
         // perform create request 
-        this.refresh();
+        await this.refresh();
         const response = await fetch(this.objectUrl(type), this.attachToken({
             method: "POST",
             mode: "cors",
@@ -285,7 +285,7 @@ export default class API {
         const objUrl = `${this.objectUrl(type)}/${id}`;
 
         // perform update request 
-        this.refresh();
+        await this.refresh();
         const response = await fetch(objUrl, this.attachToken({
             method: "PATCH",
             mode: "cors",
@@ -310,7 +310,7 @@ export default class API {
 
         // perform delete request
         const objUrl = `${this.objectUrl(type)}/${id}`;
-        this.refresh();
+        await this.refresh();
         const response = await fetch(objUrl, this.attachToken({
             method: "DELETE",
             mode: "cors",

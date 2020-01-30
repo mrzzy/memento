@@ -103,7 +103,7 @@ class MyEmployees extends React.Component {
 
             let today = new Date();
 
-            if (taskDeadline.getDate() === today.getDate()) {
+            if (taskDeadline.getDate() === today.getDate() && !tasks[i].completed) {
                 filteredTasks.push(tasks[i]);
                 if (employeeToTask[tasks[i].userId] === undefined) {
                     employeeToTask[tasks[i].userId] = [tasks[i]]
@@ -330,7 +330,7 @@ class AddEmployeeTask extends React.Component {
                     <input onChange={this.props.onChange} className="forminput" id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
                     <input onChange={this.props.onChange} className="forminput" type="date" name="deadlineDate" required />
                     <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" min="09:00" max="18:00" required />
-                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="240" />
+                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="1000" />
                     <input type="submit" value=">" />
                 </form>
             </div>

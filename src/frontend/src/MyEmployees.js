@@ -38,6 +38,23 @@ class MyEmployees extends React.Component {
 
     constructor() {
         super();
+
+        // [filteredTasks, employees, employeeToTask]
+        let details = this.settingUp();
+
+        this.state = {
+            tasks: details[0],
+            employees: details[1],
+            employeeToTask: details[2],
+            myemployees: myemployees,
+            activated: -1,
+            popUp: null,
+            newTask: {}
+        };
+    }
+
+    // Obtaining data and sorting it out again
+    settingUp() {
         let filteredTasks = []; // array of tasks
         let employees = {}; // id: name
         let employeeToTask = {}; // id: task
@@ -65,24 +82,65 @@ class MyEmployees extends React.Component {
             employees[myemployees[i]["userId"]] = myemployees[i]["name"];
         }
 
-        this.state = {
-            tasks: filteredTasks,
-            employees: employees,
-            employeeToTask: employeeToTask,
-            myemployees: myemployees,
-            activated: -1,
-            popUp: null
-        };
+        return [filteredTasks, employees, employeeToTask];
+    }
+
+    // change "30-12-2020" to date object
+    parseDate(sD, sT) {
+        let b = sD.split(/\D/);
+        let deadline = new Date(b[0], --b[1], b[2]);
+        let a = sT.split(/\D/);
+        deadline.setHours(a[0]);
+        deadline.setMinutes(a[1]);
+
+        return deadline;
     }
 
     showMore = (employee, e) => {
         this.setState({ activated: employee["userId"] });
     }
 
-    addTask = (employee, e) => {
-        console.log("addTask was called for " + employee["name"]);
+    onChange = (e) => {
+        let newTask = this.state.newTask;
+        newTask[e.target.name] = e.target.value;
+        this.setState({ newTask: newTask });
+    }
+
+    createTask = (employee, e) => {
+        //{ taskId: 2, userId: 1, completed: false, deadline: ISOString, duration: 3600, name: "", description: "" },
+        let newTask = {};
+        newTask["completed"] = false;
+        newTask["taskId"] = Math.floor(Math.random() * 100); // testing purposes only
+        newTask["userId"] = employee.userId;
+        newTask["deadline"] = this.parseDate(this.state.newTask["deadlineDate"], this.state.newTask["deadlineTime"]).toISOString();
+        newTask["duration"] = this.state.newTask["duration"];
+        newTask["name"] = this.state.newTask["taskTitle"];
+        newTask["description"] = this.state.newTask["taskDesc"];
+
+        tasks.push(newTask);
+        let details = this.settingUp();
+
+        e.preventDefault();
+
         this.setState({
-            popUp: <AddEmployeeTask employeeId={employee["userId"]} name={employee["name"]} cancelPopUp={this.cancelPopUp} />
+            popUp: false,
+            activated: -1,
+            tasks: details[0],
+            employees: details[1],
+            employeeToTask: details[2],
+            myemployees: myemployees
+        });
+    }
+
+    addTaskPopUp = (employee, e) => {
+        this.setState({
+            popUp:
+                <AddEmployeeTask
+                    employeeId={employee["userId"]}
+                    name={employee["name"]}
+                    cancelPopUp={this.cancelPopUp}
+                    onChange={this.onChange}
+                    createTask={this.createTask.bind(null, employee)} />
         })
     }
 
@@ -110,7 +168,7 @@ class MyEmployees extends React.Component {
                             name={employee["name"]}
                             employeeId={employee["userId"]}
                             showMore={this.showMore.bind(null, employee)}
-                            addTask={this.addTask.bind(null, employee)}
+                            addTaskPopUp={this.addTaskPopUp.bind(null, employee)}
                             showTasks={(this.state.activated == employee["userId"]) ? true : false} />
                     )}
                 </div>
@@ -195,7 +253,7 @@ class Employee extends React.Component {
 
     render() {
         const tasks = this.props.tasks.map((task) =>
-            <div className="task" key={task.taskId}>
+            <div className="aTask" key={task.taskId}>
                 <div className="details">
                     <span className="taskTitle">{task.name}</span>
                     <span className="taskDesc">{task.description}</span>
@@ -213,8 +271,8 @@ class Employee extends React.Component {
                 </div>
 
                 {(this.props.showTasks) ?
-                    <div className="taskList">
-                        <button onClick={this.props.addTask}>Add Task</button>
+                    <div className="aTaskList">
+                        <button onClick={this.props.addTaskPopUp}>Add Task</button>
                         {tasks}
                     </div> :
                     null}
@@ -231,12 +289,12 @@ class AddEmployeeTask extends React.Component {
             <div className="popUp">
                 <button onClick={this.props.cancelPopUp}>X</button>
                 <h2>Task For <span className="popUpName">{this.props.name}</span></h2>
-                <form>
-                    <input class="forminput" id="taskTitle" type="text" placeholder="TITLE" required />
-                    <input class="forminput" id="taskDesc" type="text" placeholder="DESCRIPTION" required />
-                    <input class="forminput" type="date" required />
-                    <input class="forminput" type="time" id="appt" name="appt" min="09:00" max="18:00" required />
-                    <input class="forminput" type="number" name="quantity" min="1" max="240" />
+                <form onSubmit={this.props.createTask}>
+                    <input onChange={this.props.onChange} className="forminput" id="taskTitle" type="text" name="taskTitle" placeholder="TITLE" required />
+                    <input onChange={this.props.onChange} className="forminput" id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
+                    <input onChange={this.props.onChange} className="forminput" type="date" name="deadlineDate" required />
+                    <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" min="09:00" max="18:00" required />
+                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="240" />
                     <input type="submit" value=">" />
                 </form>
             </div>

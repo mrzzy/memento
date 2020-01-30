@@ -67,3 +67,11 @@ def authenticate(kind="access"):
         return auth_fn
     return auth_decorator
 
+# extract the bearer token from the given flask request
+# request - request to extract jwt token from
+# returns jwt token object
+def extract_token(request):
+    auth_header = request.headers.get("Authorization", "")
+    _, jwt_token = auth_header.split()
+    token  = Token.from_jwt(jwt_token)
+    return token

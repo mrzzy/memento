@@ -29,10 +29,17 @@ def parse_options():
     parser.add_argument("--channel", dest="channel_id", type=int,
                         help="id of the channel to listen for notifications",
                         default=None)
+    parser.add_argument("--user", dest="user_id", type=int,
+                        help="id of the user to listen for notifications for", default=None)
     parser.add_argument("--secure",  dest="is_secure", type=bool, nargs="?",
                         const=True,
                         help="Whether to use secure websockets", default=False)
     args = parser.parse_args()
+
+    if not args.channel_id is None and args.user_id is None:
+        print("Only one of --channel or --user should be specified")
+    elif not args.user_id is None:
+        args.channel_id = f"user..{args.user_id}"
 
     return {
         "api_host":  args.api_host,

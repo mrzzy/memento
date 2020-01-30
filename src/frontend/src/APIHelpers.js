@@ -15,7 +15,7 @@ export default class APIHelpers {
     // retrieve employee userIds for employer with the given employer id
     // employerId - user id of the employee to create tasks for 
     // returns user ids of employee of employer
-    async  getEmployeesForEmployer(employerId) {
+    async getEmployeesForEmployer(employerId) {
         // get managment relationships for employer
         const manages = await this.api.query("manage", {"manager": employerId});
         const employeeeIds = manages.map((manage) => manage.manageeId);

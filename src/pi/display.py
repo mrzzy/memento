@@ -1,6 +1,12 @@
+#
+# Memento Pi
+# Utilities for dsiplaying notification on the raspberry pi
+#
+
 import re
 import time
 import argparse
+import threading
 import luma.core
 import luma.led_matrix
 import gpiozero
@@ -17,30 +23,16 @@ from gpiozero import Button
 from gpiozero import LED
 from time import sleep
 
-serial = spi(port=0, device=0, gpio=noop())
-device = max7219(serial, cascaded=4, block_orientation=-90)
-#device = led.matrix(serial, cascaded=4, block_orientation=-90)
-# x = 0
-# msg = "Your late hoe"
-# msg = "Deadline ebwf"
-
-def displaymsg():
-    x=0
-    for a in range (7):
+# setup led display
+led_serial = spi(port=0, device=0, gpio=noop())
+led_display = max7219(led_serial, cascaded=4, block_orientation=-90)
 
 
-
-        #states where theZ
-        if(x == 0):
-            msg = "Your task is due now"
-        elif (x == 1):
-            msg = "Your task is due now"
-        elif (x == 2):
-            msg = "Your task is due now"
-
-        show_message(device, msg, fill="white", font=proportional(LCD_FONT),scroll_delay=0.025)
-        time.sleep(0.05)
-        x += 1
-        if(x > 2):
-            x = 0
-
+# show the given message on the led display
+# msg - message to show  on the display
+# speed - speed to show the message
+def show(msg, speed=20):
+    show_fn = (lambda : show_message(led_display, msg, fill="white",
+                                     font=proportional(LCD_FONT),
+                                     scroll_delay=1/speed))
+    threading.Thread(target=show_fn).start()

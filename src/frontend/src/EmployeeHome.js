@@ -110,7 +110,8 @@ class EmployeeHome extends React.Component {
         for (let i = 0; i < taskIds.length; i++) {
             let task = await this.state.api.get("task", taskIds[i]);
             task.id = taskIds[i];
-            taskList.push(task);
+            if (!task.completed)
+                taskList.push(task);
         }
 
         return taskList
@@ -390,7 +391,17 @@ class CurrentTask extends React.Component {
         CreateNotification(task, firingTime, 3);
     }
 
-    finishTask() {
+    async finishTask() {
+        // TO DO : CREATE NOTIFICATION FOR PI
+        //// create channel
+        //let api = new API();
+        //let id = api.authCheck();
+        //let newChannel = { kind: "task", userId: id };
+        //api.post("channel", newChannel);
+
+        //// create notification
+        //let newNotification = 
+
         this.props.updateToDoListElement(this.state.currentTask.id); // to update to do list component's allTaskList
         clearInterval(this.state.countDownTimer);
         this.setState({ hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: null });

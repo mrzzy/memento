@@ -15,9 +15,9 @@ export default class APIHelpers {
     // retrieve employee userIds for employer with the given employer id
     // employerId - user id of the employee to create tasks for 
     // returns user ids of employee of employer
-    getEmployeesForEmployer(employerId) {
+    async  getEmployeesForEmployer(employerId) {
         // get managment relationships for employer
-        const manages =  this.api.query("manage", {"manager": employerId});
+        const manages = await this.api.query("manage", {"manager": employerId});
         const employeeeIds = manages.map((manage) => manage.manageeId);
     
         return employeeeIds
@@ -26,8 +26,8 @@ export default class APIHelpers {
     // get tasks assigned to userId
     // userId - id of the employee to get tasks for
     // return tasks
-    getTasks(userId) {
-        const taskIds = this.api.query("task", {"assignee": userId});
+    async getTasks(userId) {
+        const taskIds = await this.api.query("task", {"assignee": userId});
         return taskIds
     }
 
@@ -35,9 +35,14 @@ export default class APIHelpers {
     // userId - id of the employee to get tasks for
     // date - UTC datetime specifying the day to get tasks
     // returns task ids
-    getTasksForDate(userId, date) {
-        const taskIds = this.api.query("task", {"assignee": userId, "for-day": date});
+    async getTasksForDate(userId, date) {
+        const taskIds = await this.api.query("task", {"assignee": userId, "for-day": date});
         return taskIds
     }
-    
+
+    // check if the user specified by the given userId is an employer
+    async isEmployer(userId) {
+        const manageIds = await this.api.query("manage", {"manager": userId});
+        return manageIds.length > 0;
+    }
 }

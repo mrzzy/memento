@@ -88,9 +88,11 @@ async def subscribe_channel(api_host, channel_id, is_secure, handler):
 
 # handler to handle incoming notifications
 def handle_notify(notify):
-    print(f"recieved notification {notify['title']}")
-    display.show(f"{notify['title']}: {notify['description']}")
-    buzzer.play()
+    print(f"recieved notification: {notify['title']}")
+    # notify user when a task or event is overdue or due soonf
+    if notify["scope"] in ("task" , "event") and notify["subject"] in ("soondue", "overdue"):
+        display.show(f"{notify['title']}: {notify['description']}")
+        buzzer.play()
 
 async def main():
     options = parse_options()

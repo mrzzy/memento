@@ -11,10 +11,13 @@ class VisitorHome extends React.Component {
         this.state = { api: api };
     }
 
-    render() {
-        if (this.state.api.state.accessToken !== null)
+    async componentDidMount() {
+        let loggedIn = await this.state.api.authCheck();
+        if (loggedIn !== null)
             return <Redirect to='/employee' />
+    }
 
+    render() {
         return (
             <div>
                 <NavigationVisitor />

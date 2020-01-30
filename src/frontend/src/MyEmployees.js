@@ -232,11 +232,11 @@ class AddEmployeeTask extends React.Component {
                 <button onClick={this.props.cancelPopUp}>X</button>
                 <h2>Task For <span className="popUpName">{this.props.name}</span></h2>
                 <form>
-                    <input id="taskTitle" type="text" placeholder="TITLE" required />
-                    <input id="taskDesc" type="text" placeholder="DESCRIPTION" required />
-                    <input type="date" required />
-                    <input type="time" id="appt" name="appt" min="09:00" max="18:00" required />
-                    <input type="number" name="quantity" min="1" max="240" />
+                    <input class="forminput" id="taskTitle" type="text" placeholder="TITLE" required />
+                    <input class="forminput" id="taskDesc" type="text" placeholder="DESCRIPTION" required />
+                    <input class="forminput" type="date" required />
+                    <input class="forminput" type="time" id="appt" name="appt" min="09:00" max="18:00" required />
+                    <input class="forminput" type="number" name="quantity" min="1" max="240" />
                     <input type="submit" value=">" />
                 </form>
             </div>

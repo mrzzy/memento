@@ -9,7 +9,7 @@ class Login extends React.Component {
     constructor() {
         super();
         const api = new API();
-        this.state = { login: true, loggedIn: false, username: "", password: "", message: "", api: api };
+        this.state = { login: true, loggedIn: false, username: "", password: "", message: "", api: api, redirect: false };
         this.handleLogin = this.handleLogin.bind(this);
     }
 
@@ -20,17 +20,15 @@ class Login extends React.Component {
         // run some stuff. still not sure how to keep users logged in
         //let employee = ["employee", "pass"];
         //let employer = ["employer", "pass"];
-        
+        e.preventDefault();
         const hasLogin = await this.state.api.login(this.state.username, this.state.password);
 
-        window.alert(hasLogin);
-
         if (hasLogin)
-            return <Redirect to="/employee" />;
+            this.setState({ redirect: true });
         else
             this.setState({ message: "Incorrect username or password!" });
 
-        e.preventDefault();
+        
     }
 
     handlePasswordChange = (e) => this.setState({ "password": e.target.value });
@@ -38,8 +36,11 @@ class Login extends React.Component {
     handleUsernameChange = (e) => this.setState({ "username": e.target.value });
 
     render() {
-        if (this.state.api.state.accessToken !== null)
-            return <Redirect to='/employee' />
+        //if (this.state.api.authCheck() !== null)
+        //    return <Redirect to='/employee' />
+
+        if (this.state.redirect)
+            return <Redirect to="/employee" />;
 
         return (
             <div>

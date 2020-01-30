@@ -85,5 +85,6 @@ class LocalBroker(AbstractBroker):
     # removes all subscribers on the channel
     # channel - name of the channel to clear
     def clear(self, channel):
-        for subscribe_id in self.message_board[channel].keys():
-            self.unsubscribe(channel, subscribe_id)
+        remove_ids = list(self.message_board[channel].keys())
+        for subscribe_id in remove_ids:
+            self.unsubscribe(subscribe_id)

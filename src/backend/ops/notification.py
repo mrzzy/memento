@@ -65,17 +65,21 @@ def create_channel(user_id):
 def delete_channel(channel_id):
     channel = Channel.query.get(channel_id)
     if channel is None: raise NotFoundError
+    import  traceback
+    try:
 
-    # clear subscribers to channel
-    message_broker.publish(f"channel/{channel_id}", "close/{channel_id}")
-    message_broker.clear(f"channel/{channel_id}")
+        # clear subscribers to channel
+        message_broker.publish(f"channel/{channel_id}", f"close/{channel_id}")
+        message_broker.clear(f"channel/{channel_id}")
 
-    # cascade delete notifications
-    notify_ids = query_notifys(channel_id=channel_id)
-    for notify_id in notify_ids: delete_notify(notify_id)
+        # cascade delete notifications
+        notify_ids = query_notifys(channel_id=channel_id)
+        for notify_id in notify_ids: delete_notify(notify_id)
 
-    db.session.delete(channel)
-    db.session.commit()
+        db.session.delete(channel)
+        db.session.commit()
+    except Exception as e:
+        traceback.print_exc()
 
 ## Notification Ops
 # query ids of notifications

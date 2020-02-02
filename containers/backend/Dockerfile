@@ -33,6 +33,7 @@ RUN chmod u+x -R /scripts
 # configure backend container entrypoint
 EXPOSE 5000
 ENV FLASK_APP=app.py
+ENV PYTHONUNBUFFERED=1
 ENTRYPOINT [ "/scripts/entrypoint.sh" ]
 
 ## develop image

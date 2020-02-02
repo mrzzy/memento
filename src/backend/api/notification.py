@@ -132,16 +132,13 @@ def route_subscribe(socket):
 
     # build callback to handle subscriptions
     def handler(subscribe_id, message):
-        # check if client is still connected
-        if socket.closed:
-            # client disconnected: unsubscribe from further callbacks
-            unsubscribe_channel(subscribe_id)
-            return
-
         # handle notification message
         print(f"handling message: {message}")
         notify = handle_notify(subscribe_id, message)
-        if not notify is None:
+        if socket.closed: # check if client is still connected
+            # client disconnected: unsubscribe from further callbacks
+            unsubscribe_channel(subscribe_id)
+        elif not notify is None:
             # convert to iso date format
             # add "Z" to signal utc timezone
             notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
@@ -157,7 +154,7 @@ def route_subscribe(socket):
 
         # return db connection to pool
         # required to prevent the connection pool from 
-        # running out of connnections  and causing timeouts
+        # running out of connnections and causing timeouts
         db.session.remove()
 
     # subscribe to channels with callack
@@ -166,4 +163,8 @@ def route_subscribe(socket):
         subscribe_channel(channel_id, handler)
 
     # required to prevent websocket from closing
+    # return db connection to pool
+    # required to prevent the connection pool from 
+    # running out of connnections and causing timeouts
+    db.session.remove()
     while True: time.sleep(600)

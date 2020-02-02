@@ -205,6 +205,7 @@ def subscribe_channel(channel_id, callback):
 def unsubscribe_channel(subscribe_id):
     message_broker.unsubscribe(subscribe_id)
 
+
 # schedule the firing of the given pending notification 
 # raises ValueError if attempting to schedule a notification that is not pending.
 # notify_id - id of the notification to send
@@ -220,6 +221,10 @@ def schedule_notify(notify_id):
         raise ValueError( "Attempted to schedule a notification that is not pending")
 
     def fire_notify():
+        # return db connection to pool
+        # required to prevent the connection pool from 
+        # running out of connnections and causing timeouts
+        db.session.remove()
         # wait till notification firing time
         time_till_fire = (firing_time - datetime.utcnow()).total_seconds()
         time.sleep(max(0, time_till_fire))
@@ -231,15 +236,15 @@ def schedule_notify(notify_id):
 # returns a notification as dict if handled a notification message
 # returns None if recieved a channel close message
 def handle_notify(subscribe_id, message):
+    notify = None
     if "notify/" in message:
         # recieved notification message
         _, notify_id = message.split("/")
         notify = get_notify(notify_id)
-        return notify
     elif "close/" in message:
         # recieved channel close message: unsubscribe from channel
         unsubscribe_channel(subscribe_id)
-        return None
     else:
         raise NotImplementedError(f"Unknown message: {message}")
 
+    return notify

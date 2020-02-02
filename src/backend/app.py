@@ -46,3 +46,11 @@ def check_database():
         message = str(e)
         is_database_ok = False
     return is_database_ok, message
+
+
+# return db connection to pool
+# required to prevent the connection pool from 
+# running out of connnections and causing timeouts
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()

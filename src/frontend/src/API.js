@@ -33,14 +33,7 @@ export default class API {
 
         // object state
         this.stateCookieName = "memento-api-obj-state";
-        // try to load state form cookie
-        this.state = Cookie.getJSON(this.stateCookieName);
-        if(this.state == null) {
-            this.state = { 
-                "refreshToken": null,
-                "accessToken": null,
-            };
-        }
+        this.state = this.initState();
 
         // build map of available api routes
         this.apiMap = {
@@ -53,6 +46,25 @@ export default class API {
     }
 
     /* utils */
+    // attempts to load object state from cookies
+    // otherwise inits object state
+    initState() {
+        var state = Cookie.getJSON(this.stateCookieName);
+        if(state == null) {
+            state = { 
+                "refreshToken": null,
+                "accessToken": null,
+            }
+        } else {
+            // access token should be already expired
+            // hence we mark it as expire so it will be refreshed
+            state["accessToken"] = null
+        }
+    
+        return state;
+    }
+
+    
     // convert the given set of url param to url param string
     // returns the url param string 
     convertUrl(params) {
@@ -331,15 +343,17 @@ export default class API {
     // as handler to handle incoming notifications
     // channelId- id of the channel to subscribe to
     // handler(notify) - callback called on when on recieve notification
-    subscribe(channelId, handler) {
+    async subscribe(channelId, handler) {
         // build websocket url to listen for notifications
         const listenParams = this.convertUrl({ "channel": channelId });
         const listenUrl = `${this.socketRoot}/notification/subscribe${listenParams}`;
         
         // open websocket to listen for notifications
         const socket = new WebSocket(listenUrl);
+        var hasOpened = false;
         socket.onopen = () => {
             console.log(`API: Listening for notifications on channel: ${channelId}`);
+            hasOpened = true;
         };
     
         socket.onclose = () => {
@@ -352,6 +366,16 @@ export default class API {
             const notify = JSON.parse(notifyJson);
             
             handler(notify);
+        }
+        
+        // wait for the websocket to open 
+        const beginWait = new Date();
+        const timeoutSecs = 5.0;
+        var now = new Date();
+        while(hasOpened != true  && (now - beginWait) / 1000.0 < timeoutSecs) {
+            // sleep to give up thread for other tasks
+            await new Promise(r => setTimeout(r, 100));
+            now = new Date();
         }
     }
 }

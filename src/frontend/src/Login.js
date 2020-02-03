@@ -4,16 +4,38 @@ import { NavigationVisitor } from './Navigation';
 import { Redirect } from 'react-router-dom';
 
 import API from './API';
+import APIHelpers from './APIHelpers';
 
 class Login extends React.Component {
     constructor() {
         super();
         const api = new API();
-        this.state = { login: true, loggedIn: false, username: "", password: "", message: "", api: api, redirect: false };
+        const apiHelper = new APIHelpers(api);
+        this.state = {
+            login: true,
+            loggedIn: false,
+            username: "",
+            password: "",
+            message: "",
+            api: api,
+            apiHelper: apiHelper,
+            employer: false,
+            employee: false
+        };
         this.handleLogin = this.handleLogin.bind(this);
     }
 
-    switchToSignup = () => this.setState({ login: false });
+    async componentDidMount() {
+        try {
+            let loggedIn = await this.state.api.authCheck();
+            let hasEmployers = await this.state.apiHelper.isEmployer(loggedIn);
+            this.setState({ employer: hasEmployers, employee: !hasEmployers });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    switchToSignup = () => this.setState({ login: false, message: "" });
     switchToLogin = () => this.setState({ login: true });
 
     async handleLogin (e) {
@@ -22,9 +44,21 @@ class Login extends React.Component {
         //let employer = ["employer", "pass"];
         e.preventDefault();
         const hasLogin = await this.state.api.login(this.state.username, this.state.password);
+        alert("Login works");
+        if (hasLogin) {
+            try {
+                let id = await this.state.api.authCheck();
+                alert("Auth check works");
+                let hasEmployees = await this.state.apiHelper.isEmployer(id);
+                alert("isEmployer works");
+                this.setState({ employee: !hasEmployees, employer: hasEmployees });
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.setState({ message: "Something has gone wrong! Please try again later." });
+            }
+        }
 
-        if (hasLogin)
-            this.setState({ redirect: true });
         else
             this.setState({ message: "Incorrect username or password!" });
 
@@ -39,8 +73,11 @@ class Login extends React.Component {
         //if (this.state.api.authCheck() !== null)
         //    return <Redirect to='/employee' />
 
-        if (this.state.redirect)
+        if (this.state.employee)
             return <Redirect to="/employee" />;
+
+        if (this.state.employer)
+            return <Redirect to="/employer" />;
 
         return (
             <div>
@@ -53,9 +90,8 @@ class Login extends React.Component {
                         handleLogin={this.handleLogin}
                         handlePasswordChange={this.handlePasswordChange}
                         handleUsernameChange={this.handleUsernameChange} /> : <SignupSection />)}
+                    <p style={{ color: "red" }}>{this.state.message}</p>
                 </div>
-
-                <p>{this.state.message}</p>
             </div>
         );
     }

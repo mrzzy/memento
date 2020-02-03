@@ -6,10 +6,11 @@
 
 from unittest import TestCase
 from datetime import datetime
-
+from functools import partial
 
 from ...ops.identity import *
 from ...ops.assignment import *
+from ...ops.notification import *
 
 class TestAssigmentOps(TestCase):
 
@@ -46,6 +47,16 @@ class TestAssigmentOps(TestCase):
                                   task_id,
                                   worker_id,
                                   manager_id)
+        query_task_notifys = partial(query_notifys,
+                                     scope=Notification.Scope.Task,
+                                     scope_target=task_id)
+        # check auto notifications are created properly
+        self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=worker_id)),
+                                          subject=Notification.Subject.Assigned)) > 0)
+        self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=worker_id)),
+                                          subject=Notification.Subject.Overdue)) > 0)
+        self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=worker_id)),
+                                          subject=Notification.Subject.DueSoon)) > 0)
 
         task = get_task(task_id)
         self.assertEqual(task["name"], "fish")
@@ -55,7 +66,12 @@ class TestAssigmentOps(TestCase):
         self.assertEqual(query_tasks(for_day=datetime.today()), [task_id])
         self.assertEqual(query_tasks(assignee_id=worker_id), [task_id])
 
-        update_task(task_id, name="cook")
+
+        update_task(task_id, name="cook", completed=True, started=True)
+        self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=manager_id)),
+                                               subject=Notification.Subject.Started)) > 0)
+        self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=manager_id)),
+                                               subject=Notification.Subject.Completed)) > 0)
         task = get_task(task_id)
         self.assertEqual(task["name"], "cook")
 
@@ -127,6 +143,10 @@ class TestAssigmentOps(TestCase):
         self.assertEqual(query_assigns(for_day=datetime.today()), [assign_id])
         self.assertEqual(query_assigns(pending=False,
                                        due_by=datetime.utcnow()), [])
+        # check notification sent on assignment
+        self.assertTrue(len(query_notifys(channel_id=str(Channel(user_id=worker_id)),
+                                          scope=Notification.Scope.Task,
+                                          scope_target=task_id)) > 0)
 
         # swap worker and manager in assignment as a proof of concept
         update_assign(assign_id, assigner_id=worker_id, assignee_id=manager_id)

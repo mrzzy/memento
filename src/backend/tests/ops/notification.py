@@ -63,14 +63,14 @@ class TestsNotficationOps(TestCase):
         # should automatically create channel on create_user()
         channel_id = query_channels(user_id=user_id)[0]
         notify_id = create_notify("fish task", channel_id,
-                                  Notification.Subject.Created,
+                                  Notification.Subject.Changed,
                                   scope=Notification.Scope.Task,
                                   scope_target=task_id)
 
         notify = get_notify(notify_id)
         self.assertEqual(notify["title"], "fish task")
         self.assertEqual(notify["scope"], Notification.Scope.Task)
-        self.assertEqual(notify["subject"], Notification.Subject.Created)
+        self.assertEqual(notify["subject"], Notification.Subject.Changed)
         self.assertEqual(notify["scopeTarget"], task_id)
         self.assertEqual(query_notifys(), [notify_id])
         self.assertEqual(query_notifys(pending=True), [])

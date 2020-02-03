@@ -129,7 +129,6 @@ def update_team(team_id, org_id=None, name=None):
 # cascade delete team assignments to users & team roles
 # throws NotFoundError if no team with team_id is found
 def delete_team(team_id):
-    print(f"delete team: {team_id}")
     #if team_id == 8: raise ValueError
     team = Team.query.get(team_id)
     if team is None: raise NotFoundError
@@ -493,7 +492,6 @@ def delete_role_relation(rolebind_id):
 
     # check if role has any rolebindings, if so delete role too
     rolebind_ids = RoleBinding.query.filter_by(role_id=role_id)
-    print(f"{role_id}: {rolebind_ids.count()}")
     if rolebind_ids.count() < 1:
         delete_role(role_id)
 

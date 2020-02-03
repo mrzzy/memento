@@ -89,8 +89,9 @@ def delete_channel(channel_id):
 # limit - output ids limit to the first limit channels
 # scope - show only notifications that are scoped to the given scope 
 # scope_target - show only notifications that are scoped to the given scope target 
+# subject - show only notifications that have the given subject 
 def query_notifys(pending=None, channel_id=None, skip=0, limit=None,
-                  scope=None, scope_target=None):
+                  scope=None, scope_target=None, subject=None):
     notify_ids = Notification.query.with_entities(Notification.id)
     # apply filters
     if not pending is None:
@@ -105,6 +106,9 @@ def query_notifys(pending=None, channel_id=None, skip=0, limit=None,
         notify_ids = notify_ids.filter_by(scope=scope)
     if not scope_target is None:
         notify_ids = notify_ids.filter_by(scope_target=scope_target)
+    if not subject is None:
+        notify_ids = notify_ids.filter_by(subject=subject)
+
     # apply skip & limit
     notify_id = [ i[0] for i in notify_ids ]
     return apply_bound(notify_id, skip, limit)
@@ -234,7 +238,7 @@ def schedule_notify(notify_id):
 
 # defines a handler to handle notification/channel messages published
 # returns a notification as dict if handled a notification message
-# returns None if recieved a channel close message
+# returns None if recieved a channel close message or notification no longer valid
 def handle_notify(subscribe_id, message):
     notify = None
     if "notify/" in message:

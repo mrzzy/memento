@@ -4,7 +4,8 @@
 # Assignment Ops
 #
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from functools import partial
 
 from ..app import db
 from ..models.assignment import *
@@ -12,7 +13,7 @@ from ..models.notification import *
 from ..mapping.assignment import *
 from ..utils import map_dict, apply_bound
 from ..api.error import NotFoundError
-from ..ops.notification import create_notify
+from ..ops.notification import create_notify, query_notifys, delete_notify
 
 ## Task Ops
 # query ids of tasks
@@ -92,16 +93,52 @@ def update_task(task_id, name=None, deadline=None, duration=None,
                 author_id=None, description=None, completed=None, started=None):
     task = Task.query.get(task_id)
     if task is None: raise NotFoundError
+    # check for task completion and started 
+    has_completed = True if completed and not task.completed else False
+    has_started = True if started and not task.started else False
+
     # update task fields
     if not name is None: task.name = name
     if not deadline is None: task.deadline = deadline
     if not duration is None: task.duration = duration
     if not author_id is None: task.author_id = author_id
     if not description is None: task.description = description
-    if not completed is None: task.completed = completed
     if not started is None: task.started = started
 
     db.session.commit()
+
+    # notify assigner that task is completed or started
+    create_task_notify = partial(create_notify,
+                                 scope=Notification.Scope.Task,
+                                 scope_target=task_id)
+
+    if has_completed or has_started:
+        assigns = [ get_assign(i) for i in query_assigns("task", task_id) ]
+        assigner_ids = [ assign["assignerId"] for assign in  assigns ]
+        channel_ids = [ str(Channel(user_id=i)) for i in assigner_ids ]
+
+        if has_completed:
+            for channel_id in channel_ids:
+                create_task_notify(title="task completed",
+                                   channel_id=channel_id,
+                                   subject=Notification.Subject.Completed)
+        if has_started:
+            for channel_id in channel_ids:
+                create_task_notify(title="task started",
+                                   channel_id=channel_id,
+                                   subject=Notification.Subject.Started)
+
+    # stop overdue or duesoon notification from firing since task is now completed
+    query_pending_task_notify = partial(query_notifys,
+                                        pending=True,
+                                        scope=Notification.Scope.Task,
+                                        scope_target=task_id)
+    if has_completed:
+        overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
+        duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
+
+        for notify_id in overdue_ids + duesoon_ids:
+            delete_notify(notify_id)
 
 # delete the task for the given task id
 # cascade deletes and dependent objects on task
@@ -113,6 +150,10 @@ def delete_task(task_id):
     # cascade delete dependent assignments
     assign_ids = query_assigns(Assignment.Kind.Task, task_id)
     for assign_id in assign_ids: delete_assign(assign_id)
+    # cascade delete notifications
+    notify_ids = query_notifys(scope=Notification.Scope.Task,
+                               scope_target=task_id)
+    for notify_id in notify_ids: delete_notify(notify_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -285,13 +326,38 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
     db.session.add(assign)
     db.session.commit()
 
-    # notify assignee of new assignment
     channel_id = str(Channel(user_id=assignee_id))
-    create_notify(f"new {type} assignment", channel_id,
-                  subject=Notification.Subject.Assigned,
-                  scope=kind,
-                  scope_target=item_id,
-                  firing_time=None) # fire now
+
+    # notify assignee of new assignment
+    create_assign_notify = partial(create_notify,
+                                   channel_id=channel_id,
+                                   scope=kind,
+                                   scope_target=item_id)
+    create_assign_notify(title=f"new {kind} assignment",
+                         subject=Notification.Subject.Assigned)
+
+    # timed assignment notifications
+    if kind == Assignment.Kind.Task:
+        duetime = get_task(item_id)["deadline"]
+        # notify assignee when overdue
+        create_assign_notify(title=f"overdue {kind} assignment",
+                             subject=Notification.Subject.Overdue,
+                             firing_time=duetime)
+
+        # notify assignee when due soon
+        due_secs = (datetime.now() - duetime).seconds
+        # notify assignee when 25% time left
+        duesoon = duetime + timedelta(seconds=0.75 * due_secs)
+        create_assign_notify(title=f"{kind} assignment due soon",
+                             subject=Notification.Subject.DueSoon,
+                             firing_time=duesoon)
+
+    elif kind == Assignment.Kind.Event:
+        duetime = get_event(item_id)["startTime"]
+        # notify assignee when event starting 
+        create_assign_notify(title=f"{kind} assignment starting soon",
+                             subject=Notification.Subject.Started,
+                             firing_time=duetime)
 
     return assign.id
 
@@ -316,5 +382,17 @@ def update_assign(assign_id, kind=None, item_id=None, assignee_id=None, assigner
 def delete_assign(assign_id):
     assign = Assignment.query.get(assign_id)
     if assign is None: raise NotFoundError
+
+    # cascade delete notifications created by assignment
+    query_assign_notifys = partial(query_notifys,
+                                   scope=assign.kind,
+                                   scope_target=assign.item_id)
+    assigner_channel_id = str(Channel(user_id=assign.assigner_id))
+    assigner_notify_ids = query_assign_notifys(channel_id=assigner_channel_id)
+    assignee_channel_id = str(Channel(user_id=assign.assignee_id))
+    assignee_notify_ids = query_assign_notifys(channel_id=assignee_channel_id)
+    for notify_id in assigner_notify_ids + assignee_notify_ids:
+        delete_notify(notify_id)
+
     db.session.delete(assign)
     db.session.commit()

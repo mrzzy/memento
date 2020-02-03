@@ -3,21 +3,33 @@ import './App.css';
 import { NavigationVisitor } from './Navigation';
 import { Redirect } from 'react-router-dom';
 import API from './API';
+import APIHelpers from './APIHelpers'
 
 class VisitorHome extends React.Component {
     constructor() {
         super();
         const api = new API();
-        this.state = { api: api };
+        const apiHelper = new APIHelpers(api);
+        this.state = { api: api, apiHelper: apiHelper, employer: false, employee: false };
     }
 
     async componentDidMount() {
-        let loggedIn = await this.state.api.authCheck();
-        if (loggedIn !== null)
-            return <Redirect to='/employee' />
+        try {
+            let loggedIn = await this.state.api.authCheck();
+            let hasEmployers = await this.state.apiHelper.isEmployer(loggedIn);
+            this.setState({ employer: hasEmployers, employee: !hasEmployers });
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     render() {
+        if (this.state.employee)
+            return <Redirect to='/employee' />
+
+        if (this.state.employer)
+            return <Redirect to='/employer' />
+
         return (
             <div>
                 <NavigationVisitor />

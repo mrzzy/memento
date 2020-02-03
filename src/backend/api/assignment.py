@@ -171,10 +171,9 @@ def route_assigns():
                                pending, due_by, skip, limit, for_day)
     return jsonify(assign_ids)
 
-# api - read, create, update, delete assignments
+# api - read, create, delete assignments
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/assign", methods=["POST"])
-@assign.route(f"/api/v{API_VERSION}/{assign.name}/assign/<assign_id>",
-              methods=["GET", "PATCH", "DELETE"])
+@assign.route(f"/api/v{API_VERSION}/{assign.name}/assign/<assign_id>", methods=["GET", "DELETE"])
 @authenticate(kind="access")
 def route_assign(assign_id=None):
     if request.method == "GET" and assign_id:
@@ -186,12 +185,6 @@ def route_assign(assign_id=None):
         params = parse_params(request, assign_mapping)
         assign_id = create_assign(**params)
         return jsonify({ "id": assign_id })
-    elif request.method == "PATCH" and assign_id and request.is_json:
-        # parse params in json
-        params = parse_params(request, assign_mapping)
-        # update assign with params in json
-        update_assign(assign_id, **params)
-        return jsonify({"success": True })
     elif request.method == "DELETE" and assign_id:
         # delete assign with params in json
         delete_assign(assign_id)

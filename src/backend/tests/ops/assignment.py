@@ -148,11 +148,6 @@ class TestAssigmentOps(TestCase):
                                           scope=Notification.Scope.Task,
                                           scope_target=task_id)) > 0)
 
-        # swap worker and manager in assignment as a proof of concept
-        update_assign(assign_id, assigner_id=worker_id, assignee_id=manager_id)
-        assign = get_assign(assign_id)
-        self.assertEqual(assign["assigneeId"], manager_id)
-
         delete_assign(assign_id)
         self.assertEqual(query_assigns(), [])
         delete_org(org_id)

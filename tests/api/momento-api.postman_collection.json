@@ -3004,71 +3004,6 @@
 					"response": []
 				},
 				{
-					"name": "update assignment",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "460b02f0-32fe-46e9-94e0-a2348cd1dfeb",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"success\"));",
-									"    assert(response.success);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"assigneeId\": {{worker_id}},\n    \"assignerId\": {{supervisor_id}},\n    \"itemId\": {{event_id}},\n    \"kind\": \"event\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://{{api_host}}/api/v1/assignment/assign/{{assign_id}}",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"assignment",
-								"assign",
-								"{{assign_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "delete assignment",
 					"event": [
 						{
@@ -4214,7 +4149,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"John and Wicks Fishery\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"

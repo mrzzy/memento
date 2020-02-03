@@ -361,22 +361,6 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
 
     return assign.id
 
-# update assignment with the given assign_id
-# kind - kind of assignment item (task, event)
-# item_id - id of the item in the assignment
-# assignee_id - id of the user that is assigned this assignment
-# assigner_id - id of the user that assigned this assignement
-# throws NotFoundError if no assign with assign_id is found
-def update_assign(assign_id, kind=None, item_id=None, assignee_id=None, assigner_id=None):
-    assign = Assignment.query.get(assign_id)
-    if assign is None: raise NotFoundError
-    # update assignment fields
-    if not kind is None: assign.kind = kind
-    if not item_id is None: assign.item_id = item_id
-    if not assignee_id is None: assign.assignee_id = assignee_id
-    if not assigner_id is None: assign.assigner_id = assigner_id
-    db.session.commit()
-
 # delete assignment with given id
 # throws NotFoundError if no assign with assign_id is found
 def delete_assign(assign_id):

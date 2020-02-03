@@ -8,9 +8,11 @@ from datetime import datetime
 
 from ..app import db
 from ..models.assignment import *
+from ..models.notification import *
 from ..mapping.assignment import *
 from ..utils import map_dict, apply_bound
 from ..api.error import NotFoundError
+from ..ops.notification import create_notify
 
 ## Task Ops
 # query ids of tasks
@@ -282,6 +284,14 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
                         assignee_id=assignee_id)
     db.session.add(assign)
     db.session.commit()
+
+    # notify assignee of new assignment
+    channel_id = str(Channel(user_id=assignee_id))
+    create_notify(f"new {type} assignment", channel_id,
+                  subject=Notification.Subject.Assigned,
+                  scope=kind,
+                  scope_target=item_id,
+                  firing_time=None) # fire now
 
     return assign.id
 

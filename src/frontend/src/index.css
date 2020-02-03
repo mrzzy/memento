@@ -305,7 +305,7 @@ div.currentTaskContent.noTasks {
 .popUp {
     position: fixed;
     background-color: white;
-    height: 50vh;
+    height: 60vh;
     width: 50vw;
     top: 25vh;
     left: 25vw;

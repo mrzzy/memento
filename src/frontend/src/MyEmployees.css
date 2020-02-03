@@ -42,7 +42,6 @@
     display: flex;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 40px;
     justify-content: space-between;
 
     display: inline-flex;
@@ -50,15 +49,23 @@
     align-items: flex-end;
     max-width: 100%;
 }
+.aTaskList button {
+    background-color: #ffda79;
+    border-radius: 10pc;
+    border: none;
+    width: 20%;
+    font-size: 30px;
+    margin-bottom: 3%;
+    font-weight: 500;
+}
+
 .taskList button {
     background-color: #ffda79;
     border-radius: 10pc;
-    width: 10rem;
-    height: 2rem;
     border: none;
     font-weight: 900;
-
 }
+
 .taskList button:hover{
     background-color: var(--main-color);
 }
@@ -94,9 +101,12 @@
     justify-content: center;
 }
 .popUp button {
-    align-self: flex-end;
+    font-size: 150%;
     border: none;
-    margin-right: 1rem;
+    margin-left: 1rem;
+    background-color: #ffffff;
+    position: fixed;
+    top: 195px;
 }
 .popUp form {
     display: inline-flex;
@@ -136,4 +146,10 @@
 }
 .popUp button:focus {
     outline: none;
+}
+
+@media only screen and (max-width: 670px) {
+.popUp{
+    height: 60vh;
+  }
 }

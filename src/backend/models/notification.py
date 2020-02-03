@@ -38,7 +38,7 @@ class Notification(db.Model):
     # subject defines the purpose of which the notification is sent
     class Subject:
         Changed = "changed"
-        Created = "created"
+        Assigned = "assigned"
         Started = "started"
         DueSoon = "soondue"
         Completed = "completed"

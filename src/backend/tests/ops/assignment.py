@@ -53,7 +53,7 @@ class TestAssigmentOps(TestCase):
         # check auto notifications are created properly
         self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=worker_id)),
                                           subject=Notification.Subject.Assigned)) > 0)
-        self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=worker_id)),
+        self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=manager_id)),
                                           subject=Notification.Subject.Overdue)) > 0)
         self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=worker_id)),
                                           subject=Notification.Subject.DueSoon)) > 0)

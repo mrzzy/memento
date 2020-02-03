@@ -326,14 +326,15 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
     db.session.add(assign)
     db.session.commit()
 
-    channel_id = str(Channel(user_id=assignee_id))
+    assignee_channel_id = str(Channel(user_id=assignee_id))
+    assigner_channel_id = str(Channel(user_id=assigner_id))
 
     # notify assignee of new assignment
     create_assign_notify = partial(create_notify,
-                                   channel_id=channel_id,
                                    scope=kind,
                                    scope_target=item_id)
     create_assign_notify(title=f"new {kind} assignment",
+                         channel_id=assignee_channel_id,
                          subject=Notification.Subject.Assigned)
 
     # timed assignment notifications
@@ -342,6 +343,7 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
         # notify assignee when overdue
         create_assign_notify(title=f"overdue {kind} assignment",
                              subject=Notification.Subject.Overdue,
+                             channel_id=assigner_channel_id,
                              firing_time=duetime)
 
         # notify assignee when due soon
@@ -350,13 +352,15 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
         duesoon = duetime + timedelta(seconds=0.75 * due_secs)
         create_assign_notify(title=f"{kind} assignment due soon",
                              subject=Notification.Subject.DueSoon,
+                             channel_id=assignee_channel_id,
                              firing_time=duesoon)
 
     elif kind == Assignment.Kind.Event:
         duetime = get_event(item_id)["startTime"]
         # notify assignee when event starting 
-        create_assign_notify(title=f"{kind} assignment starting soon",
+        create_assign_notify(title=f"{kind} assignment starting",
                              subject=Notification.Subject.Started,
+                             channel_id=assignee_channel_id,
                              firing_time=duetime)
 
     return assign.id

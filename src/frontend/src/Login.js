@@ -44,13 +44,10 @@ class Login extends React.Component {
         //let employer = ["employer", "pass"];
         e.preventDefault();
         const hasLogin = await this.state.api.login(this.state.username, this.state.password);
-        alert("Login works");
         if (hasLogin) {
             try {
                 let id = await this.state.api.authCheck();
-                alert("Auth check works");
                 let hasEmployees = await this.state.apiHelper.isEmployer(id);
-                alert("isEmployer works");
                 this.setState({ employee: !hasEmployees, employer: hasEmployees });
             } catch (e) {
                 console.error(e);

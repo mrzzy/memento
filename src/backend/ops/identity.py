@@ -65,12 +65,12 @@ def delete_org(org_id):
     org = Organisation.query.get(org_id)
     if org is None: raise NotFoundError
 
-    # cascade delete users
-    user_ids = query_users(org_id=org_id)
-    for user_id in user_ids: delete_user(user_id)
     # cascade delete teams
     team_ids = query_teams(org_id=org_id)
     for team_id in team_ids: delete_team(team_id)
+    # cascade delete users
+    user_ids = query_users(org_id=org_id)
+    for user_id in user_ids: delete_user(user_id)
     # cascade delete scopped roles
     role_ids = query_roles(org_id=org_id)
     for role_id in role_ids: delete_role(role_id)
@@ -126,17 +126,22 @@ def update_team(team_id, org_id=None, name=None):
 
 
 # delete team for id 
-# cascade delete team assignments to users
+# cascade delete team assignments to users & team roles
 # throws NotFoundError if no team with team_id is found
 def delete_team(team_id):
+    print(f"delete team: {team_id}")
+    #if team_id == 8: raise ValueError
     team = Team.query.get(team_id)
     if team is None: raise NotFoundError
 
     # cascade delete assignments 
     user_ids = query_users(team_id=team_id)
     for user_id in user_ids:
-        _ , rolebind_id = get_team_member_ids(team_id, user_id)
+        role_id, rolebind_id = get_team_member_ids(team_id, user_id)
         unassign_team(rolebind_id)
+    # cascade delete roles
+    for role_id in query_roles(team_id=team_id):
+        delete_role(role_id)
 
     db.session.delete(team)
     db.session.commit()
@@ -351,10 +356,12 @@ def delete_manage(rolebind_id):
 # query id of roles based on params:
 # org_id - show only managements that are scoped to the given organisation
 # user_id - show only roles that are scoped to the given user
+# team_id - show only roles that are scoped to given team
 # bound_to - show only role that are bound to the given user
 # skip - skip the first skip organisations
 # limit - output ids limit to the first limit organisations
-def query_roles(org_id=None, user_id=None, bound_to=None, skip=None, limit=None):
+def query_roles(org_id=None, user_id=None, team_id=None,
+                bound_to=None, skip=None, limit=None):
     role_ids = Role.query.with_entities(Role.id)
     # apply filters
     if not org_id is None:
@@ -363,6 +370,9 @@ def query_roles(org_id=None, user_id=None, bound_to=None, skip=None, limit=None)
     if not user_id is None:
         role_ids = role_ids.filter_by(scope_kind=Role.ScopeKind.User,
                                       scope_target=user_id)
+    if not team_id is None:
+        role_ids = role_ids.filter_by(scope_kind=Role.ScopeKind.Team,
+                                      scope_target=team_id)
     if not bound_to is None:
         role_ids = role_ids.join(RoleBinding, RoleBinding.role_id == Role.id)
         role_ids = role_ids.filter(RoleBinding.user_id == bound_to)
@@ -483,6 +493,7 @@ def delete_role_relation(rolebind_id):
 
     # check if role has any rolebindings, if so delete role too
     rolebind_ids = RoleBinding.query.filter_by(role_id=role_id)
+    print(f"{role_id}: {rolebind_ids.count()}")
     if rolebind_ids.count() < 1:
         delete_role(role_id)
 

@@ -140,7 +140,7 @@ def route_users():
 
 # api - create users
 @identity.route(f"/api/v{API_VERSION}/{identity.name}/user", methods=["POST"])
-def route_create_user(user_id=None):   
+def route_create_user(user_id=None):
     if request.method == "POST" and request.is_json:
         # create user with params in json
         params = parse_params(request, user_mapping)
@@ -231,10 +231,12 @@ def route_roles():
     if not org_id is None: org_id = int(org_id)
     user_id = request.args.get("user", None)
     if not user_id is None: user_id = int(user_id)
+    team_id = request.args.get("team", None)
+    if not team_id is None: team_id = int(team_id)
     bound_user_id =  request.args.get("bound-to", None)
     if not bound_user_id is None: bound_user_id = int(bound_user_id)
-    role_ids = query_roles(org_id=org_id, user_id=user_id, bound_to=bound_user_id,
-                           skip=skip, limit=limit)
+    role_ids = query_roles(org_id=org_id, user_id=user_id, team_id=team_id,
+                           bound_to=bound_user_id, skip=skip, limit=limit)
 
     return jsonify(role_ids)
 

@@ -47,6 +47,7 @@ class MyEmployees extends React.Component {
     async componentDidMount() {
         try {
             const loggedIn = await this.state.api.authCheck();
+            let redirectToEmployee = await this.state.apiHelper.isEmployer(loggedIn);
 
             this.settingUp(loggedIn)
                 .then(details => {
@@ -55,7 +56,8 @@ class MyEmployees extends React.Component {
                         employees: details[1],
                         employeeToTask: details[2],
                         myEmployees: details[3],
-                        userId: loggedIn
+                        userId: loggedIn,
+                        redirectToEmployee: !redirectToEmployee
                     });
                 })
 
@@ -188,8 +190,10 @@ class MyEmployees extends React.Component {
     }
 
     render() {
-        if (this.state.api.authCheck() === null)
+        if (this.state.userId === null)
             return <Redirect to='/' />
+        else if (this.state.redirectToEmployee)
+            return <Redirect to='/employee' />
 
         return (
             <div>

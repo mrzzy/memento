@@ -4,6 +4,7 @@ import './EmployerHome.css';
 import { NavigationEmployer } from './Navigation';
 import { Redirect } from 'react-router-dom';
 import API from './API';
+import APIHelpers from './APIHelpers';
 
 // Dummy data.
 
@@ -26,13 +27,16 @@ import API from './API';
 
 // date object with new Date(0), setMiliseconds to Date.parse("ISOstring")
 
+let testDate = new Date();
+testDate.setHours(12, 30);
+
 var myemployees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }, { userId: 3, name: "Jessie" }, { userId: 4, name: "Guhesh" }];
 var tasks = [
-    { taskId: 2, userId: 1, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
-    { taskId: 3, userId: 3, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
-    { taskId: 4, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
-    { taskId: 5, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
-    { taskId: 6, userId: 4, completed: false, deadline: "2020-01-30T04:30:05.244Z", duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
+    { taskId: 2, userId: 1, completed: false, deadline: testDate.toISOString(), duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
+    { taskId: 3, userId: 3, completed: false, deadline: testDate.toISOString(), duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
+    { taskId: 4, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+    { taskId: 5, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
+    { taskId: 6, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
 ];
 
 
@@ -59,13 +63,87 @@ class EmployerHome extends React.Component {
         }
 
         const api = new API();
+        const apiHelper = new APIHelpers(api);
 
-        this.state = { api: api, tasks: filteredTasks, employees: employees };
+        this.state = { api: api, apiHelper: apiHelper, tasks: filteredTasks, employees: employees };
+    }
+
+    async componentDidMount() {
+        try {
+            const loggedIn = await this.state.api.authCheck();
+            let redirectToEmployee = await this.state.apiHelper.isEmployer(loggedIn);
+            this.settingUp(loggedIn)
+                .then(details => {
+                    this.setState({
+                        tasks: details[0],
+                        employees: details[1],
+                        userId: loggedIn,
+                        redirectToEmployee: !redirectToEmployee
+                    });
+                })
+
+        } catch (e) {
+            console.error(e);
+            if (this.state.userId !== null)
+                this.setState({ userId: null });
+        }
+    }
+
+    async settingUp(loggedIn) {
+        /* taskId: 2
+         * userId: 1
+         * completed: false
+         * deadline: ""
+         * duration: 3600
+         * name: "Finish Project"
+         * description: "This is a test description to test out the front end." */
+
+        let filteredTasks = []; // array of tasks
+        let employees = {}; // id: name
+
+        const manages = await this.state.api.query("manage", { "manager": loggedIn });
+        const employeeIds = await manages.map((manage) => manage.match(/[0-9]+/)[0]); // returns list of employeeIds
+        let myEmployees = [];
+        for (const id of employeeIds) {
+            let user = await this.state.api.get("user", id)
+            myEmployees.push({ userId: parseInt(id), name: user.name });
+            console.log(myEmployees);
+        }
+
+        let tasks = {};
+        let date = new Date();
+
+        for (const employee of myEmployees) {
+            let taskIds = await this.state.apiHelper.getTasks(employee.userId);
+
+            for (const taskId of taskIds) {
+                let task = await this.state.api.get("task", taskId);
+
+                let taskDate = new Date(0);
+                taskDate.setMilliseconds(Date.parse(task.deadline));
+
+                if (taskDate.getDate() == date.getDate() && !task.completed) {
+                    task.id = taskId;
+                    task.userId = employee.userId;
+                    filteredTasks.push(task);
+                }
+            }
+
+            console.log(tasks);
+        }
+
+        for (let i = 0; i < myEmployees.length; i++) {
+            employees[myEmployees[i].userId] = myEmployees[i].name;
+        }
+
+        return [filteredTasks, employees];
     }
 
     render() {
-        if (this.state.api.authCheck() === null)
+        if (this.state.userId === null)
             return <Redirect to='/' />
+        else if (this.state.redirectToEmployee)
+            return <Redirect to='/employee' />
 
         return (
             <div>

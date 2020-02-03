@@ -66,14 +66,13 @@ const dummyTaskList = [
 class EmployeeHome extends React.Component {
     constructor() {
         super();
-        this.state = { taskList: [] }
         this.taskListElement = React.createRef();
         const api = new API();
         /* To use for testing when the server is down
          * uncomment to see website with tasks */
         // set state: taskList: dummyTaskList, 
 
-        this.state = { taskList: [], api: api, apiHelpers: new APIHelpers(api) };
+        this.state = { taskList: null, api: api, apiHelpers: new APIHelpers(api) };
     }
 
     async componentDidMount() {
@@ -81,17 +80,14 @@ class EmployeeHome extends React.Component {
 
         try {
             let loggedIn = await this.state.api.authCheck();
-            this.setState({ userId: loggedIn });
+            this.setState({ userId: parseInt(loggedIn) });
+            let taskList = await this.getTaskList();
+            this.setState({ taskList: taskList });
+            this.taskListElement.current.updateAllTasksList(taskList);
         } catch (e) {
             if (this.state.userId !== null)
                 this.setState({ userId: null });
         }
-
-        this.setState({ userId: await this.state.api.authCheck() });
-
-        let taskList = await this.getTaskList();
-
-        this.taskListElement.current.updateAllTasksList(taskList);
     }
 
     async componentDidUpdate() {
@@ -264,8 +260,13 @@ class ToDoList extends React.Component {
 
     componentDidMount() {
         // To get all the tasks that have not been finished.
-        let allTasksList = [...this.state.allTasksList];
-        let unfinishedTasks = allTasksList.filter(task => task.completed === false);
+        let unfinishedTasks;
+        if (this.state.allTasksList !== null) {
+            let allTasksList = [...this.state.allTasksList];
+            unfinishedTasks = allTasksList.filter(task => task.completed === false);
+        }
+        else
+            unfinishedTasks = null;
         this.setState({ unfinishedTasksList: unfinishedTasks });
     }
 
@@ -312,7 +313,7 @@ class ToDoList extends React.Component {
         return (
             <div className="toDoList">
                 <h2>TO DO LIST</h2>
-                {
+                {(this.state.unfinishedTasksList !== null) ?
                     this.state.unfinishedTasksList.map(task =>
                         <Task
                             key={task.id}
@@ -322,7 +323,8 @@ class ToDoList extends React.Component {
                             duration={task.duration}
                             remove={this.removeTask}
                             secondsToHMS={this.props.secondsToHMS}
-                            currentTaskNull={this.state.currentTaskNull} />)
+                            currentTaskNull={this.state.currentTaskNull} />) :
+                    <p>Loading...</p>
                 }
             </div>
         );
@@ -393,14 +395,24 @@ class CurrentTask extends React.Component {
 
     async finishTask() {
         // TO DO : CREATE NOTIFICATION FOR PI
-        //// create channel
+        // create channel
         //let api = new API();
         //let id = api.authCheck();
         //let newChannel = { kind: "task", userId: id };
-        //api.post("channel", newChannel);
+        //let channelId = await api.post("channel", newChannel);
 
         //// create notification
-        //let newNotification = 
+        //let currentTime = new Date().getTime() + 3000;
+        //let fireTime = new Date(0);
+        //fireTime.setMilliseconds(currentTime);
+        //let newNotification = {
+        //    title: this.state.currentTask.name,
+        //    description: this.state.currentTask.description,
+        //    firingTime: fireTime.toISOString(),
+        //    channelId: channelId
+        //};
+
+        //await api.post("notify", newNotification);
 
         this.props.updateToDoListElement(this.state.currentTask.id); // to update to do list component's allTaskList
         clearInterval(this.state.countDownTimer);

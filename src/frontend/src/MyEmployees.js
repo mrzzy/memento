@@ -46,6 +46,8 @@ class MyEmployees extends React.Component {
     async componentDidMount() {
         try {
             const loggedIn = await this.state.api.authCheck();
+            const channel = await this.state.apiHelper.getChannel(loggedIn);
+            this.state.api.subscribe(channel, this.wsHandler);
             let redirectToEmployee = await this.state.apiHelper.isEmployer(loggedIn);
 
             this.settingUp(loggedIn)
@@ -117,6 +119,19 @@ class MyEmployees extends React.Component {
         }
 
         return [filteredTasks, employees, employeeToTask, myEmployees];
+    }
+
+    wsHandler = (notify) => {
+        console.log("Logging notify...");
+        console.log(notify);
+        if (notify.scope === "task") {
+            if (notify.subject === "completed") {
+                this.settingUp(this.state.userId)
+                    .then(details => {
+                        this.setState({ tasks: details[0] });
+                    })
+            }
+        }
     }
 
     // change "30-12-2020" to date object

@@ -99,7 +99,10 @@ class EmployerHome extends React.Component {
             if (notify.subject === "completed") {
                 this.settingUp(this.state.userId)
                     .then(details => {
-                        this.setState({ tasks: details[0] });
+                        this.setState({
+                            tasks: details[0],
+                            employees: details[1]
+                        });
                     })
             }
         }

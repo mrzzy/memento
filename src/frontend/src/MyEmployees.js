@@ -47,7 +47,7 @@ class MyEmployees extends React.Component {
         try {
             const loggedIn = await this.state.api.authCheck();
             const channel = await this.state.apiHelper.getChannel(loggedIn);
-            this.state.api.subscribe(channel, this.wsHandler);
+            await this.state.api.subscribe(channel, this.wsHandler);
             let redirectToEmployee = await this.state.apiHelper.isEmployer(loggedIn);
 
             this.settingUp(loggedIn)
@@ -128,7 +128,12 @@ class MyEmployees extends React.Component {
             if (notify.subject === "completed") {
                 this.settingUp(this.state.userId)
                     .then(details => {
-                        this.setState({ tasks: details[0] });
+                        this.setState({
+                            tasks: details[0],
+                            employees: details[1],
+                            employeeToTask: details[2],
+                            myEmployees: details[3]
+                        });
                     })
             }
         }

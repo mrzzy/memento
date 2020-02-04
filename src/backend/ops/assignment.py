@@ -104,6 +104,7 @@ def update_task(task_id, name=None, deadline=None, duration=None,
     if not author_id is None: task.author_id = author_id
     if not description is None: task.description = description
     if not started is None: task.started = started
+    if not completed is None: task.completed = completed
 
     db.session.commit()
 

@@ -33,7 +33,7 @@ export default class APIHelpers {
 
     // get tasks assigned to userId for the given date
     // userId - id of the employee to get tasks for
-    // date - UTC datetime specifying the day to get tasks
+    // date - ISO datetime specifying the day to get tasks
     // returns task ids
     async getTasksForDate(userId, date) {
         const taskIds = await this.api.query("task", {"assignee": userId, "for-day": date});

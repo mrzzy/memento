@@ -44,33 +44,35 @@ class EmployerHome extends React.Component {
 
     constructor() {
         super();
-        let filteredTasks = [];
-        let employees = {}
-        for (let i = 0; i < tasks.length; i++) {
-            let stringDate = tasks[i].deadline;
-            let mili = Date.parse(stringDate);
-            let taskDeadline = new Date(0);
-            taskDeadline.setMilliseconds(mili);
+        //let filteredTasks = [];
+        //let employees = {}
+        //for (let i = 0; i < tasks.length; i++) {
+        //    let stringDate = tasks[i].deadline;
+        //    let mili = Date.parse(stringDate);
+        //    let taskDeadline = new Date(0);
+        //    taskDeadline.setMilliseconds(mili);
 
-            let today = new Date();
+        //    let today = new Date();
 
-            if (taskDeadline.getDate() === today.getDate())
-                filteredTasks.push(tasks[i])
-        }
+        //    if (taskDeadline.getDate() === today.getDate())
+        //        filteredTasks.push(tasks[i])
+        //}
 
-        for (let i = 0; i < myemployees.length; i++) {
-            employees[myemployees[i]["userId"]] = myemployees[i]["name"];
-        }
+        //for (let i = 0; i < myemployees.length; i++) {
+        //    employees[myemployees[i]["userId"]] = myemployees[i]["name"];
+        //}
 
         const api = new API();
         const apiHelper = new APIHelpers(api);
 
-        this.state = { api: api, apiHelper: apiHelper, tasks: filteredTasks, employees: employees };
+        this.state = { api: api, apiHelper: apiHelper, tasks: null, employees: null };
     }
 
     async componentDidMount() {
         try {
             const loggedIn = await this.state.api.authCheck();
+            const channel = await this.state.apiHelper.getChannel(loggedIn);
+            this.state.api.subscribe(channel, this.wsHandler);
             let redirectToEmployee = await this.state.apiHelper.isEmployer(loggedIn);
             this.settingUp(loggedIn)
                 .then(details => {
@@ -86,6 +88,20 @@ class EmployerHome extends React.Component {
             console.error(e);
             if (this.state.userId !== null)
                 this.setState({ userId: null });
+        }
+    }
+
+    wsHandler = (notify) => {
+        console.log("Logging notify...")
+        console.log(notify);
+
+        if (notify.scope === "task") {
+            if (notify.subject === "completed") {
+                this.settingUp(this.state.userId)
+                    .then(details => {
+                        this.setState({ tasks: details[0] });
+                    })
+            }
         }
     }
 
@@ -224,8 +240,10 @@ class AllEmployeesTasks extends React.Component {
     }
 
     render() {
-        const tasks = this.props.tasks.map((task) =>
-                <div className="employeeTask" key={task.taskId}>
+        let tasks;
+        if (this.props.tasks !== null) {
+            tasks = this.props.tasks.map((task) =>
+                <div className="employeeTask" key={task.id}>
                     <div className="profile">
                         <img src="./anon.png" alt="Employee Profile Pic" />
                         <span className="userName">{this.props.employees[task.userId]}</span>
@@ -237,12 +255,16 @@ class AllEmployeesTasks extends React.Component {
                     </div>
                     <span className="deadline">{this.deadline(task.deadline)}</span>
                 </div>
-        );
+            );
+        }
+
+        else
+            tasks = null;
 
         return (
             <div>
                 <h2 className="sectionTitle">Employees' Tasks</h2>
-                {tasks}
+                {(tasks === null) ? <p style={{marginLeft:"10vw"}}>Loading...</p> : tasks}
             </div>
         );
     }

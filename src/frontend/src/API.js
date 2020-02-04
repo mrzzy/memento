@@ -23,8 +23,8 @@ export default class API {
             this.protocol = "https"
             this.socketProtocol = "wss";
         } else {
-            this.protocol = "http";
-            this.socketProtocol = "ws";
+            this.protocol = "https";
+            this.socketProtocol = "wss";
         }
     
         // build api root url from configuration

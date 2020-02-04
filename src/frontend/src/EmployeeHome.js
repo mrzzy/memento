@@ -82,6 +82,8 @@ class EmployeeHome extends React.Component {
             let loggedIn = await this.state.api.authCheck();
             this.setState({ userId: parseInt(loggedIn) });
             let taskList = await this.getTaskList();
+            let channel = await this.state.apiHelpers.getChannel(loggedIn);
+            await this.state.api.subscribe(channel, this.wsHandler);
             this.setState({ taskList: taskList });
             this.taskListElement.current.updateAllTasksList(taskList);
         } catch (e) {
@@ -97,6 +99,19 @@ class EmployeeHome extends React.Component {
         } catch (e) {
             if (this.state.userId !== null)
                 this.setState({ userId: null });
+        }
+    }
+
+    wsHandler = (notify) => {
+        console.log("Logging notify... line 105");
+        console.log(notify);
+
+        if (notify.subject === "assigned") {
+            this.getTaskList()
+                .then((taskList) => {
+                    this.setState({ taskList: taskList });
+                    this.taskListElement.current.updateAllTasksList(taskList);
+                });
         }
     }
 
@@ -275,7 +290,7 @@ class ToDoList extends React.Component {
         this.setState({ unfinishedTasksList: unfinishedTasks, allTasksList: tasks });
     }
 
-    updateCompletedTask(id) {
+    async updateCompletedTask(id) {
         // Loop through the list of tasks to find the specific task.
         for (let i = 0; i < this.state.allTasksList.length; i++) {
             if (this.state.allTasksList[i].id === id) {
@@ -289,7 +304,9 @@ class ToDoList extends React.Component {
                 delete update.id;
                 delete update.started;
                 update.completed = true;
-                this.props.api.update("task", id, update);
+                let response = await this.props.api.update("task", id, update);
+                console.log("Logging response Line 293...");
+                console.log(response);
                 break;
             }
         }

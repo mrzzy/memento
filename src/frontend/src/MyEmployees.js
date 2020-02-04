@@ -26,16 +26,15 @@ class MyEmployees extends React.Component {
 
         // [filteredTasks, employees, employeeToTask]
         //let details = this.settingUp();
-        let details = [[],[],[], []];
         const api = new API();
         const apiHelper = new APIHelpers(api);
         this.createTask = this.createTask.bind(this);
 
         this.state = {
-            tasks: details[0],
-            employees: details[1],
-            employeeToTask: details[2],
-            myEmployees: details[3],
+            tasks: [],
+            employees: [],
+            employeeToTask: [],
+            myEmployees: null,
             activated: -1,
             popUp: null,
             newTask: {},
@@ -79,7 +78,6 @@ class MyEmployees extends React.Component {
         for (const id of employeeIds) {
             let user = await this.state.api.get("user", id)
             myEmployees.push({ userId: parseInt(id), name: user.name });
-            console.log(myEmployees);
         }
 
         let tasks = [];
@@ -93,8 +91,6 @@ class MyEmployees extends React.Component {
                 task.userId = employee.userId;
                 tasks.push(task);
             }
-
-            console.log(tasks);
         }
 
         for (let i = 0; i < tasks.length; i++) {
@@ -140,7 +136,10 @@ class MyEmployees extends React.Component {
 
     onChange = (e) => {
         let newTask = this.state.newTask;
-        newTask[e.target.name] = e.target.value;
+        if (e.target.name === "duration")
+            newTask[e.target.name] = e.target.value * 60;
+        else
+            newTask[e.target.name] = e.target.value;
         this.setState({ newTask: newTask });
     }
 
@@ -201,7 +200,7 @@ class MyEmployees extends React.Component {
                 <h1 className="pagetitle">MY EMPLOYEES</h1>
                 <Calendar />
                 <div>
-                    {this.state.myEmployees.map((employee) =>
+                    {(this.state.myEmployees !== null)? this.state.myEmployees.map((employee) =>
                         <Employee
                             key={employee["userId"]}
                             tasks={(this.state.employeeToTask[employee["userId"]] === undefined) ? [] : this.state.employeeToTask[employee["userId"]]}
@@ -210,7 +209,7 @@ class MyEmployees extends React.Component {
                             showMore={this.showMore.bind(null, employee)}
                             addTaskPopUp={this.addTaskPopUp.bind(null, employee)}
                             showTasks={(this.state.activated === employee["userId"]) ? true : false} />
-                    )}
+                    ) : <p style={{ marginLeft: "10vw" }}>Loading...</p>}
                 </div>
                 {this.state.popUp}
             </div>

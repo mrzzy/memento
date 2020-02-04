@@ -341,7 +341,7 @@ class AddEmployeeTask extends React.Component {
     render() {
         return (
             <div className="popUp">
-                <button onClick={this.props.cancelPopUp}>X</button>
+                <button className="btnX" onClick={this.props.cancelPopUp}>X</button>
                 <h2>Task For <span className="popUpName">{this.props.name}</span></h2>
                 <form onSubmit={this.props.createTask}>
                     <input onChange={this.props.onChange} className="forminput" id="taskTitle" type="text" name="taskTitle" placeholder="TITLE" required />

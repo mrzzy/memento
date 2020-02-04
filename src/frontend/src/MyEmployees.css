@@ -101,7 +101,7 @@
     flex-flow: column wrap;
     justify-content: center;
 }
-.popUp button {
+.btnX {
     font-size: 150%;
     border: none;
     margin-left: 1rem;

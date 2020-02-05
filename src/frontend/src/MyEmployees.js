@@ -327,7 +327,7 @@ class Employee extends React.Component {
                     <span className="taskDesc">{task.description}</span>
                 </div>
                 <span className="deadline">{this.deadline(task.deadline)}</span>
-                <img style={{ width: "70px" }} src={task.started ? "./workingon.png" : "tobecompleted.png"} />
+                <div className="status"><img style={{ width: "70px" }} src={task.started ? "./workingon.png" : "tobecompleted.png"} /></div>
             </div>
         );
 
@@ -365,7 +365,7 @@ class AddEmployeeTask extends React.Component {
                     <input onChange={this.props.onChange} className="forminput" id="taskTitle" type="text" name="taskTitle" placeholder="TITLE" required />
                     <input onChange={this.props.onChange} className="forminput" id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
                     <input onChange={this.props.onChange} className="forminput" type="date" name="deadlineDate" required />
-                    <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" min="09:00" max="18:00" required />
+                    <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" required />
                     <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="1000" />
                     <input type="submit" value=">" />
                 </form>

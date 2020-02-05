@@ -27,17 +27,17 @@ import APIHelpers from './APIHelpers';
 
 // date object with new Date(0), setMiliseconds to Date.parse("ISOstring")
 
-let testDate = new Date();
-testDate.setHours(12, 30);
+//let testDate = new Date();
+//testDate.setHours(12, 30);
 
-var myemployees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }, { userId: 3, name: "Jessie" }, { userId: 4, name: "Guhesh" }];
-var tasks = [
-    { taskId: 2, userId: 1, completed: false, deadline: testDate.toISOString(), duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
-    { taskId: 3, userId: 3, completed: false, deadline: testDate.toISOString(), duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
-    { taskId: 4, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
-    { taskId: 5, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
-    { taskId: 6, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
-];
+//var myemployees = [{ userId: 1, name: "John" }, { userId: 2, name: "Adel" }, { userId: 3, name: "Jessie" }, { userId: 4, name: "Guhesh" }];
+//var tasks = [
+//    { taskId: 2, userId: 1, completed: false, deadline: testDate.toISOString(), duration: 3600, name: "Finish Project", description: "This is a test description to test out the front end." },
+//    { taskId: 3, userId: 3, completed: false, deadline: testDate.toISOString(), duration: 3600, name: "Start next project", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat" },
+//    { taskId: 4, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Sweep Some floors", description: "This is a test description to test out the front end." },
+//    { taskId: 5, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Make some wine", description: "This is a test description to test out the front end." },
+//    { taskId: 6, userId: 4, completed: false, deadline: testDate.toISOString(), duration: 36000, name: "Drink that coke", description: "This is a test description to test out the front end." },
+//];
 
 
 class EmployerHome extends React.Component {
@@ -69,6 +69,10 @@ class EmployerHome extends React.Component {
         this.state = { api: api, apiHelper: apiHelper, tasks: null, employees: null };
     }
 
+    componentWillUnmount() {
+        console.log("Unmounting Employer Home...");
+    }
+
     async componentDidMount() {
         try {
             const loggedIn = await this.state.api.authCheck();
@@ -95,7 +99,6 @@ class EmployerHome extends React.Component {
     wsHandler = (notify) => {
         console.log("Logging notify...")
         console.log(notify);
-        let tasks = [...this.state.tasks];
         if (notify.scope === "task") {
             if (notify.subject === "completed") {
                 this.settingUp(this.state.userId)
@@ -103,7 +106,8 @@ class EmployerHome extends React.Component {
                         for (let task of this.state.tasks) {
                             if (task.id !== notify.scopeTarget)
                                 continue;
-                            this.openPopUp(this.state.employees[task.userId], task.name);
+                            if (this.popUpElement.current !== null)
+                                this.openPopUp(this.state.employees[task.userId], task.name);
                         }
                         this.setState({
                             tasks: details[0],
@@ -146,7 +150,6 @@ class EmployerHome extends React.Component {
             myEmployees.push({ userId: parseInt(id), name: user.name });
         }
 
-        let tasks = {};
         let date = new Date();
 
         for (const employee of myEmployees) {
@@ -158,7 +161,7 @@ class EmployerHome extends React.Component {
                 let taskDate = new Date(0);
                 taskDate.setMilliseconds(Date.parse(task.deadline));
 
-                if (taskDate.getDate() == date.getDate() && !task.completed) {
+                if (taskDate.getDate() === date.getDate() && !task.completed) {
                     task.id = taskId;
                     task.userId = employee.userId;
                     filteredTasks.push(task);
@@ -260,11 +263,18 @@ class AllEmployeesTasks extends React.Component {
         return deadline;
     }
 
+    whichColour(started) {
+        if (started)
+            return "linear-gradient(to right, rgb(246, 247, 248) 0%, rgb(246, 247, 248) 83%, #97e5df 83%, #97e5df 100%)";
+        else
+            return "linear-gradient(to right, rgb(246, 247, 248) 0%, rgb(246, 247, 248) 83%, #ffd159 83%, #ffd159 100%)";
+    }
+
     render() {
         let tasks;
         if (this.props.tasks !== null) {
             tasks = this.props.tasks.map((task) =>
-                <div className="employeeTask" key={task.id}>
+                <div className="employeeTask" key={task.id} style={{ background: this.whichColour(task.started)}}>
                     <div className="profile">
                         <img
                             src={(this.props.employees[task.userId] === "Adeline") ? "adeline.jpg" : "./anon.png"}
@@ -278,7 +288,7 @@ class AllEmployeesTasks extends React.Component {
                         <p>{task.description}</p>
                     </div>
                     <span className="deadline">{this.deadline(task.deadline)}</span>
-                    <img style={{ width: "90px" }} src={task.started ? "./workingon.png" : "tobecompleted.png"} />
+                    <img style={{ width: "90px" }} alt="Status of task" src={task.started ? "./workingon.png" : "tobecompleted.png"} />
                 </div>
             );
         }

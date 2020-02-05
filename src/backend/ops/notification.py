@@ -147,7 +147,7 @@ def create_notify(title, channel_id, subject=Notification.Subject.Changed,
     db.session.commit()
 
     # notify users of notification change 
-    if notify.pending: schedule_notify(notify.id)
+    schedule_notify(notify.id)
 
     return notify.id
 
@@ -219,10 +219,11 @@ def schedule_notify(notify_id):
     if notify is None: raise NotFoundError
     channel_id = notify.channel_id
     firing_time = notify.firing_time
+    subject = notify.subject
 
     if not notify.pending:
         # notification no longer pending
-        raise ValueError( "Attempted to schedule a notification that is not pending")
+        raise TypeError("Attempted to schedule a notification that is not pending")
 
     def fire_notify():
         # return db connection to pool
@@ -231,8 +232,10 @@ def schedule_notify(notify_id):
         db.session.remove()
         # wait till notification firing time
         time_till_fire = (firing_time - datetime.utcnow()).total_seconds()
+        print(f"waiting to fire notify: {subject} for {time_till_fire} secs")
         time.sleep(max(0, time_till_fire))
         # publish firing message on channel
+        print(f"fired notify: {subject} on {channel_id}")
         message_broker.publish(f"channel/{channel_id}", f"notify/{notify_id}")
     gevent.spawn(fire_notify)
 

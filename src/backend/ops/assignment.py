@@ -13,7 +13,7 @@ from ..models.notification import *
 from ..mapping.assignment import *
 from ..utils import map_dict, apply_bound
 from ..api.error import NotFoundError
-from ..ops.notification import create_notify, query_notifys, delete_notify
+from ..ops.notification import *
 
 ## Task Ops
 # query ids of tasks
@@ -141,6 +141,21 @@ def update_task(task_id, name=None, deadline=None, duration=None,
         for notify_id in overdue_ids + duesoon_ids:
             delete_notify(notify_id)
 
+    # update duesoon & duetime notification to the new deadline if changeed
+    if deadline:
+        # notify assignee when dealdine
+        overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
+        for notify_id in overdue_ids:
+            update_notify(notify_id, firing_time=deadline)
+
+        # notify assignee when due soon
+        due_secs = (datetime.utcnow() - deadline).seconds
+        # notify assignee when 25% time left
+        duesoon = deadline + timedelta(seconds=0.75 * due_secs)
+        duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
+        for notify_id in overdue_ids:
+            update_notify(notify_id, firing_time=duesoon)
+
 # delete the task for the given task id
 # cascade deletes and dependent objects on task
 # throws NotFoundError if no task with task_id is found
@@ -239,6 +254,14 @@ def update_event(event_id=None, name=None, start_time=None,
     if not author_id is None: event.author_id = author_id
     if not description is None: event.description = description
     db.session.commit()
+
+    # update event staring notification
+    notify_ids = query_notifys(scope=Notification.Scope.Task,
+                               scope_target=event_id,
+                               subject=Notification.Subject.Started)
+    for notify_id in notify_ids:
+        update_notify(notify_id, firing_time=start_time)
+
 
 # delete the event for the given event id
 # cascade deletes and dependent objects on event
@@ -348,13 +371,15 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
                              firing_time=duetime)
 
         # notify assignee when due soon
-        due_secs = (datetime.now() - duetime).seconds
+        due_secs = (datetime.utcnow() - duetime).seconds
         # notify assignee when 25% time left
         duesoon = duetime + timedelta(seconds=0.75 * due_secs)
         create_assign_notify(title=f"{kind} assignment due soon",
                              subject=Notification.Subject.DueSoon,
                              channel_id=assignee_channel_id,
                              firing_time=duesoon)
+
+        print(f"duetime: {duetime}, duesoon: {duesoon}, duesecs: {due_secs}")
 
     elif kind == Assignment.Kind.Event:
         duetime = get_event(item_id)["startTime"]

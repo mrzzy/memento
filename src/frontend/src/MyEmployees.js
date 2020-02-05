@@ -130,7 +130,8 @@ class MyEmployees extends React.Component {
                 for (let task of this.state.tasks) {
                     if (task.id !== notify.scopeTarget)
                         continue;
-                    this.openPopUp(this.state.employees[task.userId], task.name);
+                    if (this.popUpElement.current !== null)
+                        this.openPopUp(this.state.employees[task.userId], task.name);
                 }
                 this.settingUp(this.state.userId)
                     .then(details => {
@@ -141,6 +142,18 @@ class MyEmployees extends React.Component {
                             myEmployees: details[3]
                         });
                     })
+            }
+
+            else if (notify.subject === "started") {
+                let tempTaskList = [...this.state.tasks];
+                for (let i = 0; i < tempTaskList.length; i++) {
+                    if (tempTaskList[i].id !== notify.scopeTarget)
+                        continue;
+                    tempTaskList[i].started = true;
+                    break;
+                }
+
+                this.setState({ tasks: tempTaskList });
             }
         }
     }
@@ -319,9 +332,16 @@ class Employee extends React.Component {
         this.setState({ tasks: tasks });
     }
 
+    whichColour(started) {
+        if (started)
+            return "linear-gradient(to right, white 0%, white 83%, #97e5df 83%, #97e5df 100%)";
+        else
+            return "linear-gradient(to right, white 0%, white 83%, #ffd159 83%, #ffd159 100%)";
+    }
+
     render() {
         const tasks = this.props.tasks.map((task) =>
-            <div className="aTask" key={task.id}>
+            <div className="aTask" key={task.id} style={{ background: this.whichColour(task.started)}}>
                 <div className="details">
                     <span className="taskTitle">{task.name}</span>
                     <span className="taskDesc">{task.description}</span>

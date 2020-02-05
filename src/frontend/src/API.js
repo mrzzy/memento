@@ -19,9 +19,9 @@ export default class API {
         this.apiHost = process.env.REACT_APP_BACKEND_API_HOST || "memento.mrzzy.co";
         this.apiVersion = 1
         
-        if(process.env.REACT_APP_BACKEND_API_PROTOCOL_SECURE) {
-            this.protocol = "https"
-            this.socketProtocol = "wss";
+        if(process.env.REACT_APP_BACKEND_API_PROTOCOL_INSECURE) {
+            this.protocol = "http"
+            this.socketProtocol = "ws";
         } else {
             this.protocol = "https";
             this.socketProtocol = "wss";

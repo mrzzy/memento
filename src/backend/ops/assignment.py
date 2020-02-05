@@ -114,9 +114,13 @@ def update_task(task_id, name=None, deadline=None, duration=None,
                                  scope=Notification.Scope.Task,
                                  scope_target=task_id)
 
+    query_pending_task_notify = partial(query_notifys,
+                                        pending=True,
+                                        scope=Notification.Scope.Task,
+                                        scope_target=task_id)
     if has_completed or has_started:
         assigns = [ get_assign(i) for i in query_assigns("task", task_id) ]
-        assigner_ids = [ assign["assignerId"] for assign in  assigns ]
+        assigner_ids = list(set([ assign["assignerId"] for assign in  assigns ]))
         channel_ids = [ str(Channel(user_id=i)) for i in assigner_ids ]
 
         if has_completed:
@@ -126,10 +130,6 @@ def update_task(task_id, name=None, deadline=None, duration=None,
                                    subject=Notification.Subject.Completed)
 
             # stop overdue or duesoon notification from firing since task is now completed
-            query_pending_task_notify = partial(query_notifys,
-                                                pending=True,
-                                                scope=Notification.Scope.Task,
-                                                scope_target=task_id)
             overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
             duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
 
@@ -359,6 +359,7 @@ def create_assign(kind, item_id, assignee_id, assigner_id):
     create_assign_notify = partial(create_notify,
                                    scope=kind,
                                    scope_target=item_id)
+
     create_assign_notify(title=f"new {kind} assignment",
                          channel_id=assignee_channel_id,
                          subject=Notification.Subject.Assigned)

@@ -138,7 +138,7 @@ def route_subscribe(socket):
         if socket.closed: # check if client is still connected
             # client disconnected: unsubscribe from further callbacks
             unsubscribe_channel(subscribe_id)
-        elif not notify is None:
+        elif not notify is None and not type(notify) == str:
             # convert to iso date format
             # add "Z" to signal utc timezone
             notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
@@ -148,9 +148,10 @@ def route_subscribe(socket):
             except WebSocketError:
                 # websocket error: probably socket closed
                 socket.close()
-        else:
+        elif notify == "close":
             # channel has closed: disconnect the client
             socket.close()
+            unsubscribe_channel(subscribe_id)
 
         # return db connection to pool
         # required to prevent the connection pool from 

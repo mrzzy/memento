@@ -29,7 +29,7 @@ message_broker = LocalBroker()
 def query_channels(user_id=None, pending=None, skip=0, limit=None):
     channel_ids = Channel.query.with_entities(Channel.id)
     # apply filters
-    if not user_id is None: 
+    if not user_id is None:
         channel_ids = channel_ids.filter_by(user_id=user_id)
     if not pending is None:
         now = datetime.utcnow()
@@ -147,7 +147,7 @@ def create_notify(title, channel_id, subject=Notification.Subject.Changed,
     db.session.commit()
 
     # notify users of notification change 
-    schedule_notify(notify.id)
+    if notify.pending: schedule_notify(notify.id)
 
     return notify.id
 
@@ -157,7 +157,7 @@ def create_notify(title, channel_id, subject=Notification.Subject.Changed,
 # subject - subject of the notification
 # scope - defines type of object of which notification is scoped by
 # scope_target - defines the id of the object of which the notification is scoped by
-# firing_time - firing datetime of the notification - TODO: updating firing time does not seem to work
+# firing_time - firing datetime of the notification
 # description - description of the notification 
 # returns the id of the new notification
 # throws NotFoundError if no notify with notify_id is found
@@ -241,17 +241,20 @@ def schedule_notify(notify_id):
 
 # defines a handler to handle notification/channel messages published
 # returns a notification as dict if handled a notification message
-# returns None if recieved a channel close message or notification no longer valid
+# returns "close" if recieved a channel close message or None if notification not valid
 def handle_notify(subscribe_id, message):
-    notify = None
     if "notify/" in message:
         # recieved notification message
         _, notify_id = message.split("/")
+        # check if notification are due to fire
+        # may have changed while waiting for the firing time
+        if not Notification.query.get(notify_id).due: return None
         notify = get_notify(notify_id)
+        return notify
     elif "close/" in message:
         # recieved channel close message: unsubscribe from channel
         unsubscribe_channel(subscribe_id)
+        return "close"
     else:
         raise NotImplementedError(f"Unknown message: {message}")
 
-    return notify

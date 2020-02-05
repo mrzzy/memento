@@ -64,6 +64,7 @@ class EmployerHome extends React.Component {
 
         const api = new API();
         const apiHelper = new APIHelpers(api);
+        this.popUpElement = React.createRef(); 
 
         this.state = { api: api, apiHelper: apiHelper, tasks: null, employees: null };
     }
@@ -94,13 +95,33 @@ class EmployerHome extends React.Component {
     wsHandler = (notify) => {
         console.log("Logging notify...")
         console.log(notify);
-
+        let tasks = [...this.state.tasks];
         if (notify.scope === "task") {
             if (notify.subject === "completed") {
                 this.settingUp(this.state.userId)
                     .then(details => {
-                        this.setState({ tasks: details[0] });
+                        for (let task of this.state.tasks) {
+                            if (task.id !== notify.scopeTarget)
+                                continue;
+                            this.openPopUp(this.state.employees[task.userId], task.name);
+                        }
+                        this.setState({
+                            tasks: details[0],
+                            employees: details[1]
+                        });
                     })
+            }
+
+            else if (notify.subject === "started") {
+                let tempTaskList = [...this.state.tasks];
+                for (let i = 0; i < tempTaskList.length; i++) {
+                    if (tempTaskList[i].id !== notify.scopeTarget)
+                        continue;
+                    tempTaskList[i].started = true;
+                    break;
+                }
+
+                this.setState({ tasks: tempTaskList });
             }
         }
     }
@@ -123,7 +144,6 @@ class EmployerHome extends React.Component {
         for (const id of employeeIds) {
             let user = await this.state.api.get("user", id)
             myEmployees.push({ userId: parseInt(id), name: user.name });
-            console.log(myEmployees);
         }
 
         let tasks = {};
@@ -144,8 +164,6 @@ class EmployerHome extends React.Component {
                     filteredTasks.push(task);
                 }
             }
-
-            console.log(tasks);
         }
 
         for (let i = 0; i < myEmployees.length; i++) {
@@ -154,6 +172,8 @@ class EmployerHome extends React.Component {
 
         return [filteredTasks, employees];
     }
+
+    openPopUp = (name, task) => this.popUpElement.current.setState({ visible: true, name: name, task: task }); // To create pop up notification when time is up
 
     render() {
         if (this.state.userId === null)
@@ -167,6 +187,7 @@ class EmployerHome extends React.Component {
                 <h1 className="pagetitle">HOME</h1>
                 <Calendar />
                 <AllEmployeesTasks tasks={this.state.tasks} employees={this.state.employees} />
+                <PopUp ref={this.popUpElement} />
             </div>
         );
 	}
@@ -245,7 +266,10 @@ class AllEmployeesTasks extends React.Component {
             tasks = this.props.tasks.map((task) =>
                 <div className="employeeTask" key={task.id}>
                     <div className="profile">
-                        <img src="./anon.png" alt="Employee Profile Pic" />
+                        <img
+                            src={(this.props.employees[task.userId] === "Adeline") ? "adeline.jpg" : "./anon.png"}
+                            alt="Employee Profile Pic"
+                            className="employeePic" />
                         <span className="userName">{this.props.employees[task.userId]}</span>
                     </div>
 
@@ -254,6 +278,7 @@ class AllEmployeesTasks extends React.Component {
                         <p>{task.description}</p>
                     </div>
                     <span className="deadline">{this.deadline(task.deadline)}</span>
+                    <img style={{ width: "90px" }} src={task.started ? "./workingon.png" : "tobecompleted.png"} />
                 </div>
             );
         }
@@ -267,6 +292,36 @@ class AllEmployeesTasks extends React.Component {
                 {(tasks === null) ? <p style={{marginLeft:"10vw"}}>Loading...</p> : tasks}
             </div>
         );
+    }
+}
+
+class PopUp extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { visible: this.props.visible, name: "", task: "" };
+        this.closeMe = this.closeMe.bind(this);
+    }
+
+    closeMe() {
+        this.setState({ visible: false, name: "", task: "" });
+    }
+
+    render() {
+        if (this.state.visible) {
+            return (
+                <div className="popUpBackground">
+                    <div className="popUp">
+                        <h1>{this.state.name} Completed<br />a Task</h1>
+                        <span>{this.state.name} completed "{this.state.task}".</span>
+                        <div className="buttonDiv">
+                            <button onClick={this.closeMe}>Okay</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        return null;
     }
 }
 

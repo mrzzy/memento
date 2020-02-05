@@ -29,6 +29,7 @@ class MyEmployees extends React.Component {
         const api = new API();
         const apiHelper = new APIHelpers(api);
         this.createTask = this.createTask.bind(this);
+        this.popUpElement = React.createRef();
 
         this.state = {
             tasks: [],
@@ -46,6 +47,8 @@ class MyEmployees extends React.Component {
     async componentDidMount() {
         try {
             const loggedIn = await this.state.api.authCheck();
+            const channel = await this.state.apiHelper.getChannel(loggedIn);
+            await this.state.api.subscribe(channel, this.wsHandler);
             let redirectToEmployee = await this.state.apiHelper.isEmployer(loggedIn);
 
             this.settingUp(loggedIn)
@@ -118,6 +121,31 @@ class MyEmployees extends React.Component {
 
         return [filteredTasks, employees, employeeToTask, myEmployees];
     }
+
+    wsHandler = (notify) => {
+        console.log("Logging notify...");
+        console.log(notify);
+        if (notify.scope === "task") {
+            if (notify.subject === "completed") {
+                for (let task of this.state.tasks) {
+                    if (task.id !== notify.scopeTarget)
+                        continue;
+                    this.openPopUp(this.state.employees[task.userId], task.name);
+                }
+                this.settingUp(this.state.userId)
+                    .then(details => {
+                        this.setState({
+                            tasks: details[0],
+                            employees: details[1],
+                            employeeToTask: details[2],
+                            myEmployees: details[3]
+                        });
+                    })
+            }
+        }
+    }
+
+    openPopUp = (name, task) => this.popUpElement.current.setState({ visible: true, name: name, task: task }); // To create pop up notification when time is up
 
     // change "30-12-2020" to date object
     parseDate(sD, sT) {
@@ -211,6 +239,7 @@ class MyEmployees extends React.Component {
                             showTasks={(this.state.activated === employee["userId"]) ? true : false} />
                     ) : <p style={{ marginLeft: "10vw" }}>Loading...</p>}
                 </div>
+                <PopUp ref={this.popUpElement} />
                 {this.state.popUp}
             </div>
         );
@@ -298,13 +327,17 @@ class Employee extends React.Component {
                     <span className="taskDesc">{task.description}</span>
                 </div>
                 <span className="deadline">{this.deadline(task.deadline)}</span>
+                <div className="status"><img style={{ width: "70px" }} src={task.started ? "./workingon.png" : "tobecompleted.png"} /></div>
             </div>
         );
 
         return (
             <div onClick={this.props.showMore} className="employee">
                 <div className="employeeTop">
-                    <img src="./anon.png" alt="Employee Profile Pic" />
+                    <img
+                        src={(this.props.name === "Adeline") ? "adeline.jpg" : "./anon.png"}
+                        alt="Employee Profile Pic"
+                        className="employeePic" />
                     <h3>{this.props.name}</h3>
                     <span className="numTasks">{this.props.tasks.length} Task(s) <span>left</span></span>
                 </div>
@@ -332,12 +365,42 @@ class AddEmployeeTask extends React.Component {
                     <input onChange={this.props.onChange} className="forminput" id="taskTitle" type="text" name="taskTitle" placeholder="TITLE" required />
                     <input onChange={this.props.onChange} className="forminput" id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
                     <input onChange={this.props.onChange} className="forminput" type="date" name="deadlineDate" required />
-                    <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" min="09:00" max="18:00" required />
+                    <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" required />
                     <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="1000" />
                     <input type="submit" value=">" />
                 </form>
             </div>
         );
+    }
+}
+
+class PopUp extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { visible: this.props.visible, name: "", task: "" };
+        this.closeMe = this.closeMe.bind(this);
+    }
+
+    closeMe() {
+        this.setState({ visible: false, name: "", task: "" });
+    }
+
+    render() {
+        if (this.state.visible) {
+            return (
+                <div className="popUpBackground">
+                    <div className="popUp">
+                        <h1>{this.state.name} Completed<br />a Task</h1>
+                        <span>{this.state.name} completed "{this.state.task}".</span>
+                        <div className="buttonDiv">
+                            <button onClick={this.closeMe}>Okay</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        return null;
     }
 }
 

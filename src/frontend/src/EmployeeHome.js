@@ -1,5 +1,4 @@
 import React from 'react';
-import { GETTaskFromUserId, UpdateTasks, CreateChannel, CreateNotification } from './iamAPI';
 import './App.css';
 import { NavigationEmployee } from './Navigation';
 import { Redirect } from 'react-router-dom';
@@ -9,57 +8,57 @@ import APIHelpers from './APIHelpers';
 
 /* ----------------DUMMY DATA.---------------- */
 // Used for testing when the server is down
-const dummyTaskList = [
-    {
-        id: 0,
-        name: "Pitch",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 60,
-        completed: true
-    },
-    {
-        id: 1,
-        name: "Presentation",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 300,
-        completed: false
-    },
-    {
-        id: 2,
-        name: "Pitch",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 60,
-        completed: false
-    },
-    {
-        id: 3,
-        name: "Report Writing",
-        description: "Create a report about our upcoming application.",
-        duration: 3600,
-        completed: false
-    },
-    {
-        id: 4,
-        name: "Create App",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 8649,
-        completed: false
-    },
-    {
-        id: 5,
-        name: "Clean Up",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 5,
-        completed: false
-    },
-    {
-        id: 6,
-        name: "Shift Boxes",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 6,
-        completed: false
-    }
-];
+//const dummyTaskList = [
+//    {
+//        id: 0,
+//        name: "Pitch",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 60,
+//        completed: true
+//    },
+//    {
+//        id: 1,
+//        name: "Presentation",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 300,
+//        completed: false
+//    },
+//    {
+//        id: 2,
+//        name: "Pitch",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 60,
+//        completed: false
+//    },
+//    {
+//        id: 3,
+//        name: "Report Writing",
+//        description: "Create a report about our upcoming application.",
+//        duration: 3600,
+//        completed: false
+//    },
+//    {
+//        id: 4,
+//        name: "Create App",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 8649,
+//        completed: false
+//    },
+//    {
+//        id: 5,
+//        name: "Clean Up",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 5,
+//        completed: false
+//    },
+//    {
+//        id: 6,
+//        name: "Shift Boxes",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 6,
+//        completed: false
+//    }
+//];
 
 
 /* ----------------EMPLOYEE HOME---------------- */
@@ -76,8 +75,6 @@ class EmployeeHome extends React.Component {
     }
 
     async componentDidMount() {
-        const self = this;
-
         try {
             let loggedIn = await this.state.api.authCheck();
             this.setState({ userId: parseInt(loggedIn) });
@@ -95,7 +92,7 @@ class EmployeeHome extends React.Component {
     async componentDidUpdate() {
         // authcheck requires authorisation
         try {
-            let loggedIn = await this.state.api.authCheck();
+            await this.state.api.authCheck();
         } catch (e) {
             if (this.state.userId !== null)
                 this.setState({ userId: null });
@@ -318,9 +315,9 @@ class ToDoList extends React.Component {
                 let response = await this.props.api.update("task", id, update);
                 console.log("Logging response Line 293...");
                 console.log(response);
-                break;
 
                 this.setState({ allTasksList: tempTaskList, currentTaskNull: true });
+                break;
             }
         }
     }
@@ -427,33 +424,9 @@ class CurrentTask extends React.Component {
         let endTiming = new Date().getTime() + (task.duration * 1000);
         let countDownTimerId = setInterval(this.updateCountDown, 200); // set for updateCountDown to be called every 200ms to ensure count down is smooth
         this.setState({ hour: hms[0], minute: hms[1], second: hms[2], endTime: endTiming, countDownTimer: countDownTimerId, currentTask: task });
-
-        // To create a notification  for the raspberry pi
-        let firingTime = new Date(endTiming).toISOString();
-        CreateNotification(task, firingTime, 3);
     }
 
     async finishTask() {
-        // TO DO : CREATE NOTIFICATION FOR PI
-        // create channel
-        //let api = new API();
-        //let id = api.authCheck();
-        //let newChannel = { kind: "task", userId: id };
-        //let channelId = await api.post("channel", newChannel);
-
-        //// create notification
-        //let currentTime = new Date().getTime() + 3000;
-        //let fireTime = new Date(0);
-        //fireTime.setMilliseconds(currentTime);
-        //let newNotification = {
-        //    title: this.state.currentTask.name,
-        //    description: this.state.currentTask.description,
-        //    firingTime: fireTime.toISOString(),
-        //    channelId: channelId
-        //};
-
-        //await api.post("notify", newNotification);
-
         this.props.updateToDoListElement(this.state.currentTask.id); // to update to do list component's allTaskList
         clearInterval(this.state.countDownTimer);
         this.setState({ hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: null, colour: "#ffd159" });

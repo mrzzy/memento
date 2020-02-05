@@ -96,6 +96,10 @@
     width: 70%;
 }
 
+.status {
+    padding: 1em;
+}
+
 .taskTitle {
     font-size: 40px;;
 }

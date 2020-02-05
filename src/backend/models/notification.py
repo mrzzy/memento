@@ -83,7 +83,7 @@ class Notification(db.Model):
         time_till_fire = (datetime.utcnow() - self.firing_time).total_seconds()
         # max secs after firing time for a notification to be considered still pending 
         pending_window = 60.0
-        return True if time_till_fire > -pending_window else False
+        return True if time_till_fire < pending_window else False
 
     @property
     def due(self):

@@ -115,10 +115,10 @@ def update_task(task_id, name=None, deadline=None, duration=None,
                                  scope=Notification.Scope.Task,
                                  scope_target=task_id)
 
-    query_pending_task_notify = partial(query_notifys,
-                                        pending=True,
-                                        scope=Notification.Scope.Task,
-                                        scope_target=task_id)
+    query_task_notify = partial(query_notifys,
+                                scope=Notification.Scope.Task,
+                                scope_target=task_id)
+
     if has_completed or has_started:
         assigns = [ get_assign(i) for i in query_assigns("task", task_id) ]
         assigner_ids = list(set([ assign["assignerId"] for assign in  assigns ]))
@@ -147,9 +147,9 @@ def update_task(task_id, name=None, deadline=None, duration=None,
                                    subject=Notification.Subject.Completed)
 
             # stop overdue or duesoon or late notification from firing since task is now completed
-            overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
-            duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
-            late_ids = query_pending_task_notify(subject=Notification.Subject.Late)
+            overdue_ids = query_task_notify(subject=Notification.Subject.Overdue, pending=True)
+            duesoon_ids = query_task_notify(subject=Notification.Subject.DueSoon, pending=True)
+            late_ids = query_task_notify(subject=Notification.Subject.Late, pending=True)
 
             for notify_id in overdue_ids + duesoon_ids + late_ids:
                 delete_notify(notify_id)
@@ -160,7 +160,7 @@ def update_task(task_id, name=None, deadline=None, duration=None,
         # deadline timezone naive
         duetime = deadline.replace(tzinfo=None)
         # notify assignee when deadline
-        overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
+        overdue_ids = query_task_notify(subject=Notification.Subject.Overdue)
         for notify_id in overdue_ids:
             update_notify(notify_id, firing_time=duetime)
 
@@ -168,7 +168,7 @@ def update_task(task_id, name=None, deadline=None, duration=None,
         due_secs = (datetime.utcnow() - duetime).seconds
         # notify assignee when 25% time left
         duesoon = duetime + timedelta(seconds=0.75 * due_secs)
-        duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
+        duesoon_ids = query_task_notify(subject=Notification.Subject.DueSoon)
         for notify_id in overdue_ids:
             update_notify(notify_id, firing_time=duesoon)
 

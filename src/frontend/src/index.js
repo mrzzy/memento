@@ -8,25 +8,18 @@ import VisitorHome from './VisitorHome';
 import About from './About';
 import Login from './Login';
 import * as serviceWorker from './serviceWorker';
-import { Route, BrowserRouter as Router } from 'react-router-dom';
-
-if (sessionStorage.getItem("loggedIn") === null) {
-    sessionStorage.setItem("loggedIn", "false");
-}
-
-if (sessionStorage.getItem("role") === null) {
-    sessionStorage.setItem("role", "");
-}
-
+import { Route, Switch, BrowserRouter as Router } from 'react-router-dom';
 
 const routing = (
     <Router>
-        <Route exact path="/" component={VisitorHome} />
-        <Route path="/about" component={About} />
-        <Route path="/employee" component={EmployeeHome} />
-        <Route path="/employer" component={EmployerHome} />
-        <Route path="/my-employees" component={MyEmployee} />
-        <Route path="/login" component={Login} />
+        <Switch>
+            <Route exact path="/" component={VisitorHome} />
+            <Route path="/about" component={About} />
+            <Route path="/employee" component={EmployeeHome} />
+            <Route path="/employer" component={EmployerHome} />
+            <Route path="/my-employees" component={MyEmployee} />
+            <Route path="/login" component={Login} />
+        </Switch>
     </Router>
 )
 

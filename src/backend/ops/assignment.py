@@ -6,6 +6,7 @@
 
 from datetime import datetime, timedelta, timezone
 from functools import partial
+from sqlalchemy.exc import IntegrityError
 
 from ..app import db
 from ..models.assignment import *
@@ -360,6 +361,13 @@ def get_assign(assign_id):
 # assignee_id - id of the user that is assigned this assignment
 # assigner_id - id of the user that assigned this assignement
 def create_assign(kind, item_id, assignee_id, assigner_id):
+    # check if we already have an assignment with the same fields
+    duplicate_ids = Assignment.query.filter_by(kind=kind, item_id=item_id,
+                                               assignee_id=assignee_id,
+                                               assigner_id=assigner_id)
+    if duplicate_ids.count() > 0:
+        raise IntegrityError("Duplicate Assignment")
+
     assign = Assignment(kind=kind, item_id=item_id, assigner_id=assigner_id,
                         assignee_id=assignee_id)
     db.session.add(assign)

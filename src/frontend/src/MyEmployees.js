@@ -29,6 +29,7 @@ class MyEmployees extends React.Component {
         const api = new API();
         const apiHelper = new APIHelpers(api);
         this.createTask = this.createTask.bind(this);
+        this.popUpElement = React.createRef();
 
         this.state = {
             tasks: [],
@@ -126,6 +127,11 @@ class MyEmployees extends React.Component {
         console.log(notify);
         if (notify.scope === "task") {
             if (notify.subject === "completed") {
+                for (let task of this.state.tasks) {
+                    if (task.id !== notify.scopeTarget)
+                        continue;
+                    this.openPopUp(this.state.employees[task.userId], task.name);
+                }
                 this.settingUp(this.state.userId)
                     .then(details => {
                         this.setState({
@@ -138,6 +144,8 @@ class MyEmployees extends React.Component {
             }
         }
     }
+
+    openPopUp = (name, task) => this.popUpElement.current.setState({ visible: true, name: name, task: task }); // To create pop up notification when time is up
 
     // change "30-12-2020" to date object
     parseDate(sD, sT) {
@@ -231,6 +239,7 @@ class MyEmployees extends React.Component {
                             showTasks={(this.state.activated === employee["userId"]) ? true : false} />
                     ) : <p style={{ marginLeft: "10vw" }}>Loading...</p>}
                 </div>
+                <PopUp ref={this.popUpElement} />
                 {this.state.popUp}
             </div>
         );
@@ -318,13 +327,17 @@ class Employee extends React.Component {
                     <span className="taskDesc">{task.description}</span>
                 </div>
                 <span className="deadline">{this.deadline(task.deadline)}</span>
+                <img style={{ width: "70px" }} src={task.started ? "./workingon.png" : "tobecompleted.png"} />
             </div>
         );
 
         return (
             <div onClick={this.props.showMore} className="employee">
                 <div className="employeeTop">
-                    <img src="./anon.png" alt="Employee Profile Pic" />
+                    <img
+                        src={(this.props.name === "Adeline") ? "adeline.jpg" : "./anon.png"}
+                        alt="Employee Profile Pic"
+                        className="employeePic" />
                     <h3>{this.props.name}</h3>
                     <span className="numTasks">{this.props.tasks.length} Task(s) <span>left</span></span>
                 </div>
@@ -358,6 +371,36 @@ class AddEmployeeTask extends React.Component {
                 </form>
             </div>
         );
+    }
+}
+
+class PopUp extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { visible: this.props.visible, name: "", task: "" };
+        this.closeMe = this.closeMe.bind(this);
+    }
+
+    closeMe() {
+        this.setState({ visible: false, name: "", task: "" });
+    }
+
+    render() {
+        if (this.state.visible) {
+            return (
+                <div className="popUpBackground">
+                    <div className="popUp">
+                        <h1>{this.state.name} Completed<br />a Task</h1>
+                        <span>{this.state.name} completed "{this.state.task}".</span>
+                        <div className="buttonDiv">
+                            <button onClick={this.closeMe}>Okay</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        return null;
     }
 }
 

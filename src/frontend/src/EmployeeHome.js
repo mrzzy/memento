@@ -278,7 +278,14 @@ class ToDoList extends React.Component {
         let unfinishedTasks;
         if (this.state.allTasksList !== null) {
             let allTasksList = [...this.state.allTasksList];
-            unfinishedTasks = allTasksList.filter(task => task.completed === false);
+            unfinishedTasks = allTasksList.filter(
+                (task) => {
+                    let deadlineMili = Date.parse(task.deadline)
+                    let deadline = new Date(0);
+                    deadline.setMilliseconds(deadlineMili);
+
+                    return (deadline.getDate() === new Date().getDate() && !task.completed)
+                });
         }
         else
             unfinishedTasks = null;
@@ -286,7 +293,14 @@ class ToDoList extends React.Component {
     }
 
     updateAllTasksList(tasks) {
-        let unfinishedTasks = tasks.filter(task => task.completed === false);
+        let unfinishedTasks = tasks.filter(
+            (task) => {
+                let deadlineMili = Date.parse(task.deadline)
+                let deadline = new Date(0);
+                deadline.setMilliseconds(deadlineMili);
+
+                return (deadline.getDate() === new Date().getDate() && !task.completed)
+        });
         this.setState({ unfinishedTasksList: unfinishedTasks, allTasksList: tasks });
     }
 
@@ -312,12 +326,19 @@ class ToDoList extends React.Component {
         }
     }
 
-    removeTask(id) {
+    async removeTask(id) {
         for (let i = 0; i < this.state.unfinishedTasksList.length; i++) {
             if (this.state.unfinishedTasksList[i].id === id) {
                 let tempTaskList = [...this.state.unfinishedTasksList];
                 let newCurrentTask = tempTaskList.splice(i, 1);
                 this.setState({ unfinishedTasksList: tempTaskList, currentTaskNull: false });
+
+                let update = tempTaskList[i];
+                delete update.id;
+                update.started = true;
+                let response = await this.props.api.update("task", id, update);
+                console.log("Logging response Line 293...");
+                console.log(response);
 
                 // Updating current task in CurrentTask component
                 this.props.updateCurrentTaskElement(newCurrentTask[0]);
@@ -382,7 +403,7 @@ class Task extends React.Component {
 class CurrentTask extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: this.props.task };
+        this.state = { hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: this.props.task, colour: "#ffd159" };
         this.updateCountDown = this.updateCountDown.bind(this);
         this.updateCurrentTask = this.updateCurrentTask.bind(this);
         this.finishTask = this.finishTask.bind(this);
@@ -395,7 +416,9 @@ class CurrentTask extends React.Component {
         this.setState({ hour: timer[0], minute: timer[1], second: timer[2] });
 
         if (this.state.hour === 0 && this.state.minute === 0 && this.state.second === 0) {
-            this.finishTask();
+            // this.finishTask();
+            clearInterval(this.state.countDownTimer);
+            this.setState({ colour: "red" });
         }
     }
 
@@ -433,7 +456,7 @@ class CurrentTask extends React.Component {
 
         this.props.updateToDoListElement(this.state.currentTask.id); // to update to do list component's allTaskList
         clearInterval(this.state.countDownTimer);
-        this.setState({ hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: null });
+        this.setState({ hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: null, colour: "#ffd159" });
         this.props.createPopUp();
     }
 
@@ -449,13 +472,13 @@ class CurrentTask extends React.Component {
             return (
                 <div className="currentTask">
                     <h2>TASK OF THE DAY</h2>
-                    <div className="currentTaskContent withTask">
+                    <div className="currentTaskContent withTask" style={{ backgroundColor: this.state.colour }}>
                         <h2>{this.state.currentTask.name}</h2>
                         <p>{this.state.currentTask.description}</p>
                         <div className="countdown"><span className="countdownH">{zeroHour + this.state.hour}</span>:
                             <span className="countdownM">{zeroMin + this.state.minute}</span>:
                             <span className="countdownS">{zeroSec + this.state.second}</span></div>
-                        <button className="underline" onClick={this.finishTask}>FINISHED</button>
+                        <button className="underline" onClick={this.finishTask} style={{ backgroundColor: this.state.colour }}>FINISHED</button>
                     </div>
                 </div>
             );

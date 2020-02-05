@@ -43,6 +43,7 @@ class Notification(db.Model):
         DueSoon = "soondue"
         Completed = "completed"
         Overdue = "overdue"
+        Late = "late"
 
     # model fields
     id = db.Column(db.Integer, primary_key=True)

@@ -67,9 +67,13 @@ class TestAssigmentOps(TestCase):
         self.assertEqual(query_tasks(assignee_id=worker_id), [task_id])
 
 
-        update_task(task_id, name="cook", completed=True, started=True)
+        update_task(task_id, name="cook", started=True)
         self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=manager_id)),
                                                subject=Notification.Subject.Started)) > 0)
+        self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=manager_id)),
+                                               subject=Notification.Subject.Late)) > 0)
+
+        update_task(task_id, name="cook", completed=True)
         self.assertTrue(len(query_task_notifys(channel_id=str(Channel(user_id=manager_id)),
                                                subject=Notification.Subject.Completed)) > 0)
         task = get_task(task_id)

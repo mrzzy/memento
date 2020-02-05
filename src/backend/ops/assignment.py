@@ -121,25 +121,38 @@ def update_task(task_id, name=None, deadline=None, duration=None,
     if has_completed or has_started:
         assigns = [ get_assign(i) for i in query_assigns("task", task_id) ]
         assigner_ids = list(set([ assign["assignerId"] for assign in  assigns ]))
-        channel_ids = [ str(Channel(user_id=i)) for i in assigner_ids ]
+        assigner_channel_ids = [ str(Channel(user_id=i)) for i in assigner_ids ]
+
+        if has_started:
+            # send task started notification to assigner
+            for channel_id in assigner_channel_ids:
+                create_task_notify(title="task started",
+                                   channel_id=channel_id,
+                                   subject=Notification.Subject.Started)
+
+            # send task late notification to assigner
+            latetime = datetime.utcnow() + timedelta(seconds=task.duration + 1)
+            for channel_id in assigner_channel_ids:
+                create_task_notify(title="task is late",
+                                   channel_id=channel_id,
+                                   subject=Notification.Subject.Late,
+                                   firing_time=latetime)
 
         if has_completed:
-            for channel_id in channel_ids:
+            # send completed  notificationf
+            for channel_id in assigner_channel_ids:
                 create_task_notify(title="task completed",
                                    channel_id=channel_id,
                                    subject=Notification.Subject.Completed)
 
-            # stop overdue or duesoon notification from firing since task is now completed
+            # stop overdue or duesoon or late notification from firing since task is now completed
             overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
             duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
+            late_ids = query_pending_task_notify(subject=Notification.Subject.Late)
 
-            for notify_id in overdue_ids + duesoon_ids:
+            for notify_id in overdue_ids + duesoon_ids + late_ids:
                 delete_notify(notify_id)
-        if has_started:
-            for channel_id in channel_ids:
-                create_task_notify(title="task started",
-                                   channel_id=channel_id,
-                                   subject=Notification.Subject.Started)
+
 
     # update duesoon & duetime notification to the new deadline if changeed
     if deadline:

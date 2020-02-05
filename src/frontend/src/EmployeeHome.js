@@ -310,18 +310,17 @@ class ToDoList extends React.Component {
             if (this.state.allTasksList[i].id === id) {
                 let tempTaskList = [...this.state.allTasksList];
                 tempTaskList[i].completed = true;
-                this.setState({ allTasksList: tempTaskList, currentTaskNull: true });
 
                 // update the task in the database
                 //UpdateTasks(tempTaskList[i]);
                 let update = tempTaskList[i];
-                delete update.id;
-                delete update.started;
                 update.completed = true;
                 let response = await this.props.api.update("task", id, update);
                 console.log("Logging response Line 293...");
                 console.log(response);
                 break;
+
+                this.setState({ allTasksList: tempTaskList, currentTaskNull: true });
             }
         }
     }
@@ -330,15 +329,16 @@ class ToDoList extends React.Component {
         for (let i = 0; i < this.state.unfinishedTasksList.length; i++) {
             if (this.state.unfinishedTasksList[i].id === id) {
                 let tempTaskList = [...this.state.unfinishedTasksList];
-                let newCurrentTask = tempTaskList.splice(i, 1);
-                this.setState({ unfinishedTasksList: tempTaskList, currentTaskNull: false });
 
+                // updating task.started to true
                 let update = tempTaskList[i];
-                delete update.id;
                 update.started = true;
                 let response = await this.props.api.update("task", id, update);
                 console.log("Logging response Line 293...");
                 console.log(response);
+
+                let newCurrentTask = tempTaskList.splice(i, 1);
+                this.setState({ unfinishedTasksList: tempTaskList, currentTaskNull: false });
 
                 // Updating current task in CurrentTask component
                 this.props.updateCurrentTaskElement(newCurrentTask[0]);

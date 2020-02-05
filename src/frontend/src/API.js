@@ -5,6 +5,7 @@
 */
 
 import assert from "assert";
+import uuid from "uuid/v4";
 import fetch from "cross-fetch";
 import dotenv from "dotenv";
 import Cookie from "js-cookie";
@@ -34,6 +35,7 @@ export default class API {
         // object state
         this.stateCookieName = "memento-api-obj-state";
         this.state = this.initState();
+        this.sockets = {};
 
         // build map of available api routes
         this.apiMap = {
@@ -343,6 +345,7 @@ export default class API {
     // as handler to handle incoming notifications
     // channelId- id of the channel to subscribe to
     // handler(notify) - callback called on when on recieve notification
+    // returns subscriptionId
     async subscribe(channelId, handler) {
         // build websocket url to listen for notifications
         const listenParams = this.convertUrl({ "channel": channelId });
@@ -354,13 +357,18 @@ export default class API {
         socket.onopen = () => {
             console.log(`API: Listening for notifications on channel: ${channelId}`);
             hasOpened = true;
-        };
+        }
     
         socket.onclose = () => {
             console.log(`API: Stopped: Listening for notifications on channel: ${channelId}`);
+            delete this.sockets[subscriptionId];
         }
-    
+
         socket.onmessage = (packet) => {
+            // check if websocket is closing
+            if(socket.readyState == WebSocket.CLOSED 
+                || socket.readyState == WebSocket.CLOSING) return;
+
             // parse notification
             const notifyJson = packet.data;
             const notify = JSON.parse(notifyJson);
@@ -377,5 +385,34 @@ export default class API {
             await new Promise(r => setTimeout(r, 100));
             now = new Date();
         }
+        if(!hasOpened) throw "API: Failed to open websocket to listen for notifications";
+    
+        // keep track of websocket to unsubscribe later
+        const subscriptionId = uuid();
+        this.sockets[subscriptionId] = socket;
+    
+        return subscriptionId;
     }
+    
+    // unsubscribe from notification from a previous subscribe() call
+    // subscriptionId - id of subscription to unsubscribe from
+    // does nothing if websocket not open or already closed
+    unsubscribe(subscriptionId) {
+        // check if the socket is already closed
+        if(!subscriptionId in this.sockets) return;
+    
+        // close the websocket
+        const socket = this.sockets[subscriptionId];
+        socket.close();
+
+        delete this.sockets[subscriptionId];
+    }
+    
+    // unsubscribe from all notifications from a previous subscribe() calls
+    unsubscribeAll() {
+        for(var subscriptionId in this.sockets) {
+            this.unsubscribe(subscriptionId);
+        }
+    }
+    
 }

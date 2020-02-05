@@ -157,8 +157,8 @@ def create_notify(title, channel_id, subject=Notification.Subject.Changed,
 # subject - subject of the notification
 # scope - defines type of object of which notification is scoped by
 # scope_target - defines the id of the object of which the notification is scoped by
-# firing_time - firing datetime of the notification
-# description - description of the notification
+# firing_time - firing datetime of the notification - TODO: updating firing time does not seem to work
+# description - description of the notification 
 # returns the id of the new notification
 # throws NotFoundError if no notify with notify_id is found
 def update_notify(notify_id, channel_id=None, title=None, subject=None,

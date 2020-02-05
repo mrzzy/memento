@@ -124,40 +124,39 @@ def update_task(task_id, name=None, deadline=None, duration=None,
                 create_task_notify(title="task completed",
                                    channel_id=channel_id,
                                    subject=Notification.Subject.Completed)
-                if has_started:
-                    for channel_id in channel_ids:
-                        create_task_notify(title="task started",
-                                           channel_id=channel_id,
-                                           subject=Notification.Subject.Started)
 
             # stop overdue or duesoon notification from firing since task is now completed
             query_pending_task_notify = partial(query_notifys,
                                                 pending=True,
                                                 scope=Notification.Scope.Task,
                                                 scope_target=task_id)
-            if has_completed:
-                overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
-                duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
+            overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
+            duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
 
-                for notify_id in overdue_ids + duesoon_ids:
-                    delete_notify(notify_id)
+            for notify_id in overdue_ids + duesoon_ids:
+                delete_notify(notify_id)
+        if has_started:
+            for channel_id in channel_ids:
+                create_task_notify(title="task started",
+                                   channel_id=channel_id,
+                                   subject=Notification.Subject.Started)
 
-            # update duesoon & duetime notification to the new deadline if changeed
-            if deadline:
-                # deadline timezone naive
-                duetime = deadline.replace(tzinfo=None)
-                # notify assignee when deadline
-                overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
-                for notify_id in overdue_ids:
-                    update_notify(notify_id, firing_time=duetime)
+    # update duesoon & duetime notification to the new deadline if changeed
+    if deadline:
+        # deadline timezone naive
+        duetime = deadline.replace(tzinfo=None)
+        # notify assignee when deadline
+        overdue_ids = query_pending_task_notify(subject=Notification.Subject.Overdue)
+        for notify_id in overdue_ids:
+            update_notify(notify_id, firing_time=duetime)
 
-                # notify assignee when due soon
-                due_secs = (datetime.utcnow() - duetime).seconds
-                # notify assignee when 25% time left
-                duesoon = duetime + timedelta(seconds=0.75 * due_secs)
-                duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
-                for notify_id in overdue_ids:
-                    update_notify(notify_id, firing_time=duesoon)
+        # notify assignee when due soon
+        due_secs = (datetime.utcnow() - duetime).seconds
+        # notify assignee when 25% time left
+        duesoon = duetime + timedelta(seconds=0.75 * due_secs)
+        duesoon_ids = query_pending_task_notify(subject=Notification.Subject.DueSoon)
+        for notify_id in overdue_ids:
+            update_notify(notify_id, firing_time=duesoon)
 
 # delete the task for the given task id
 # cascade deletes and dependent objects on task

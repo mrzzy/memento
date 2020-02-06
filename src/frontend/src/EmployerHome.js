@@ -272,6 +272,7 @@ class AllEmployeesTasks extends React.Component {
         let date = new Date(0);
         let mili = Date.parse(dateString);
         date.setMilliseconds(mili);
+        date.setMinutes(date.getMinutes() + 30);
         let minutes = date.getMinutes().toString();
         if (minutes.length === 1)
             minutes = "0" + minutes;

@@ -71,6 +71,7 @@ class EmployerHome extends React.Component {
 
     componentWillUnmount() {
         console.log("Unmounting Employer Home...");
+        this.state.api.unsubscribe(this.websocket);
     }
 
     async componentDidMount() {

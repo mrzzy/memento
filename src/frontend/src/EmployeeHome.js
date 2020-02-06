@@ -74,13 +74,18 @@ class EmployeeHome extends React.Component {
         this.state = { taskList: null, api: api, apiHelpers: new APIHelpers(api) };
     }
 
+
+    componenWillUnmount() {
+        this.state.api.unsubscribe(this.websocket);
+    }
+
     async componentDidMount() {
         try {
             let loggedIn = await this.state.api.authCheck();
             this.setState({ userId: parseInt(loggedIn) });
             let taskList = await this.getTaskList();
             let channel = await this.state.apiHelpers.getChannel(loggedIn);
-            await this.state.api.subscribe(channel, this.wsHandler);
+            this.websocket = await this.state.api.subscribe(channel, this.wsHandler);
             this.setState({ taskList: taskList });
             this.taskListElement.current.updateAllTasksList(taskList);
         } catch (e) {

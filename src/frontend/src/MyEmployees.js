@@ -44,11 +44,15 @@ class MyEmployees extends React.Component {
         };
     }
 
+    componentWillUnmount() {
+        this.state.api.unsubscribe(this.websocket);
+    }
+
     async componentDidMount() {
         try {
             const loggedIn = await this.state.api.authCheck();
             const channel = await this.state.apiHelper.getChannel(loggedIn);
-            await this.state.api.subscribe(channel, this.wsHandler);
+            this.websocket = await this.state.api.subscribe(channel, this.wsHandler);
             let redirectToEmployee = await this.state.apiHelper.isEmployer(loggedIn);
 
             this.settingUp(loggedIn)
@@ -131,17 +135,19 @@ class MyEmployees extends React.Component {
                     if (task.id !== notify.scopeTarget)
                         continue;
                     if (this.popUpElement.current !== null)
-                        this.openPopUp(this.state.employees[task.userId], task.name);
+                        this.openPopUp(this.state.employees[task.userId], task.name, "complete");
                 }
-                this.settingUp(this.state.userId)
-                    .then(details => {
-                        this.setState({
-                            tasks: details[0],
-                            employees: details[1],
-                            employeeToTask: details[2],
-                            myEmployees: details[3]
-                        });
-                    })
+                if (this.state.userId !== undefined) {
+                    this.settingUp(this.state.userId)
+                        .then(details => {
+                            this.setState({
+                                tasks: details[0],
+                                employees: details[1],
+                                employeeToTask: details[2],
+                                myEmployees: details[3]
+                            });
+                        })
+                }
             }
 
             else if (notify.subject === "started") {
@@ -155,10 +161,19 @@ class MyEmployees extends React.Component {
 
                 this.setState({ tasks: tempTaskList });
             }
+
+            else if (notify.subject === "late") {
+                for (let task of this.state.tasks) {
+                    if (task.id !== notify.scopeTarget)
+                        continue;
+                    if (this.popUpElement.current !== null)
+                        this.openPopUp(this.state.employees[task.userId], task.name, "late");
+                }
+            }
         }
     }
 
-    openPopUp = (name, task) => this.popUpElement.current.setState({ visible: true, name: name, task: task }); // To create pop up notification when time is up
+    openPopUp = (name, task, type) => this.popUpElement.current.setState({ visible: true, name: name, task: task, type: type }); // To create pop up notification when time is up
 
     // change "30-12-2020" to date object
     parseDate(sD, sT) {
@@ -386,7 +401,7 @@ class AddEmployeeTask extends React.Component {
                     <input onChange={this.props.onChange} className="forminput" id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
                     <input onChange={this.props.onChange} className="forminput" type="date" name="deadlineDate" required />
                     <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" required />
-                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="1000" />
+                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="0.1" max="1000" />
                     <input type="submit" value=">" />
                 </form>
             </div>
@@ -397,27 +412,43 @@ class AddEmployeeTask extends React.Component {
 class PopUp extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { visible: this.props.visible, name: "", task: "" };
+        this.state = { visible: this.props.visible, name: "", task: "", type: "" };
         this.closeMe = this.closeMe.bind(this);
     }
 
     closeMe() {
-        this.setState({ visible: false, name: "", task: "" });
+        this.setState({ visible: false, name: "", task: "", type: "" });
     }
 
     render() {
         if (this.state.visible) {
-            return (
-                <div className="popUpBackground">
-                    <div className="popUp">
-                        <h1>{this.state.name} Completed<br />a Task</h1>
-                        <span>{this.state.name} completed "{this.state.task}".</span>
-                        <div className="buttonDiv">
-                            <button onClick={this.closeMe}>Okay</button>
+            if (this.state.type === "complete") {
+                return (
+                    <div className="popUpBackground">
+                        <div className="popUp">
+                            <h1>{this.state.name} Completed<br />a Task</h1>
+                            <span>{this.state.name} completed "{this.state.task}".</span>
+                            <div className="buttonDiv">
+                                <button onClick={this.closeMe}>Okay</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            );
+                );
+            }
+
+            else if (this.state.type === "late") {
+                return (
+                    <div className="popUpBackground">
+                        <div className="popUp">
+                            <h1>{this.state.name} has <br />an overdued Task</h1>
+                            <span>{this.state.name} has not completed "{this.state.task}".</span>
+                            <div className="buttonDiv">
+                                <button onClick={this.closeMe}>Okay</button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
         }
 
         return null;

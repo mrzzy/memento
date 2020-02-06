@@ -70,16 +70,16 @@ class EmployerHome extends React.Component {
     }
 
     componentWillUnmount() {
-        console.log("Unmounting Employer Home...");
-        this.state.api.unsubscribe(this.websocket);
+        if (this.websocket !== undefined) {
+            this.state.api.unsubscribe(this.websocket);
+        }
     }
 
     async componentDidMount() {
         try {
             const loggedIn = await this.state.api.authCheck();
-            const channel = await this.state.apiHelper.getChannel(loggedIn);
+            let [redirectToEmployee, channel] = await Promise.all([this.state.apiHelper.isEmployer(loggedIn), this.state.apiHelper.getChannel(loggedIn)]);
             this.websocket = await this.state.api.subscribe(channel, this.wsHandler);
-            let redirectToEmployee = await this.state.apiHelper.isEmployer(loggedIn);
             this.settingUp(loggedIn)
                 .then(details => {
                     this.setState({

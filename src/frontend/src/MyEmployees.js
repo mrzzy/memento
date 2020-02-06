@@ -336,6 +336,7 @@ class Employee extends React.Component {
         let date = new Date(0);
         let mili = Date.parse(dateString);
         date.setMilliseconds(mili);
+        date.setMinutes(date.getMinutes() + 30);
         let minutes = date.getMinutes().toString();
         if (minutes.length === 1)
             minutes = "0" + minutes;
@@ -401,7 +402,7 @@ class AddEmployeeTask extends React.Component {
                     <input onChange={this.props.onChange} className="forminput" id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
                     <input onChange={this.props.onChange} className="forminput" type="date" name="deadlineDate" required />
                     <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" required />
-                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="0.1" max="1000" />
+                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="1000" />
                     <input type="submit" value=">" />
                 </form>
             </div>

@@ -13,13 +13,12 @@ services:
     env_file: ".env"
     volumes:
       - database-data:/var/lib/postgresql/data
-  # memento-backend container
   backend:
     image: "mrzzy/memento-backend:latest"
     build:
       context: .
       dockerfile: containers/backend/Dockerfile
-      target: develop
+      target: production
       args:
         API_VERSION: 1
     ports:
@@ -30,6 +29,19 @@ services:
     depends_on:
       - postgres
     volumes:
-      - "./src/backend:/backend"
+      - "./src/backend:/backend" 
+  frontend:
+    image: "mrzzy/memento-frontend:latest"
+    build:
+      context: .
+      dockerfile: containers/frontend/Dockerfile
+      target: production
+    ports:
+      - "3000:3000"
+    env_file: ".env"
+    depends_on:
+      - postgres
+    volumes:
+      - "./src/frontend:/frontend" 
 volumes:
   database-data:

@@ -21,6 +21,10 @@ images:
     repository: mrzzy/memento-backend
     tag: latest
     pullPolicy: Always
+  frontend:
+    repository: mrzzy/memento-frontend
+    tag: latest
+    pullPolicy: Always
 
 imagePullSecrets: []
 
@@ -32,6 +36,8 @@ deployment:
 # scaling
 scaling: 
   backend:
+    replicaCount: 1
+  frontend:
     replicaCount: 1
 
 # security
@@ -70,6 +76,10 @@ services:
     name: memento-backend
     type: ClusterIP
     port: 80
+  frontend:
+    name: memento-frontend
+    type: ClusterIP
+    port: 80
 
 # ingress
 ingress:
@@ -83,6 +93,10 @@ ingress:
     - host: memento.mrzzy.co
       paths: [ "/api" ]
       serviceName: memento-backend
+      servicePort: 80
+    - host: memento.mrzzy.co
+      paths: [ "/" ]
+      serviceName: memento-frontend
       servicePort: 80
 
   tls:

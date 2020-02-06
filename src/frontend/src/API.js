@@ -98,7 +98,7 @@ export default class API {
             }
         }
     
-        throw `API: Unknown api type: ${type}`;
+        throw new Error(`API: Unknown api type: ${type}`);
     }
 
     // set the values in the given valueMap dict to the object state
@@ -115,9 +115,9 @@ export default class API {
     // checks the given response for errors
     // if detected, throws and exception detailing the error
     async checkResponse(response) {
-        if(response.status != 200) {
+        if(response.status !== 200) {
             const body = await response.text();
-            throw `FATAL: API call failed with status code: ${response.status}, response: ${body}`;
+            throw new Error(`FATAL: API call failed with status code: ${response.status}, response: ${body}`);
         }
     }
 
@@ -366,8 +366,8 @@ export default class API {
 
         socket.onmessage = (packet) => {
             // check if websocket is closing
-            if(socket.readyState == WebSocket.CLOSED 
-                || socket.readyState == WebSocket.CLOSING) return;
+            if(socket.readyState === WebSocket.CLOSED 
+                || socket.readyState === WebSocket.CLOSING) return;
 
             // parse notification
             const notifyJson = packet.data;
@@ -380,12 +380,12 @@ export default class API {
         const beginWait = new Date();
         const timeoutSecs = 5.0;
         var now = new Date();
-        while(hasOpened != true  && (now - beginWait) / 1000.0 < timeoutSecs) {
+        while(hasOpened !== true  && (now - beginWait) / 1000.0 < timeoutSecs) {
             // sleep to give up thread for other tasks
             await new Promise(r => setTimeout(r, 100));
             now = new Date();
         }
-        if(!hasOpened) throw "API: Failed to open websocket to listen for notifications";
+        if(!hasOpened) throw new Error("API: Failed to open websocket to listen for notification");
     
         // keep track of websocket to unsubscribe later
         const subscriptionId = uuid();
@@ -399,7 +399,7 @@ export default class API {
     // does nothing if websocket not open or already closed
     unsubscribe(subscriptionId) {
         // check if the socket is already closed
-        if(!subscriptionId in this.sockets) return;
+        if(!(subscriptionId in this.sockets)) return;
     
         // close the websocket
         const socket = this.sockets[subscriptionId];

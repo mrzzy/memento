@@ -122,7 +122,9 @@ def update_task(task_id, name=None, deadline=None, duration=None,
     if has_completed or has_started:
         assigns = [ get_assign(i) for i in query_assigns("task", task_id) ]
         assigner_ids = list(set([ assign["assignerId"] for assign in  assigns ]))
+        assignee_ids = list(set([ assign["assigneeId"] for assign in  assigns ]))
         assigner_channel_ids = [ str(Channel(user_id=i)) for i in assigner_ids ]
+        assignee_channel_ids = [ str(Channel(user_id=i)) for i in assignee_ids ]
 
         if has_started:
             # send task started notification to assigner
@@ -131,9 +133,9 @@ def update_task(task_id, name=None, deadline=None, duration=None,
                                    channel_id=channel_id,
                                    subject=Notification.Subject.Started)
 
-            # send task late notification to assigner
+            # send task late notification to assigner & assignee
             latetime = datetime.utcnow() + timedelta(seconds=task.duration + 1)
-            for channel_id in assigner_channel_ids:
+            for channel_id in assigner_channel_ids + assignee_channel_ids:
                 create_task_notify(title="task is late",
                                    channel_id=channel_id,
                                    subject=Notification.Subject.Late,
@@ -169,7 +171,7 @@ def update_task(task_id, name=None, deadline=None, duration=None,
         # notify assignee when 25% time left
         duesoon = duetime + timedelta(seconds=0.75 * due_secs)
         duesoon_ids = query_task_notify(subject=Notification.Subject.DueSoon)
-        for notify_id in overdue_ids:
+        for notify_id in duesoon_ids:
             update_notify(notify_id, firing_time=duesoon)
 
 # delete the task for the given task id

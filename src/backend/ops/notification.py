@@ -248,7 +248,8 @@ def handle_notify(subscribe_id, message):
         _, notify_id = message.split("/")
         # check if notification are due to fire
         # may have changed while waiting for the firing time
-        if not Notification.query.get(notify_id).due: return None
+        notify = Notification.query.get(notify_id)
+        if not notify or not notify.due: return None
         notify = get_notify(notify_id)
         return notify
     elif "close/" in message:

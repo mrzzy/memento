@@ -402,7 +402,7 @@ class AddEmployeeTask extends React.Component {
                     <input onChange={this.props.onChange} className="forminput" id="taskDesc" type="text" name="taskDesc" placeholder="DESCRIPTION" required />
                     <input onChange={this.props.onChange} className="forminput" type="date" name="deadlineDate" required />
                     <input onChange={this.props.onChange} className="forminput" type="time" id="deadlineTime" name="deadlineTime" required />
-                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" min="1" max="1000" />
+                    <input onChange={this.props.onChange} className="forminput" type="number" name="duration" step="0.1" min="0.1" max="1000" />
                     <input type="submit" value=">" />
                 </form>
             </div>

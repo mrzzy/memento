@@ -44,10 +44,10 @@ spec:
               protocol: TCP
           # inject configuration using environment
           envFrom:
-            - configMapRef:
-                name: {{ include "memento.fullname" . }}-config-env
             - secretRef:
                 name: {{ include "memento.fullname" . }}-secrets
+            - configMapRef:
+                name: {{ include "memento.fullname" . }}-config-env
           livenessProbe:
             httpGet:
               path: /healthz

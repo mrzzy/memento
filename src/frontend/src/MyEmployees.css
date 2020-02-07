@@ -1,0 +1,167 @@
+
+:root {
+    --main-color: #FFD159;
+    --header-font: 'Montserrat', sans-serif; /*Used as family font*/
+    --regular-font: 'Roboto', sans-serif;
+}
+
+.employee {
+    background-color: rgb(246, 247, 248);
+    width: 70vw;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 20px;
+    padding: 30px 60px;
+}
+
+.employeePic {
+    height: 150px;
+    width: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.employeeTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.employee h3 {
+    font-size: 40px;
+}
+
+.numTasks {
+    font-size: 40px;
+}
+
+.numTasks span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #646464;
+}
+
+.aTaskList {
+    width: 80vw;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: space-between;
+
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    max-width: 100%;
+}
+.aTaskList button {
+    background-color: #ffda79;
+    border-radius: 10pc;
+    border: none;
+    width: 20%;
+    font-size: 30px;
+    margin-bottom: 3%;
+    font-weight: 500;
+}
+
+.taskList button {
+    background-color: #ffda79;
+    border-radius: 10pc;
+    border: none;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.taskList button:hover{
+    background-color: var(--main-color);
+}
+
+.aTask {
+    margin: 0 0 30px 0;
+    border-radius: 20px;
+    display: inline-flex;
+    width: 500px;
+    justify-content: space-around;
+    align-items: center;
+    background-color: white;
+    width: 70%;
+    padding: 20px;
+}
+
+.details {
+    display: inline-flex;
+    flex-direction: column;
+    width: 70%;
+}
+
+.status {
+    padding: 0 0 0 2em;
+}
+
+.taskTitle {
+    font-size: 40px;;
+}
+
+.popUpName {
+    text-decoration: underline;
+}
+.popUp{
+    display: inline-flex;
+    flex-flow: column wrap;
+    justify-content: center;
+}
+.btnX {
+    font-size: 150%;
+    border: none;
+    margin-left: 1rem;
+    background-color: #ffffff;
+    position: fixed;
+    top: 195px;
+}
+.popUp form {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.forminput{
+    border: none;
+    border-bottom: 2px solid #ffda79;
+    margin-left: 2.5rem;
+    width: 80%;
+}
+
+.popUp form input {
+    margin-bottom: 20px;
+}
+
+.popUp form input[type=submit] {
+    align-self: flex-end;
+    border-radius: 100%;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+    border: none;
+    background-color: #ffda79;
+    color: white;
+    margin-right: 1rem;
+}
+
+
+/*outline*/
+.taskList button:focus{
+    outline: none;
+}
+.forminput:focus{
+    outline: none;
+}
+.popUp button:focus {
+    outline: none;
+}
+
+@media only screen and (max-width: 670px) {
+.popUp{
+    height: 60vh;
+  }
+}

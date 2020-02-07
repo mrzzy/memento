@@ -14,12 +14,14 @@ from .utils import parse_params
 from ..config import API_VERSION
 from ..mapping.assignment import *
 from ..ops.assignment import *
+from ..ops.auth import authenticate
 
 assign = Blueprint("assignment", __name__)
 
 ## Task API
 # api - query tasks
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/tasks")
+@authenticate(kind="access")
 def route_tasks():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -29,17 +31,25 @@ def route_tasks():
     if not author_id is None: author_id = int(author_id)
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
-    limit_by = request.args.get("limit-by", None)
-    if not limit_by is None: limit_by = parse_datetime(limit_by)
+    started = request.args.get("started", None)
+    if not started is None: started = parse_bool(started)
+    due_by = request.args.get("due-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
+    assignee_id = request.args.get("assignee", None)
+    if not assignee_id is None: assignee_idf = int(assignee_id)
+    for_day = request.args.get("for-day", None)
+    if not for_day is None: for_day = parse_datetime(for_day)
 
     # perform query
-    task_ids = query_tasks(pending, author_id, limit_by, skip, limit)
+    task_ids = query_tasks(pending, started, author_id, due_by, skip, limit,
+                           assignee_id, for_day)
     return jsonify(task_ids)
 
 # api - read, create, update, delete tasks
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/task", methods=["POST"])
-@assign.route(f"/api/v{API_VERSION}/{assign.name}/task/<task_id>", 
+@assign.route(f"/api/v{API_VERSION}/{assign.name}/task/<task_id>",
               methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_task(task_id=None):
     if request.method == "GET" and task_id:
         # get task for id
@@ -74,6 +84,7 @@ def route_task(task_id=None):
 ## Event API
 # api - query events
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/events")
+@authenticate(kind="access")
 def route_events():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -83,17 +94,25 @@ def route_events():
     if not author_id is None: author_id = int(author_id)
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
-    limit_by = request.args.get("limit-by", None)
-    if not limit_by is None: limit_by = parse_datetime(limit_by)
+    due_by = request.args.get("limit-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
+    due_by = request.args.get("due-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
+    assignee_id = request.args.get("assignee", None)
+    if not assignee_id is None: assignee_idf = int(assignee_id)
+    for_day = request.args.get("for-day", None)
+    if not for_day is None: for_day = parse_datetime(for_day)
 
     # perform query
-    event_ids = query_events(pending, author_id, limit_by, skip, limit)
+    event_ids = query_events(pending, author_id, due_by, skip, limit, assignee_id,
+                             for_day)
     return jsonify(event_ids)
 
 # api - read, create, update, delete events
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/event", methods=["POST"])
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/event/<event_id>",
               methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_event(event_id=None):
     if request.method == "GET" and event_id:
         # get event for id
@@ -127,6 +146,7 @@ def route_event(event_id=None):
 ## Assignment API
 # api - query assignments
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/assigns")
+@authenticate(kind="access")
 def route_assigns():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -141,18 +161,20 @@ def route_assigns():
     if not item_id is None: item_id = int(item_id)
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
-    limit_by = request.args.get("limit-by", None)
-    if not limit_by is None: limit_by = parse_datetime(limit_by)
+    due_by = request.args.get("due-by", None)
+    if not due_by is None: due_by = parse_datetime(due_by)
+    for_day = request.args.get("for-day", None)
+    if not for_day is None: for_day = parse_datetime(for_day)
 
     # perform query
     assign_ids = query_assigns(kind, item_id, assignee_id, assignee_id,
-                               pending, limit_by, skip, limit)
+                               pending, due_by, skip, limit, for_day)
     return jsonify(assign_ids)
 
-# api - read, create, update, delete assignments
+# api - read, create, delete assignments
 @assign.route(f"/api/v{API_VERSION}/{assign.name}/assign", methods=["POST"])
-@assign.route(f"/api/v{API_VERSION}/{assign.name}/assign/<assign_id>",
-              methods=["GET", "PATCH", "DELETE"])
+@assign.route(f"/api/v{API_VERSION}/{assign.name}/assign/<assign_id>", methods=["GET", "DELETE"])
+@authenticate(kind="access")
 def route_assign(assign_id=None):
     if request.method == "GET" and assign_id:
         # get assign for id
@@ -163,12 +185,6 @@ def route_assign(assign_id=None):
         params = parse_params(request, assign_mapping)
         assign_id = create_assign(**params)
         return jsonify({ "id": assign_id })
-    elif request.method == "PATCH" and assign_id and request.is_json:
-        # parse params in json
-        params = parse_params(request, assign_mapping)
-        # update assign with params in json
-        update_assign(assign_id, **params)
-        return jsonify({"success": True })
     elif request.method == "DELETE" and assign_id:
         # delete assign with params in json
         delete_assign(assign_id)

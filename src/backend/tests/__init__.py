@@ -4,10 +4,10 @@
 # Tests
 #
 
-from .models.iam import *
+from .models.identity import *
 from .models.assignment import *
 from .models.notification import *
 
-from .ops.iam import *
+from .ops.identity import *
 from .ops.assignment import *
 from .ops.notification import *

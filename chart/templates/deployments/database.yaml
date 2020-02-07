@@ -44,10 +44,10 @@ spec:
               protocol: TCP
           # inject configuration using environment
           envFrom:
+            - secretRef:
+                name: {{ include "memento.fullname" . }}-secrets
             - configMapRef:
                 name: {{ include "memento.fullname" . }}-config-env
-            - secretRef:
-                name: {{ include "memento.fullname" . }}-database
           livenessProbe:
             tcpSocket:
               port: postgres
@@ -62,7 +62,9 @@ spec:
           volumeMounts:
             - name: database-data
               mountPath: "/var/lib/postgresql/data"
-              subPath: memento-database-data
+              {{ if .Values.deployment.database.subPath -}}
+              subPath: "{{ .Values.deployment.database.subPath }}"
+              {{- end }}
       volumes:
         - name: database-data
           persistentVolumeClaim:

@@ -10,43 +10,43 @@ from datetime import datetime
 
 from gevent.lock import Semaphore
 
-from ...ops.iam import *
+from ...ops.identity import *
 from ...ops.notification import *
 
 class TestsNotficationOps(TestCase):
     def create_test_data(self):
         org_id = create_org("kompany")
-        user_id = create_user(User.Kind.Supervisor,
-                              "John",
+        user_id = create_user("John",
                               "P@$$w0rd",
                               "john@jmail.com",
                               org_id)
-        return org_id, user_id
+        task_deadline = datetime.utcnow()
+        task_id = create_task("fish",
+                              deadline= task_deadline,
+                              duration=60,
+                              author_id=user_id)
+        return org_id, user_id, task_id
 
     def test_channel_ops(self):
         self.assertEqual(query_channels(), [])
 
         got_lookup_error = False
         try:
-            get_channel(2)
+            get_channel("")
         except NotFoundError:
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
-        org_id, user_id = self.create_test_data()
-        channel_id = create_channel(Channel.Kind.Notice, user_id)
+        org_id, user_id, task_id = self.create_test_data()
+        # should automatically create channel on create_user()
+        channel_id = query_channels(user_id=user_id)[0]
 
         channel = get_channel(channel_id)
         self.assertEqual(channel["userId"], user_id)
         self.assertEqual(query_channels(), [channel_id])
         self.assertEqual(query_channels(pending=True), [])
 
-        update_channel(channel_id, kind=Channel.Kind.Task)
-        channel = get_channel(channel_id)
-        self.assertEqual(channel["kind"], Channel.Kind.Task)
-
         delete_channel(channel_id)
-        self.assertEqual(query_tasks(), [])
         delete_org(org_id)
 
     def test_notify_ops(self):
@@ -59,14 +59,23 @@ class TestsNotficationOps(TestCase):
             got_lookup_error = True
         self.assertTrue(got_lookup_error)
 
-        org_id, user_id = self.create_test_data()
-        channel_id = create_channel(Channel.Kind.Notice, user_id)
-        notify_id = create_notify("fish", channel_id)
+        org_id, user_id, task_id = self.create_test_data()
+        # should automatically create channel on create_user()
+        channel_id = query_channels(user_id=user_id)[0]
+        notify_id = create_notify("fish task", channel_id,
+                                  Notification.Subject.Changed,
+                                  scope=Notification.Scope.Task,
+                                  scope_target=task_id)
 
         notify = get_notify(notify_id)
-        self.assertEqual(notify["title"], "fish")
+        self.assertEqual(notify["title"], "fish task")
+        self.assertEqual(notify["scope"], Notification.Scope.Task)
+        self.assertEqual(notify["subject"], Notification.Subject.Changed)
+        self.assertEqual(notify["scopeTarget"], task_id)
         self.assertEqual(query_notifys(), [notify_id])
         self.assertEqual(query_notifys(pending=True), [])
+        self.assertEqual(query_notifys(scope=Notification.Scope.Task,
+                                       scope_target=task_id), [notify_id])
 
         update_notify(notify_id, title="gym")
         notify = get_notify(notify_id)
@@ -77,8 +86,8 @@ class TestsNotficationOps(TestCase):
         delete_org(org_id)
 
     def test_subscription(self):
-        org_id, user_id = self.create_test_data()
-        channel_id = create_channel(Channel.Kind.Notice, user_id)
+        org_id, user_id, task_id = self.create_test_data()
+        channel_id = query_channels(user_id)[0]
 
         # define a test handler to run on notificaion
         run_lock = Semaphore()

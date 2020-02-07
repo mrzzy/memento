@@ -11,6 +11,6 @@ if wait-for $DATABASE_HOST -t 30
 then 
     # perform database migrations
     flask db upgrade
-    # run command 
-    exec "$@"
+    # run command
+    ash -c "$*"
 fi

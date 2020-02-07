@@ -6,7 +6,6 @@
 
 # defines the mapping from channel model fields to json api representation
 channel_mapping = [
-    ("kind", "kind"),
     ("user_id", "userId")
 ]
 
@@ -15,5 +14,8 @@ notify_mapping = [
     ("title", "title"),
     ("description", "description"),
     ("firing_time", "firingTime"),
-    ("channel_id", "channelId")
+    ("channel_id", "channelId"),
+    ("subject", "subject"),
+    ("scope", "scope"),
+    ("scope_target", "scopeTarget")
 ]

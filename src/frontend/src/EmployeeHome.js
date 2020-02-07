@@ -1,90 +1,151 @@
 import React from 'react';
-import { GETTaskFromUserId, UpdateTasks, CreateChannel, CreateNotification } from './iamAPI';
 import './App.css';
-import NavigationEmployee from './Navigation';
+import { NavigationEmployee } from './Navigation';
+import { Redirect } from 'react-router-dom';
+
+import API from './API';
+import APIHelpers from './APIHelpers';
 
 /* ----------------DUMMY DATA.---------------- */
 // Used for testing when the server is down
-const dummyTaskList = [
-    {
-        id: 0,
-        name: "Pitch",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 60,
-        completed: true
-    },
-    {
-        id: 1,
-        name: "Presentation",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 300,
-        completed: false
-    },
-    {
-        id: 2,
-        name: "Pitch",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 60,
-        completed: false
-    },
-    {
-        id: 3,
-        name: "Report Writing",
-        description: "Create a report about our upcoming application.",
-        duration: 3600,
-        completed: false
-    },
-    {
-        id: 4,
-        name: "Create App",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 8649,
-        completed: false
-    },
-    {
-        id: 5,
-        name: "Clean Up",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 5,
-        completed: false
-    },
-    {
-        id: 6,
-        name: "Shift Boxes",
-        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
-        duration: 6,
-        completed: false
-    }
-];
+//const dummyTaskList = [
+//    {
+//        id: 0,
+//        name: "Pitch",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 60,
+//        completed: true
+//    },
+//    {
+//        id: 1,
+//        name: "Presentation",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 300,
+//        completed: false
+//    },
+//    {
+//        id: 2,
+//        name: "Pitch",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 60,
+//        completed: false
+//    },
+//    {
+//        id: 3,
+//        name: "Report Writing",
+//        description: "Create a report about our upcoming application.",
+//        duration: 3600,
+//        completed: false
+//    },
+//    {
+//        id: 4,
+//        name: "Create App",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 8649,
+//        completed: false
+//    },
+//    {
+//        id: 5,
+//        name: "Clean Up",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 5,
+//        completed: false
+//    },
+//    {
+//        id: 6,
+//        name: "Shift Boxes",
+//        description: "Start on storyboarding If you're visiting this page, you're likely here because you're searching for a random sentence",
+//        duration: 6,
+//        completed: false
+//    }
+//];
 
 
 /* ----------------EMPLOYEE HOME---------------- */
 class EmployeeHome extends React.Component {
     constructor() {
         super();
-        this.state = { taskList: [] }
         this.taskListElement = React.createRef();
+        const api = new API();
         /* To use for testing when the server is down
          * uncomment to see website with tasks */
-        // this.state = { taskList: dummyTaskList }
+        // set state: taskList: dummyTaskList, 
+
+        this.state = { taskList: null, api: api, apiHelpers: new APIHelpers(api) };
     }
 
-    componentDidMount() {
-        const self = this;
-        // Default user id for testing.
-        GETTaskFromUserId(17)
-            .then(tasks => {
-                self.taskListElement.current.updateAllTasksList(tasks);
-            });
+
+    componenWillUnmount() {
+        if (this.websocket !== undefined) {
+            this.state.api.unsubscribe(this.websocket);
+        }
+    }
+
+    async componentDidMount() {
+        try {
+            let loggedIn = await this.state.api.authCheck();
+            this.setState({ userId: parseInt(loggedIn) });
+
+            // Promise.all
+            let [taskList, channel] = await Promise.all([this.getTaskList(), this.state.apiHelpers.getChannel(loggedIn)]);
+
+            this.websocket = this.state.api.subscribe(channel, this.wsHandler);
+
+            this.setState({ taskList: taskList });
+            this.taskListElement.current.updateAllTasksList(taskList);
+        } catch (e) {
+            console.error(e);
+            if (this.state.userId !== null)
+                this.setState({ userId: null });
+        }
+    }
+
+    async componentDidUpdate() {
+        // authcheck requires authorisation
+        try {
+            await this.state.api.authCheck();
+        } catch (e) {
+            if (this.state.userId !== null)
+                this.setState({ userId: null });
+        }
+    }
+
+    wsHandler = (notify) => {
+        console.log("Logging notify... line 105");
+        console.log(notify);
+
+        if (notify.subject === "assigned") {
+            this.getTaskList()
+                .then((taskList) => {
+                    this.setState({ taskList: taskList });
+                    this.taskListElement.current.updateAllTasksList(taskList);
+                });
+        }
+    }
+
+    async getTaskList() {
+        let taskIds = await this.state.apiHelpers.getTasks(this.state.userId);
+        let taskList = [];
+        for (let i = 0; i < taskIds.length; i++) {
+            let task = await this.state.api.get("task", taskIds[i]);
+            task.id = taskIds[i];
+            if (!task.completed)
+                taskList.push(task);
+        }
+
+        return taskList
     }
 
     render() {
+        if (this.state.userId === null)
+            return <Redirect to='/' />
+
         return (
             <div>
                 <NavigationEmployee />
                 <h1 className="pagetitle">HOME</h1>
                 <Calendar />
-                <TaskList allTasksList={this.state.taskList} ref={this.taskListElement} />
+                <TaskList api={this.state.api} allTasksList={this.state.taskList} ref={this.taskListElement} />
             </div>
         );
     }
@@ -139,6 +200,7 @@ class TaskList extends React.Component {
                     allTasksList={this.props.allTasksList}
                     updateCurrentTaskElement={this.updateCurrentTaskElement}
                     secondsToHMS={this.secondsToHMS}
+                    api={this.props.api}
                     ref={this.toDoListElement} />
                 <CurrentTask
                     ref={this.currentTaskElement}
@@ -221,35 +283,68 @@ class ToDoList extends React.Component {
 
     componentDidMount() {
         // To get all the tasks that have not been finished.
-        let allTasksList = [...this.state.allTasksList];
-        let unfinishedTasks = allTasksList.filter(task => task.completed === false);
+        let unfinishedTasks;
+        if (this.state.allTasksList !== null) {
+            let allTasksList = [...this.state.allTasksList];
+            unfinishedTasks = allTasksList.filter(
+                (task) => {
+                    let deadlineMili = Date.parse(task.deadline)
+                    let deadline = new Date(0);
+                    deadline.setMilliseconds(deadlineMili);
+
+                    return (deadline.getDate() === new Date().getDate() && !task.completed)
+                });
+        }
+        else
+            unfinishedTasks = null;
         this.setState({ unfinishedTasksList: unfinishedTasks });
     }
 
     updateAllTasksList(tasks) {
-        let unfinishedTasks = tasks.filter(task => task.completed === false);
+        let unfinishedTasks = tasks.filter(
+            (task) => {
+                let deadlineMili = Date.parse(task.deadline)
+                let deadline = new Date(0);
+                deadline.setMilliseconds(deadlineMili);
+
+                return (deadline.getDate() === new Date().getDate() && !task.completed)
+        });
         this.setState({ unfinishedTasksList: unfinishedTasks, allTasksList: tasks });
     }
 
-    updateCompletedTask(id) {
+    async updateCompletedTask(id) {
         // Loop through the list of tasks to find the specific task.
         for (let i = 0; i < this.state.allTasksList.length; i++) {
             if (this.state.allTasksList[i].id === id) {
                 let tempTaskList = [...this.state.allTasksList];
                 tempTaskList[i].completed = true;
-                this.setState({ allTasksList: tempTaskList, currentTaskNull: true });
 
                 // update the task in the database
-                UpdateTasks(tempTaskList[i]);
+                //UpdateTasks(tempTaskList[i]);
+                let update = tempTaskList[i];
+                update.completed = true;
+                let response = await this.props.api.update("task", id, update);
+                console.log("Logging response Line 293...");
+                console.log(response);
+
+                this.setState({ allTasksList: tempTaskList, currentTaskNull: true });
                 break;
             }
         }
     }
 
-    removeTask(id) {
+    async removeTask(id) {
         for (let i = 0; i < this.state.unfinishedTasksList.length; i++) {
             if (this.state.unfinishedTasksList[i].id === id) {
                 let tempTaskList = [...this.state.unfinishedTasksList];
+
+                // updating task.started to true
+                let update = tempTaskList[i];
+                update.started = true;
+                let response = await this.props.api.update("task", id, update);
+                console.log("Logging response Line 293...");
+                console.log(response);
+
                 let newCurrentTask = tempTaskList.splice(i, 1);
                 this.setState({ unfinishedTasksList: tempTaskList, currentTaskNull: false });
 
@@ -264,7 +359,7 @@ class ToDoList extends React.Component {
         return (
             <div className="toDoList">
                 <h2>TO DO LIST</h2>
-                {
+                {(this.state.unfinishedTasksList !== null) ?
                     this.state.unfinishedTasksList.map(task =>
                         <Task
                             key={task.id}
@@ -274,7 +369,8 @@ class ToDoList extends React.Component {
                             duration={task.duration}
                             remove={this.removeTask}
                             secondsToHMS={this.props.secondsToHMS}
-                            currentTaskNull={this.state.currentTaskNull} />)
+                            currentTaskNull={this.state.currentTaskNull} />) :
+                    <p>Loading...</p>
                 }
             </div>
         );
@@ -315,7 +411,7 @@ class Task extends React.Component {
 class CurrentTask extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: this.props.task };
+        this.state = { hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: this.props.task, colour: "#ffd159" };
         this.updateCountDown = this.updateCountDown.bind(this);
         this.updateCurrentTask = this.updateCurrentTask.bind(this);
         this.finishTask = this.finishTask.bind(this);
@@ -328,7 +424,9 @@ class CurrentTask extends React.Component {
         this.setState({ hour: timer[0], minute: timer[1], second: timer[2] });
 
         if (this.state.hour === 0 && this.state.minute === 0 && this.state.second === 0) {
-            this.finishTask();
+            // this.finishTask();
+            clearInterval(this.state.countDownTimer);
+            this.setState({ colour: "red" });
         }
     }
 
@@ -337,16 +435,12 @@ class CurrentTask extends React.Component {
         let endTiming = new Date().getTime() + (task.duration * 1000);
         let countDownTimerId = setInterval(this.updateCountDown, 200); // set for updateCountDown to be called every 200ms to ensure count down is smooth
         this.setState({ hour: hms[0], minute: hms[1], second: hms[2], endTime: endTiming, countDownTimer: countDownTimerId, currentTask: task });
-
-        // To create a notification  for the raspberry pi
-        let firingTime = new Date(endTiming).toISOString();
-        CreateNotification(task, firingTime, 3);
     }
 
-    finishTask() {
+    async finishTask() {
         this.props.updateToDoListElement(this.state.currentTask.id); // to update to do list component's allTaskList
         clearInterval(this.state.countDownTimer);
-        this.setState({ hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: null });
+        this.setState({ hour: null, minute: null, second: null, endTime: null, countDownTimer: null, currentTask: null, colour: "#ffd159" });
         this.props.createPopUp();
     }
 
@@ -362,13 +456,13 @@ class CurrentTask extends React.Component {
             return (
                 <div className="currentTask">
                     <h2>TASK OF THE DAY</h2>
-                    <div className="currentTaskContent withTask">
+                    <div className="currentTaskContent withTask" style={{ backgroundColor: this.state.colour }}>
                         <h2>{this.state.currentTask.name}</h2>
                         <p>{this.state.currentTask.description}</p>
                         <div className="countdown"><span className="countdownH">{zeroHour + this.state.hour}</span>:
                             <span className="countdownM">{zeroMin + this.state.minute}</span>:
                             <span className="countdownS">{zeroSec + this.state.second}</span></div>
-                        <button className="underline" onClick={this.finishTask}>FINISHED</button>
+                        <button className="underline" onClick={this.finishTask} style={{ backgroundColor: this.state.colour }}>FINISHED</button>
                     </div>
                 </div>
             );

@@ -4,7 +4,7 @@
 # Development Stack
 #
 
-version: "3"
+version: "3.4"
 services:
   postgres:
     image: postgres:12.0-alpine
@@ -13,12 +13,14 @@ services:
     env_file: ".env"
     volumes:
       - database-data:/var/lib/postgresql/data
-  # memento-backend container
   backend:
-    image: mrzzy/memento-backend:0.1-apiv1
+    image: "mrzzy/memento-backend:1.0-apiv1"
     build:
       context: .
       dockerfile: containers/backend/Dockerfile
+      target: production
+      args:
+        API_VERSION: 1
     ports:
       - "5000:5000"
     env_file: ".env"
@@ -26,5 +28,20 @@ services:
       - PYTHONUNBUFFERED=1
     depends_on:
       - postgres
+    volumes:
+      - "./src/backend:/backend" 
+  frontend:
+    image: "mrzzy/memento-frontend:1.0-apiv1"
+    build:
+      context: .
+      dockerfile: containers/frontend/Dockerfile
+      target: production
+    ports:
+      - "3000:3000"
+    env_file: ".env"
+    depends_on:
+      - postgres
+    volumes:
+      - "./src/frontend:/frontend" 
 volumes:
   database-data:

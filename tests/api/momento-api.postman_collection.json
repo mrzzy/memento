@@ -1,12 +1,368 @@
 {
 	"info": {
-		"_postman_id": "c93524ad-bed8-404c-89b6-ff1989f43208",
+		"_postman_id": "37e957f3-16c2-4f80-9015-1eb239296e96",
 		"name": "momento/api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "iam",
+			"name": "auth",
+			"item": [
+				{
+					"name": "create organisation",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    pm.globals.set(\"holding_org_id\",  response.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"John and Wicks Holding Org\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/org",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"org"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save org_id for later tests",
+									"    pm.globals.set(\"auth_user_id\",  response.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Omega\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"omega@gmail.com\",\n\t\"orgId\": {{holding_org_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/user",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0bcc2e17-3b49-41c8-a050-689584d4cdd7",
+								"exec": [
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    const response = pm.response.json();",
+									"    pm.globals.set(\"refresh_token\", response.refreshToken)",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"omega@gmail.com\",\n\t\"password\": \"P@$$w0rd\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0bcc2e17-3b49-41c8-a050-689584d4cdd7",
+								"exec": [
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    const response = pm.response.json();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refresh_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/auth/check",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"check"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0bcc2e17-3b49-41c8-a050-689584d4cdd7",
+								"exec": [
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    const response = pm.response.json();",
+									"    pm.globals.set(\"access_token\", response.accessToken)",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refresh_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "identity",
 			"item": [
 				{
 					"name": "create organisation",
@@ -67,15 +423,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org",
+							"raw": "http://{{api_host}}/api/v1/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"org"
 							]
 						}
@@ -106,15 +462,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/orgs",
+							"raw": "http://{{api_host}}/api/v1/identity/orgs",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"orgs"
 							]
 						}
@@ -152,15 +508,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -217,15 +573,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -292,15 +648,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team",
+							"raw": "http://{{api_host}}/api/v1/identity/team",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"team"
 							]
 						}
@@ -331,15 +687,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/teams?org={{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/teams?org={{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"teams"
 							],
 							"query": [
@@ -383,15 +739,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"team",
 								"{{team_id}}"
 							]
@@ -448,15 +804,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"team",
 								"{{team_id}}"
 							]
@@ -515,7 +871,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"admin\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -523,16 +879,165 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user",
+							"raw": "http://{{api_host}}/api/v1/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create supervisor",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save org_id for later tests",
+									"    pm.globals.set(\"supervisor_id\",  response.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/user",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "assign user to team",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"teamId\": {{team_id}},\n\t\"userId\": {{user_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/team/assign",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"team",
+								"assign"
 							]
 						}
 					},
@@ -562,15 +1067,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/users?team={{team_id}}&org={{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/users?team={{team_id}}&org={{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"users"
 							],
 							"query": [
@@ -607,7 +1112,6 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const user = pm.response.json();",
-									"    assert(user.kind === \"admin\");",
 									"    assert(user.name === \"Joel\");",
 									"    assert(user.password === \"P@$$w0rd\");",
 									"    assert(user.email === \"joel@gmail.com\");",
@@ -621,15 +1125,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"user",
 								"{{user_id}}"
 							]
@@ -686,15 +1190,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"user",
 								"{{user_id}}"
 							]
@@ -753,7 +1257,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"managerId\": {{user_id}},\n\t\"kind\": \"user\",\n\t\"targetId\": {{user_id}}\n}",
+							"raw": "{\n\t\"manageeId\": {{user_id}},\n\t\"managerId\": {{supervisor_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -761,15 +1265,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manage",
+							"raw": "http://{{api_host}}/api/v1/identity/manage",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"manage"
 							]
 						}
@@ -800,29 +1304,25 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manages?kind=user&org=1&manager=1",
+							"raw": "http://{{api_host}}/api/v1/identity/manages?org={{org_id}}&manager={{supervisor_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"manages"
 							],
 							"query": [
 								{
-									"key": "kind",
-									"value": "user"
-								},
-								{
 									"key": "org",
-									"value": "1"
+									"value": "{{org_id}}"
 								},
 								{
 									"key": "manager",
-									"value": "1"
+									"value": "{{supervisor_id}}"
 								}
 							]
 						}
@@ -849,9 +1349,8 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const manage = pm.response.json();",
-									"    assert(manage.kind === \"user\");",
-									"    assert(manage.managerId === pm.globals.get(\"user_id\"));",
-									"    assert(manage.targetId === pm.globals.get(\"user_id\"));",
+									"    assert(manage.managerId === pm.globals.get(\"supervisor_id\"));",
+									"    assert(manage.manageeId === pm.globals.get(\"user_id\"));",
 									"});",
 									""
 								],
@@ -863,15 +1362,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/manage/{{manage_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"manage",
 								"{{manage_id}}"
 							]
@@ -880,12 +1379,22 @@
 					"response": []
 				},
 				{
-					"name": "update managment",
+					"name": "create new role",
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
-								"id": "460b02f0-32fe-46e9-94e0-a2348cd1dfeb",
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
 								"exec": [
 									"const assert = require(\"assert\");",
 									"",
@@ -899,28 +1408,28 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"success\"));",
-									"    assert(response.success);",
-									"});",
-									""
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save manage_id for later tests",
+									"    pm.globals.set(\"role_id\",  response.id);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
-						"method": "PATCH",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
+								"value": "application/json",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"managerId\": {{user_id}},\n\t\"kind\": \"team\",\n\t\"targetId\": {{team_id}}\n}",
+							"raw": "{\n\t\"scopeKind\": \"global\",\n\t\"scopeTarget\": null,\n\t\"kind\": \"admin\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -928,17 +1437,266 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/role",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
-								"manage",
-								"{{manage_id}}"
+								"v1",
+								"identity",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "query role ids",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1950e2a9-10ed-47cd-89c5-5575b4df6e0b",
+								"exec": [
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/roles",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8595dca9-5426-42d1-a98b-45deef262782",
+								"exec": [
+									"const assert = require(\"assert\")",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const role = pm.response.json()",
+									"    assert(role.kind === \"admin\")",
+									"    assert(role.scopeKind === \"global\")",
+									"    assert(role.scopeTarget === 0)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/role/{{role_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"role",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new rolebinding",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2088b16b-28df-4432-8a35-58803c9c90ac",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save manage_id for later tests",
+									"    pm.globals.set(\"rolebind_id\",  response.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8a315a7a-4c06-4664-81e5-76011ebaab3e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"roleId\": \"{{role_id}}\",\n\t\"userId\": {{user_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/rolebind",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"rolebind"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "query role binding ids",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1950e2a9-10ed-47cd-89c5-5575b4df6e0b",
+								"exec": [
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/rolebinds",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"rolebinds"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get role binding",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8595dca9-5426-42d1-a98b-45deef262782",
+								"exec": [
+									"const assert = require(\"assert\")",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const rolebind = pm.response.json();",
+									"",
+									"    assert(rolebind.roleId === pm.globals.get(\"role_id\"))",
+									"    assert(rolebind.userId === pm.globals.get(\"user_id\"))",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/rolebind/{{rolebind_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"rolebind",
+								"{{rolebind_id}}"
 							]
 						}
 					},
@@ -984,17 +1742,204 @@
 							}
 						],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/manage/{{manage_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/manage/{{manage_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"manage",
 								"{{manage_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete role binding",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1e4bb5fe-a230-4ad9-bb53-26cac58f0d94",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/rolebind/{{rolebind_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"rolebind",
+								"{{rolebind_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1e4bb5fe-a230-4ad9-bb53-26cac58f0d94",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/role/{{role_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"role",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unassign user from team",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"teamId\": {{team_id}},\n\t\"userId\": {{user_id}}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/team/assign",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"team",
+								"assign"
 							]
 						}
 					},
@@ -1049,15 +1994,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user/{{user_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/user/{{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"user",
 								"{{user_id}}"
 							]
@@ -1067,19 +2012,46 @@
 				},
 				{
 					"name": "delete team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "734f3299-a9b8-4d66-b081-b0921e1eb3c6",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team/{{team_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/team/{{team_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"team",
 								"{{team_id}}"
 							]
@@ -1136,15 +2108,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -1217,90 +2189,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org",
+							"raw": "http://{{api_host}}/api/v1/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"org"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create team",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "8f719416-0efb-4104-a268-8181e1808675",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"id\"));",
-									"    // save org_id for later tests",
-									"    pm.globals.set(\"team_id\",  response.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"name\": \"designers\",\n\t\"orgId\": {{org_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v0",
-								"iam",
-								"team"
 							]
 						}
 					},
@@ -1357,7 +2255,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"supervisor\",\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"James\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"james@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1365,15 +2263,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user",
+							"raw": "http://{{api_host}}/api/v1/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"user"
 							]
 						}
@@ -1431,7 +2329,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"worker\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1439,15 +2337,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user",
+							"raw": "http://{{api_host}}/api/v1/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"user"
 							]
 						}
@@ -1513,14 +2411,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/task",
+							"raw": "http://{{api_host}}/api/v1/assignment/task",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"task"
 							]
@@ -1552,14 +2450,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/tasks?author={{supervisor_id}}&pending=1",
+							"raw": "http://{{api_host}}/api/v1/assignment/tasks?author={{supervisor_id}}&started=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"tasks"
 							],
@@ -1569,7 +2467,7 @@
 									"value": "{{supervisor_id}}"
 								},
 								{
-									"key": "pending",
+									"key": "started",
 									"value": "1"
 								}
 							]
@@ -1612,14 +2510,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/task/{{task_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/task/{{task_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"task",
 								"{{task_id}}"
@@ -1669,7 +2567,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"authorId\": {{supervisor_id}},\n    \"completed\": true,\n    \"deadline\": \"2099-11-11T11:51:53.334Z\",\n    \"description\": \"Complete the fishing quota by going fishing\",\n    \"duration\": 3600,\n    \"name\": \"fishing\"\n}",
+							"raw": "{\n    \"authorId\": {{supervisor_id}},\n    \"completed\": true,\n    \"started\": true,\n    \"deadline\": \"2099-11-11T11:51:53.334Z\",\n    \"description\": \"Complete the fishing quota by going fishing\",\n    \"duration\": 3600,\n    \"name\": \"fishing\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1677,14 +2575,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/task/{{task_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/task/{{task_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"task",
 								"{{task_id}}"
@@ -1752,14 +2650,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/event",
+							"raw": "http://{{api_host}}/api/v1/assignment/event",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"event"
 							]
@@ -1791,14 +2689,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/events?author={{supervisor_id}}&pending=1",
+							"raw": "http://{{api_host}}/api/v1/assignment/events?author={{supervisor_id}}&pending=1",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"events"
 							],
@@ -1850,14 +2748,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/event/{{event_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/event/{{event_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"event",
 								"{{event_id}}"
@@ -1915,14 +2813,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/event/{{event_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/event/{{event_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"event",
 								"{{event_id}}"
@@ -1990,14 +2888,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assign",
+							"raw": "http://{{api_host}}/api/v1/assignment/assign",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assign"
 							]
@@ -2029,14 +2927,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assigns?pending=1",
+							"raw": "http://{{api_host}}/api/v1/assignment/assigns?pending=1&kind=task",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assigns"
 							],
@@ -2044,6 +2942,10 @@
 								{
 									"key": "pending",
 									"value": "1"
+								},
+								{
+									"key": "kind",
+									"value": "task"
 								}
 							]
 						}
@@ -2085,79 +2987,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assign/{{assign_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/assign/{{assign_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"assignment",
-								"assign",
-								"{{assign_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update assignment",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "460b02f0-32fe-46e9-94e0-a2348cd1dfeb",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"success\"));",
-									"    assert(response.success);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"assigneeId\": {{worker_id}},\n    \"assignerId\": {{supervisor_id}},\n    \"itemId\": {{event_id}},\n    \"kind\": \"event\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assign/{{assign_id}}",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assign",
 								"{{assign_id}}"
@@ -2215,14 +3052,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/assign/{{assign_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/assign/{{assign_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"assign",
 								"{{assign_id}}"
@@ -2237,14 +3074,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/event/{{event_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/event/{{event_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"event",
 								"{{event_id}}"
@@ -2302,14 +3139,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/assignment/task/{{task_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/task/{{task_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"assignment",
 								"task",
 								"{{task_id}}"
@@ -2367,15 +3204,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -2448,90 +3285,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org",
+							"raw": "http://{{api_host}}/api/v1/identity/org",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"org"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create team",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "8f719416-0efb-4104-a268-8181e1808675",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"id\"));",
-									"    // save org_id for later tests",
-									"    pm.globals.set(\"team_id\",  response.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"name\": \"designers\",\n\t\"orgId\": {{org_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/team",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v0",
-								"iam",
-								"team"
 							]
 						}
 					},
@@ -2588,7 +3351,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"admin\",\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}},\n\t\"teamId\": {{team_id}}\n}",
+							"raw": "{\n\t\"name\": \"Joel\",\n\t\"password\": \"P@$$w0rd\",\n\t\"email\": \"joel@gmail.com\",\n\t\"orgId\": {{org_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2596,90 +3359,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/user",
+							"raw": "http://{{api_host}}/api/v1/identity/user",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"user"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create channel",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "7bebc176-6d45-4299-9dbf-eb1fd885c987",
-								"exec": [
-									"const assert = require(\"assert\");",
-									"",
-									"pm.test(\"status code ok\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"",
-									"pm.test(\"response is parsable json\", ()  => {",
-									"    pm.response.json();",
-									"})",
-									"",
-									"pm.test(\"response has expected contents\", () => {",
-									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"id\"));",
-									"    // save channel_id for later tests",
-									"    pm.globals.set(\"channel_id\",  response.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "65bf49c5-8b04-4a81-b0e9-ae920ef1d294",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"kind\": \"task\",\n\t\"userId\": {{user_id}}\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channel",
-							"protocol": "http",
-							"host": [
-								"{{api_host}}"
-							],
-							"path": [
-								"api",
-								"v0",
-								"notification",
-								"channel"
 							]
 						}
 					},
@@ -2699,7 +3388,12 @@
 									"",
 									"pm.test(\"response is parsable json\", ()  => {",
 									"    pm.response.json();",
-									"})"
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", ()=> {",
+									"    const response = pm.response.json();",
+									"    pm.globals.set(\"channel_id\", response[0]);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -2709,16 +3403,22 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channels",
+							"raw": "http://{{api_host}}/api/v1/notification/channels?user={{user_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"channels"
+							],
+							"query": [
+								{
+									"key": "user",
+									"value": "{{user_id}}"
+								}
 							]
 						}
 					},
@@ -2744,7 +3444,6 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const channel = pm.response.json();",
-									"    assert(channel.kind === \"task\");",
 									"    assert(channel.userId === pm.globals.get(\"user_id\"));",
 									"});",
 									""
@@ -2757,14 +3456,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channel/{{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/channel/{{channel_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"channel",
 								"{{channel_id}}"
@@ -2774,12 +3473,22 @@
 					"response": []
 				},
 				{
-					"name": "update channel",
+					"name": "create task",
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8f719416-0efb-4104-a268-8181e1808675",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
-								"id": "460b02f0-32fe-46e9-94e0-a2348cd1dfeb",
+								"id": "e2e7fd77-d053-47b3-9c2d-1518f301349f",
 								"exec": [
 									"const assert = require(\"assert\");",
 									"",
@@ -2793,17 +3502,17 @@
 									"",
 									"pm.test(\"response has expected contents\", () => {",
 									"    const response = pm.response.json();",
-									"    assert(response.hasOwnProperty(\"success\"));",
-									"    assert(response.success);",
-									"});",
-									""
+									"    assert(response.hasOwnProperty(\"id\"));",
+									"    // save task_id for later tests",
+									"    pm.globals.set(\"task_id\",  response.id);",
+									"})"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
-						"method": "PATCH",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -2814,7 +3523,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"kind\": \"event\",\n    \"userId\": {{user_id}}\n}",
+							"raw": "{\n\t\"name\": \"fishing\",\n\t\"description\": \"Complete the fishing quota by going fishing\",\n\t\"duration\": 3600,\n\t\"deadline\": \"2099-11-11T11:51:53.334Z\",\n\t\"authorId\": {{user_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2822,17 +3531,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channel/{{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/assignment/task",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"notification",
-								"channel",
-								"{{channel_id}}"
+								"v1",
+								"assignment",
+								"task"
 							]
 						}
 					},
@@ -2889,7 +3597,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": \"2019-11-15T11:51:23.270Z\",\n\t\"channelId\": {{channel_id}}\n}",
+							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": \"2099-02-05T09:19:30.000Z\",\n\t\"channelId\": \"{{channel_id}}\",\n\t\"scope\": \"task\",\n\t\"scopeTarget\": {{task_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2897,14 +3605,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify",
+							"raw": "http://{{api_host}}/api/v1/notification/notify",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify"
 							]
@@ -2963,7 +3671,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": null,\n\t\"channelId\": {{channel_id}}\n}",
+							"raw": "{\n\t\"title\": \"fishing task\",\n\t\"description\": \"You have been assigned a fishing task\",\n\t\"firingTime\": null,\n\t\"channelId\": \"{{channel_id}}\",\n\t\"scope\": \"task\",\n\t\"scopeTarget\": {{task_id}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2971,14 +3679,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify",
+							"raw": "http://{{api_host}}/api/v1/notification/notify",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify"
 							]
@@ -3010,25 +3718,25 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notifys?pending=1&channel={{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notifys?channel={{channel_id}}&scope=task",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notifys"
 							],
 							"query": [
 								{
-									"key": "pending",
-									"value": "1"
-								},
-								{
 									"key": "channel",
 									"value": "{{channel_id}}"
+								},
+								{
+									"key": "scope",
+									"value": "task"
 								}
 							]
 						}
@@ -3067,14 +3775,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify/{{notify_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notify/{{notify_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify",
 								"{{notify_id}}"
@@ -3124,7 +3832,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"cooking task\",\n\t\"description\": \"You have been assigned a cooking task\",\n\t\"firingTime\": \"2099-11-11T11:51:53.334Z\",\n\t\"channelId\": {{channel_id}}\n}",
+							"raw": "{\n\t\"title\": \"cooking task\",\n\t\"description\": \"You have been assigned a cooking task\",\n\t\"firingTime\": \"2099-11-11T11:51:53.334Z\",\n\t\"channelId\": \"{{channel_id}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3132,14 +3840,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify/{{notify_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notify/{{notify_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify",
 								"{{notify_id}}"
@@ -3197,14 +3905,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/notify/{{notify_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/notify/{{notify_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"notify",
 								"{{notify_id}}"
@@ -3262,14 +3970,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/notification/channel/{{channel_id}}",
+							"raw": "http://{{api_host}}/api/v1/notification/channel/{{channel_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"notification",
 								"channel",
 								"{{channel_id}}"
@@ -3327,15 +4035,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/iam/org/{{org_id}}",
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{org_id}}",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
-								"iam",
+								"v1",
+								"identity",
 								"org",
 								"{{org_id}}"
 							]
@@ -3380,14 +4088,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{api_host}}/api/v0/status",
+							"raw": "http://{{api_host}}/api/v1/status",
 							"protocol": "http",
 							"host": [
 								"{{api_host}}"
 							],
 							"path": [
 								"api",
-								"v0",
+								"v1",
 								"status"
 							]
 						}
@@ -3396,6 +4104,109 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "cleanup",
+			"item": [
+				{
+					"name": "delete organisation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1e4bb5fe-a230-4ad9-bb53-26cac58f0d94",
+								"exec": [
+									"const assert = require(\"assert\");",
+									"",
+									"pm.test(\"status code ok\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"response is parsable json\", ()  => {",
+									"    pm.response.json();",
+									"})",
+									"",
+									"pm.test(\"response has expected contents\", () => {",
+									"    const response = pm.response.json();",
+									"    assert(response.hasOwnProperty(\"success\"));",
+									"    assert(response.success);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{api_host}}/api/v1/identity/org/{{holding_org_id}}",
+							"protocol": "http",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"identity",
+								"org",
+								"{{holding_org_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "75c6e7d5-feb3-41f9-b472-e330ba466370",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "bec4739b-60fd-476b-865e-ff8c4ddf96d5",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	],
 	"protocolProfileBehavior": {}

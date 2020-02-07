@@ -263,6 +263,35 @@ div.currentTaskContent.noTasks {
     margin: 10px;
 }
 
+@media only screen and (max-width: 1155px) {
+ 
+.toDoList{
+    margin-top: 2.5rem;
+} 
+.taskList{
+    flex-direction: column-reverse;
+}
+.task{
+    width: 170%;
+}
+.currentTask{
+    width: 90%;
+}
+    
+}
+
+@media only screen and (max-width: 500px) {
+ 
+.duration{
+    padding: 0.5rem;
+}
+.task{
+    padding: 1em 1em 1em 1em;
+}
+
+}
+    
+
 /*----------------POP UP----------------*/
 .popUpBackground {
     position: fixed;
@@ -276,7 +305,7 @@ div.currentTaskContent.noTasks {
 .popUp {
     position: fixed;
     background-color: white;
-    height: 50vh;
+    height: 60vh;
     width: 50vw;
     top: 25vh;
     left: 25vw;

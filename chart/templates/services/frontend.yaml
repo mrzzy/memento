@@ -1,0 +1,23 @@
+# 
+# Memento
+# Helm Chart
+# Frontend Service
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.frontend.name }}
+  labels:
+{{ include "memento.labels" . | indent 4 }}
+    component: frontend
+spec:
+  type: {{ .Values.services.frontend.type }}
+  ports:
+    - port: {{ .Values.services.frontend.port }}
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+      app: {{ include "memento.fullname" . }}
+      component: frontend

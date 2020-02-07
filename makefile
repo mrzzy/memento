@@ -4,27 +4,41 @@
 #
 
 ## config vars
-CONTAINERS_DIR:=containers
-# docker image build confg 
-IMG_PREFIX:=mrzzy/memento-
-IMAGES:=$(foreach IMG,$(wildcard $(CONTAINERS_DIR)/*),$(IMG_PREFIX)$(notdir $(IMG)) )
-
 # test config 
 API_HOST:=localhost:5000
 
 ## targets
-.DEFAULT: 
-.PHONY: test api-test images
+.DEFAULT:  images
+.PHONY: test api-test images push run clean
 
-images: $(IMAGES)
+## docker image targets
+images:
+	docker-compose build
 
-$(IMG_PREFIX)%: $(CONTAINERS_DIR)/%/Dockerfile
-	docker build -t $@ -f $< .
+push:
+	docker-compose push
+
+run: images
+	docker-compose up
+
+clean:
+	docker-compose down -v -t 1
+
 
 # test targets
-test: test-api
+test: test-backend
 
-# run tests for api
-test-api:
+test-backend: test-backend-unit test-backend-api
+
+test-backend-unit:
+	docker-compose down -t 1
+	docker-compose up -d && sleep 4 # wait for stack to start up
+	docker-compose exec backend ash -c "python test.py"
+	docker-compose down -t 1
+
+test-backend-api:
+	docker-compose down -t 1
+	docker-compose up -d && sleep 4 # wait for stack to start up
 	newman run --global-var api_host=$(API_HOST) \
 		tests/api/momento-api.postman_collection.json
+	docker-compose down -t 1

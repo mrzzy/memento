@@ -9,6 +9,7 @@ from datetime import datetime
 from flask import request, Blueprint, jsonify
 from sqlalchemy.exc import IntegrityError
 from dateutil.parser import parse as parse_datetime
+from geventwebsocket.exceptions import WebSocketError
 
 from ..utils import parse_bool
 from .utils import parse_params
@@ -22,6 +23,7 @@ notify_ws = Blueprint("notification", __name__)
 ## Channel API
 # api - query channels
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/channels")
+@authenticate(kind="access")
 def route_channels():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -36,10 +38,11 @@ def route_channels():
     channel_ids = query_channels(user_id, pending, skip, limit)
     return jsonify(channel_ids)
 
-# api - read, create, update, delete channels
+# api - read, create, delete channels
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/channel", methods=["POST"])
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/channel/<channel_id>",
-              methods=["GET", "PATCH", "DELETE"])
+              methods=["GET", "DELETE"])
+@authenticate(kind="access")
 def route_channel(channel_id=None):
     if request.method == "GET" and channel_id:
         # get channel for id
@@ -50,12 +53,6 @@ def route_channel(channel_id=None):
         params = parse_params(request, channel_mapping)
         channel_id = create_channel(**params)
         return jsonify({ "id": channel_id })
-    elif request.method == "PATCH" and channel_id and request.is_json:
-        # parse params in json
-        params = parse_params(request, channel_mapping)
-        # update channel with params in json
-        update_channel(channel_id, **params)
-        return jsonify({"success": True })
     elif request.method == "DELETE" and channel_id:
         # delete channel with params in json
         delete_channel(channel_id)
@@ -66,6 +63,7 @@ def route_channel(channel_id=None):
 ## Notify API
 # api - query notifications
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/notifys")
+@authenticate(kind="access")
 def route_notifys():
     # parse query params
     skip = int(request.args.get("skip", 0))
@@ -74,16 +72,21 @@ def route_notifys():
     pending = request.args.get("pending", None)
     if not pending is None: pending = parse_bool(pending)
     channel_id = request.args.get("channel", None)
-    if not channel_id is None: channel_id = int(channel_id)
+    if not channel_id is None: channel_id = str(channel_id)
+    scope = request.args.get("scope")
+    if not scope is None: scope = str(scope)
+    scope_target = request.args.get("scope_target")
+    if not scope_target is None: scope_target = int(scope_target)
 
     # perform query
-    notify_ids = query_notifys(pending, channel_id, skip, limit)
+    notify_ids = query_notifys(pending, channel_id, skip, limit, scope, scope_target)
     return jsonify(notify_ids)
 
 # api - read, create, update, delete notifys
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/notify", methods=["POST"])
 @notify.route(f"/api/v{API_VERSION}/{notify.name}/notify/<notify_id>",
               methods=["GET", "PATCH", "DELETE"])
+@authenticate(kind="access")
 def route_notify(notify_id=None):
     if request.method == "GET" and notify_id:
         # get notify for id
@@ -122,31 +125,38 @@ def route_subscribe(socket):
     # parse request args
     channel_id = request.args.get("channel", None)
     if not channel_id is None:
-        channel_ids = [ int(channel_id) ]
+        channel_ids = [ str(channel_id) ]
     else:
         # channel id is not specified, assume all channels
         channel_ids = query_channels()
 
     # build callback to handle subscriptions
     def handler(subscribe_id, message):
-        # check if client is still connected
-        if socket.closed:
-            # client disconnected: unsubscribe from further callbacks
-            unsubscribe_channel(subscribe_id)
-            return
-
         # handle notification message
         print(f"handling message: {message}")
         notify = handle_notify(subscribe_id, message)
-        if not notify is None:
+        if socket.closed: # check if client is still connected
+            # client disconnected: unsubscribe from further callbacks
+            unsubscribe_channel(subscribe_id)
+        elif not notify is None and not type(notify) == str:
             # convert to iso date format
             # add "Z" to signal utc timezone
             notify["firingTime"] = notify["firingTime"].isoformat() + "Z"
             # send notification to client
-            socket.send(json.dumps(notify))
-        else:
+            try:
+                socket.send(json.dumps(notify))
+            except WebSocketError:
+                # websocket error: probably socket closed
+                socket.close()
+        elif notify == "close":
             # channel has closed: disconnect the client
             socket.close()
+            unsubscribe_channel(subscribe_id)
+
+        # return db connection to pool
+        # required to prevent the connection pool from 
+        # running out of connnections and causing timeouts
+        db.session.remove()
 
     # subscribe to channels with callack
     for channel_id in channel_ids:
@@ -154,4 +164,8 @@ def route_subscribe(socket):
         subscribe_channel(channel_id, handler)
 
     # required to prevent websocket from closing
+    # return db connection to pool
+    # required to prevent the connection pool from 
+    # running out of connnections and causing timeouts
+    db.session.remove()
     while True: time.sleep(600)

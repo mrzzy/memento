@@ -3,3 +3,6 @@ src/frontend/node_modules/
 # ignore python venvs
 src/pi/venv/
 src/backend/venv/
+
+# tag files
+tag*

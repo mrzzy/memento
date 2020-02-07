@@ -18,7 +18,7 @@ app = Flask(__name__)
 app.config.from_object(config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-cors = CORS(app, allow_headers='Content-Type')
+cors = CORS(app)
 sockets = Sockets(app)
 # configure healthcheck route
 health = HealthCheck(app, "/healthz")
@@ -46,3 +46,11 @@ def check_database():
         message = str(e)
         is_database_ok = False
     return is_database_ok, message
+
+
+# return db connection to pool
+# required to prevent the connection pool from 
+# running out of connnections and causing timeouts
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()

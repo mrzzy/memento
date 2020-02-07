@@ -5,10 +5,11 @@
 #
 
 import os
+import string
+import random
 from tempfile import gettempdir
 
 from .utils import parse_bool
-
 
 ## config
 # server config
@@ -41,3 +42,7 @@ SQLALCHEMY_ECHO =  parse_bool(os.environ.get("SQLALCHEMY_ECHO", False))
 
 # api
 API_VERSION = os.environ.get("API_VERSION", "0")
+# jwt settings
+keyspace = string.digits + string.ascii_letters
+default_jwt_key = "".join(random.choices(keyspace, k=32))
+API_JWT_KEY = os.environ.get("JWT_KEY", default_jwt_key)

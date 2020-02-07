@@ -14,7 +14,7 @@ services:
     volumes:
       - database-data:/var/lib/postgresql/data
   backend:
-    image: "mrzzy/memento-backend:latest"
+    image: "mrzzy/memento-backend:1.0-apiv1"
     build:
       context: .
       dockerfile: containers/backend/Dockerfile
@@ -31,7 +31,7 @@ services:
     volumes:
       - "./src/backend:/backend" 
   frontend:
-    image: "mrzzy/memento-frontend:latest"
+    image: "mrzzy/memento-frontend:1.0-apiv1"
     build:
       context: .
       dockerfile: containers/frontend/Dockerfile

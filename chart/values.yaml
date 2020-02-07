@@ -19,11 +19,11 @@ images:
     pullPolicy: IfNotPresent 
   backend:
     repository: mrzzy/memento-backend
-    tag: latest
+    tag: 1.0-apiv1
     pullPolicy: Always
   frontend:
     repository: mrzzy/memento-frontend
-    tag: latest
+    tag: 1.0-apiv1
     pullPolicy: Always
 
 imagePullSecrets: []

@@ -18,3 +18,11 @@ a timely manner to ensure the punctual completion of tasks.
         - Prerequisites: K8s Cluster, nginx-ingress controller, cert-manager (optional), helm v3
         - Copy `.env` file to `chart/.env`
         - Deploy memento stack `helm upgrade -n memento --install memento chart`
+
+## Credits
+The people that make this project possible:
+- Ana @idlefrenchfry - Frontend 
+- Adele @Adelollipop - UI/UX Design, Frontend
+- Jun Ye @KJY-99 - Backend
+- Zhu Zhanyan @mrzzy - Backend, Raspberry Pi
+- Guhesh - Raspberry Pi
